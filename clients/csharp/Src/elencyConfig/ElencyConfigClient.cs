@@ -1,12 +1,14 @@
-﻿using ElencyConfig.Encryption;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Text;
+using System.Runtime.Serialization.Json;
+
+using ElencyConfig.Encryption;
 
 namespace ElencyConfig
 {
@@ -78,28 +80,35 @@ namespace ElencyConfig
             }
         }
 
-        public string AppVersion {
-            get {
+        public string AppVersion
+        {
+            get
+            {
                 CheckInitialisation();
                 return _currentAppVersion;
             }
         }
 
-        public string Environment {
-            get {
+        public string Environment
+        {
+            get
+            {
                 CheckInitialisation();
                 return _currentEnvironment;
             }
         }
 
-        public string ConfigurationId {
-            get {
+        public string ConfigurationId
+        {
+            get
+            {
                 CheckInitialisation();
                 return _currentConfigurationId;
             }
         }
 
-        public string Get(string key) {
+        public string Get(string key)
+        {
             CheckInitialisation();
             if (_currentConfiguration.ContainsKey(key))
                 return _currentConfiguration[key];
@@ -107,12 +116,14 @@ namespace ElencyConfig
             return null;
         }
 
-        public List<string> GetAllKeys() {
+        public List<string> GetAllKeys()
+        {
             CheckInitialisation();
             return _currentConfiguration.Keys.ToList();
         }
 
-        public async Task Refresh() {
+        public async Task Refresh()
+        {
             CheckInitialisation();
             await GetConfiguration();
         }
@@ -172,7 +183,7 @@ namespace ElencyConfig
         public float? GetFloat(string key, float? fallback)
         {
             return ValueRetrieval.GetFloat(Get(key), fallback);
-          
+
         }
 
         public decimal? GetDecimal(string key)
@@ -205,7 +216,8 @@ namespace ElencyConfig
             return ValueRetrieval.GetObject<T>(Get(key), fallback);
         }
 
-        private void CheckInitialisation() {
+        private void CheckInitialisation()
+        {
             if (!_initialized)
             {
                 throw new Exception("The client has not been successfully initialized");
@@ -303,11 +315,11 @@ namespace ElencyConfig
                             var endIndex = body.IndexOf("],", startIndex + 1);
                             var originalEncryptedConfigurationBody = body.Substring(startIndex, (endIndex - startIndex) + 1);
                             var encryptedConfigurationBody = originalEncryptedConfigurationBody.Substring(searchFor.Length).Trim();
-                            var encryptedConfigurationBodyAsArray = JsonConvert.DeserializeObject<string[]>(encryptedConfigurationBody);
+                            var encryptedConfigurationBodyAsArray = DeserializeObject<string[]>(encryptedConfigurationBody);
                             var decryptedConfigurationBody = AES_256_CBC.Decrypt(encryptedConfigurationBodyAsArray, _config.ConfigEncryptionKey);
                             body = body.Replace(originalEncryptedConfigurationBody, searchFor + decryptedConfigurationBody);
 
-                            var configurationResponse = JsonConvert.DeserializeObject<ConfigurationResponse>(body);
+                            var configurationResponse = DeserializeObject<ConfigurationResponse>(body);
                             var currentConfiguration = new Dictionary<string, string>();
 
                             for (var i = 0; i < configurationResponse.configuration.Length; i++)
@@ -348,6 +360,16 @@ namespace ElencyConfig
             });
 
         }
+
+        private T DeserializeObject<T>(string value) where T : class
+        {
+            using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(value)))
+            {
+                var serializer = new DataContractJsonSerializer(typeof(T));
+                return serializer.ReadObject(memoryStream) as T;
+            }
+        }
+
 
         private async Task<string> GetAccessToken()
         {
