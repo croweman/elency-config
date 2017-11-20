@@ -10,22 +10,22 @@ using System.Threading;
 
 namespace ElencyConfig
 {
-    public static class ElencyConfigClient
+    public class ElencyConfigClient
     {
-        private static bool _initialized = false;
-        private static ElencyConfiguration _config;
-        private static string _configurationPath;
-        private static Dictionary<string, string> _currentConfiguration;
-        private static string _currentVersionHash;
-        private static string _currentAppVersion;
-        private static string _currentEnvironment;
-        private static string _currentConfigurationId;
-        private static Timer _timer;
-        private static TimerCallback _timerCallback;
-        private static bool _refreshing = false;
+        private bool _initialized = false;
+        private ElencyConfiguration _config;
+        private string _configurationPath;
+        private Dictionary<string, string> _currentConfiguration;
+        private string _currentVersionHash;
+        private string _currentAppVersion;
+        private string _currentEnvironment;
+        private string _currentConfigurationId;
+        private Timer _timer;
+        private TimerCallback _timerCallback;
+        private bool _refreshing = false;
         private const int Timeout = 30000;
 
-        public static async Task Init(ElencyConfiguration config)
+        public async Task Init(ElencyConfiguration config)
         {
             if (config == null)
             {
@@ -61,7 +61,7 @@ namespace ElencyConfig
             }
         }
 
-        private static async void RefreshConfigurationOnInteval(object stateInfo)
+        private async void RefreshConfigurationOnInteval(object stateInfo)
         {
             if (_refreshing)
             {
@@ -78,28 +78,28 @@ namespace ElencyConfig
             }
         }
 
-        public static string AppVersion {
+        public string AppVersion {
             get {
                 CheckInitialisation();
                 return _currentAppVersion;
             }
         }
 
-        public static string Environment {
+        public string Environment {
             get {
                 CheckInitialisation();
                 return _currentEnvironment;
             }
         }
 
-        public static string ConfigurationId {
+        public string ConfigurationId {
             get {
                 CheckInitialisation();
                 return _currentConfigurationId;
             }
         }
 
-        public static string Get(string key) {
+        public string Get(string key) {
             CheckInitialisation();
             if (_currentConfiguration.ContainsKey(key))
                 return _currentConfiguration[key];
@@ -107,17 +107,17 @@ namespace ElencyConfig
             return null;
         }
 
-        public static List<string> GetAllKeys() {
+        public List<string> GetAllKeys() {
             CheckInitialisation();
             return _currentConfiguration.Keys.ToList();
         }
 
-        public static async Task Refresh() {
+        public async Task Refresh() {
             CheckInitialisation();
             await GetConfiguration();
         }
 
-        public static void Reset()
+        public void Reset()
         {
             if (_timer != null)
             {
@@ -134,14 +134,85 @@ namespace ElencyConfig
             _currentConfigurationId = null;
         }
 
-        private static void CheckInitialisation() {
+        public bool? GetBoolean(string key)
+        {
+            return ValueRetrieval.GetBoolean(Get(key));
+        }
+
+        public bool? GetBoolean(string key, bool? fallback)
+        {
+            return ValueRetrieval.GetBoolean(Get(key), fallback);
+        }
+
+        public DateTime? GetDateTime(string key)
+        {
+            return ValueRetrieval.GetDateTime(Get(key));
+        }
+
+        public DateTime? GetDateTime(string key, DateTime? fallback)
+        {
+            return ValueRetrieval.GetDateTime(Get(key), fallback);
+        }
+
+        public int? GetInteger(string key)
+        {
+            return ValueRetrieval.GetInteger(Get(key));
+        }
+
+        public int? GetInteger(string key, int? fallback)
+        {
+            return ValueRetrieval.GetInteger(Get(key), fallback);
+        }
+
+        public float? GetFloat(string key)
+        {
+            return ValueRetrieval.GetFloat(Get(key));
+        }
+
+        public float? GetFloat(string key, float? fallback)
+        {
+            return ValueRetrieval.GetFloat(Get(key), fallback);
+          
+        }
+
+        public decimal? GetDecimal(string key)
+        {
+            return ValueRetrieval.GetDecimal(Get(key));
+        }
+
+        public decimal? GetDecimal(string key, decimal? fallback)
+        {
+            return ValueRetrieval.GetDecimal(Get(key), fallback);
+        }
+
+        public double? GetDouble(string key)
+        {
+            return ValueRetrieval.GetDouble(Get(key));
+        }
+
+        public double? GetDouble(string key, double? fallback)
+        {
+            return ValueRetrieval.GetDouble(Get(key), fallback);
+        }
+
+        public T GetObject<T>(string key) where T : class
+        {
+            return ValueRetrieval.GetObject<T>(Get(key));
+        }
+
+        public T GetObject<T>(string key, T fallback) where T : class
+        {
+            return ValueRetrieval.GetObject<T>(Get(key), fallback);
+        }
+
+        private void CheckInitialisation() {
             if (!_initialized)
             {
                 throw new Exception("The client has not been successfully initialized");
             }
         }
 
-        private static async Task GetConfiguration()
+        private async Task GetConfiguration()
         {
             if (_currentVersionHash != null)
             {
@@ -163,7 +234,7 @@ namespace ElencyConfig
             }
         }
 
-        private static async Task RefreshConfiguration()
+        private async Task RefreshConfiguration()
         {
             var authorizationHeader = Authorization.GenerateAuthorizationHeader(_config, _configurationPath, "head");
             var uri = string.Format("{0}{1}", _config.Uri, _configurationPath);
@@ -202,7 +273,7 @@ namespace ElencyConfig
             });
         }
 
-        private static async Task RetrieveConfiguration()
+        private async Task RetrieveConfiguration()
         {
             var accessToken = await GetAccessToken();
             var authorizationHeader = Authorization.GenerateAuthorizationHeader(_config, _configurationPath, "get");
@@ -278,7 +349,7 @@ namespace ElencyConfig
 
         }
 
-        private static async Task<string> GetAccessToken()
+        private async Task<string> GetAccessToken()
         {
             var authorizationHeader = Authorization.GenerateAuthorizationHeader(_config, "/config", "head", true);
             var uri = string.Format("{0}/config", _config.Uri);

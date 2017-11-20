@@ -16,7 +16,8 @@ namespace ElencyConfig.Tests
         {
             try
             {
-                await ElencyConfigClient.Init(null);
+                var client = new ElencyConfigClient();
+                await client.Init(null);
                 Assert.Fail("Should not have got here");
             }
             catch (Exception ex)
@@ -30,7 +31,8 @@ namespace ElencyConfig.Tests
         {
             try
             {
-                await ElencyConfigClient.Init(new ElencyConfiguration());
+                var client = new ElencyConfigClient();
+                await client.Init(new ElencyConfiguration());
                 Assert.Fail("Should not have got here");
             }
             catch (Exception ex)
@@ -44,7 +46,8 @@ namespace ElencyConfig.Tests
         {
             try
             {
-                ElencyConfigClient.Get("KeyOne");
+                var client = new ElencyConfigClient();
+                client.Get("KeyOne");
                 Assert.Fail("An error was not defined");
             }
             catch (Exception ex)
@@ -58,7 +61,8 @@ namespace ElencyConfig.Tests
         {
             try
             {
-                ElencyConfigClient.GetAllKeys();
+                var client = new ElencyConfigClient();
+                client.GetAllKeys();
                 Assert.Fail("An error was not defined");
             }
             catch (Exception ex)
@@ -73,7 +77,8 @@ namespace ElencyConfig.Tests
         {
             try
             {
-                await ElencyConfigClient.Refresh();
+                var client = new ElencyConfigClient();
+                await client.Refresh();
                 Assert.Fail("An error was not defined");
             }
             catch (Exception ex)
@@ -99,7 +104,8 @@ namespace ElencyConfig.Tests
                     RequestTimeout = 500
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
                 Assert.Fail("An error was defined");
             }
             catch (Exception ex)
@@ -143,7 +149,8 @@ namespace ElencyConfig.Tests
                     RequestTimeout = 500
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
                 Assert.Fail("An error was defined");
             }
             catch (Exception ex)

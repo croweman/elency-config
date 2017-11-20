@@ -11,13 +11,6 @@ namespace ElencyConfig.Tests
         protected const string EncryptionKey = "NTY4dUppMWEyQDM0NThqaGhGYSFhYQ==";
         protected const string HMACAuthorizationKey = "MzY4dUBKaTFhMjM0ODIxamhoRmEhYWE=";
 
-        [SetUp]
-        public void Setup()
-        {
-            ElencyConfigClient.Reset();
-            nock.ClearAll();
-        }
-
         protected string GetEmbeddedResource(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();

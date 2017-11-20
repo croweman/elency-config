@@ -12,12 +12,6 @@ namespace ElencyConfig.Tests
     public class ElencyConfigClientHappyPathTests : TestBase
     {  
 
-        [SetUp]
-        public void Setup()
-        {
-            ElencyConfigClient.Reset();
-        }
-
         [Test]
         public async Task InitIsSuccessfulWhenValidDataIsProvided()
         {
@@ -52,16 +46,17 @@ namespace ElencyConfig.Tests
                     ConfigEncryptionKey = EncryptionKey
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
 
                 Assert.IsTrue(nockOne.Done());
                 Assert.IsTrue(nockTwo.Done());
-                Assert.AreEqual(2, ElencyConfigClient.GetAllKeys().Count);
-                Assert.AreEqual("KeyOneValue", ElencyConfigClient.Get("KeyOne"));
-                Assert.AreEqual("KeyTwoValue", ElencyConfigClient.Get("KeyTwo"));
-                Assert.AreEqual("1.1.1", ElencyConfigClient.AppVersion);
-                Assert.AreEqual("prod", ElencyConfigClient.Environment);
-                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", ElencyConfigClient.ConfigurationId);
+                Assert.AreEqual(2, client.GetAllKeys().Count);
+                Assert.AreEqual("KeyOneValue", client.Get("KeyOne"));
+                Assert.AreEqual("KeyTwoValue", client.Get("KeyTwo"));
+                Assert.AreEqual("1.1.1", client.AppVersion);
+                Assert.AreEqual("prod", client.Environment);
+                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", client.ConfigurationId);
             }
             catch (Exception ex)
             {
@@ -82,7 +77,6 @@ namespace ElencyConfig.Tests
                     return MatchAuthorizationHeader(headers["Authorization"], "/config", "head", true);
                 })
                 .Reply(HttpStatusCode.OK, string.Empty, responseHeaders);
-
 
             var nockTwo = new nock("http://localhost:8080")
                 .Get("/config/proj/prod/1.1.1")
@@ -105,12 +99,13 @@ namespace ElencyConfig.Tests
                     ConfigEncryptionKey = EncryptionKey
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
 
                 Assert.IsTrue(nockOne.Done());
                 Assert.IsTrue(nockTwo.Done());
-                Assert.AreEqual("KeyOneValue", ElencyConfigClient.Get("KeyOne"));
-                Assert.AreEqual("KeyTwoValue", ElencyConfigClient.Get("KeyTwo"));
+                Assert.AreEqual("KeyOneValue", client.Get("KeyOne"));
+                Assert.AreEqual("KeyTwoValue", client.Get("KeyTwo"));
             }
             catch (Exception ex)
             {
@@ -154,11 +149,12 @@ namespace ElencyConfig.Tests
                     ConfigEncryptionKey = EncryptionKey
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
 
                 Assert.IsTrue(nockOne.Done());
                 Assert.IsTrue(nockTwo.Done());
-                Assert.AreEqual(null, ElencyConfigClient.Get("Cheese"));
+                Assert.AreEqual(null, client.Get("Cheese"));
             }
             catch (Exception ex)
             {
@@ -202,11 +198,12 @@ namespace ElencyConfig.Tests
                     ConfigEncryptionKey = EncryptionKey
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
 
                 Assert.IsTrue(nockOne.Done());
                 Assert.IsTrue(nockTwo.Done());
-                var keys = ElencyConfigClient.GetAllKeys();
+                var keys = client.GetAllKeys();
                 Assert.AreEqual(2, keys.Count);
                 Assert.AreEqual("KeyOne", keys[0]);
                 Assert.AreEqual("KeyTwo", keys[1]);
@@ -285,31 +282,31 @@ namespace ElencyConfig.Tests
                     ConfigEncryptionKey = EncryptionKey
                 };
 
-            
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
 
                 Assert.IsTrue(nockOne.Done(), "1");
                 Assert.IsTrue(nockTwo.Done(), "2");
-                Assert.AreEqual(2, ElencyConfigClient.GetAllKeys().Count, "3");
-                Assert.AreEqual("KeyOneValue", ElencyConfigClient.Get("KeyOne"), "4");
-                Assert.AreEqual("KeyTwoValue", ElencyConfigClient.Get("KeyTwo"), "5");
-                Assert.AreEqual("1.1.1", ElencyConfigClient.AppVersion, "6");
-                Assert.AreEqual("prod", ElencyConfigClient.Environment, "7");
-                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", ElencyConfigClient.ConfigurationId, "8");
+                Assert.AreEqual(2, client.GetAllKeys().Count, "3");
+                Assert.AreEqual("KeyOneValue", client.Get("KeyOne"), "4");
+                Assert.AreEqual("KeyTwoValue", client.Get("KeyTwo"), "5");
+                Assert.AreEqual("1.1.1", client.AppVersion, "6");
+                Assert.AreEqual("prod", client.Environment, "7");
+                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", client.ConfigurationId, "8");
 
                 try
                 {
-                    await ElencyConfigClient.Refresh();
+                    await client.Refresh();
                     Assert.IsTrue(nockThree.Done(), "9");
                     Assert.IsTrue(nockFour.Done(), "10");
                     Assert.IsTrue(nockFive.Done(), "11");
-                    Assert.AreEqual(3, ElencyConfigClient.GetAllKeys().Count, "12");
-                    Assert.AreEqual("KeyOneValue", ElencyConfigClient.Get("KeyOne"), "13");
-                    Assert.AreEqual("KeyTwoValueUpdated", ElencyConfigClient.Get("KeyTwo"), "14");
-                    Assert.AreEqual("KeyThreeValue", ElencyConfigClient.Get("KeyThree"), "15");
-                    Assert.AreEqual("1.1.1", ElencyConfigClient.AppVersion, "16");
-                    Assert.AreEqual("prod", ElencyConfigClient.Environment, "17");
-                    Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", ElencyConfigClient.ConfigurationId, "18");
+                    Assert.AreEqual(3, client.GetAllKeys().Count, "12");
+                    Assert.AreEqual("KeyOneValue", client.Get("KeyOne"), "13");
+                    Assert.AreEqual("KeyTwoValueUpdated", client.Get("KeyTwo"), "14");
+                    Assert.AreEqual("KeyThreeValue", client.Get("KeyThree"), "15");
+                    Assert.AreEqual("1.1.1", client.AppVersion, "16");
+                    Assert.AreEqual("prod", client.Environment, "17");
+                    Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", client.ConfigurationId, "18");
                 }
                 catch (Exception ex)
                 {
@@ -392,16 +389,17 @@ namespace ElencyConfig.Tests
                     RefreshInterval = 100
                 };
 
-                await ElencyConfigClient.Init(config);
+                var client = new ElencyConfigClient();
+                await client.Init(config);
 
                 Assert.IsTrue(nockOne.Done(), "1");
                 Assert.IsTrue(nockTwo.Done(), "2");
-                Assert.AreEqual(2, ElencyConfigClient.GetAllKeys().Count, "3");
-                Assert.AreEqual("KeyOneValue", ElencyConfigClient.Get("KeyOne"), "4");
-                Assert.AreEqual("KeyTwoValue", ElencyConfigClient.Get("KeyTwo"), "5");
-                Assert.AreEqual("1.1.1", ElencyConfigClient.AppVersion, "6");
-                Assert.AreEqual("prod", ElencyConfigClient.Environment, "7");
-                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", ElencyConfigClient.ConfigurationId, "8");
+                Assert.AreEqual(2, client.GetAllKeys().Count, "3");
+                Assert.AreEqual("KeyOneValue", client.Get("KeyOne"), "4");
+                Assert.AreEqual("KeyTwoValue", client.Get("KeyTwo"), "5");
+                Assert.AreEqual("1.1.1", client.AppVersion, "6");
+                Assert.AreEqual("prod", client.Environment, "7");
+                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", client.ConfigurationId, "8");
 
                 try
                 {
@@ -413,13 +411,13 @@ namespace ElencyConfig.Tests
                             Assert.IsTrue(nockThree.Done(), "9");
                             Assert.IsTrue(nockFour.Done(), "10");
                             Assert.IsTrue(nockFive.Done(), "11");
-                            Assert.AreEqual(3, ElencyConfigClient.GetAllKeys().Count, "12");
-                            Assert.AreEqual("KeyOneValue", ElencyConfigClient.Get("KeyOne"), "13");
-                            Assert.AreEqual("KeyTwoValueUpdated", ElencyConfigClient.Get("KeyTwo"), "14");
-                            Assert.AreEqual("KeyThreeValue", ElencyConfigClient.Get("KeyThree"), "15");
-                            Assert.AreEqual("1.1.1", ElencyConfigClient.AppVersion, "16");
-                            Assert.AreEqual("prod", ElencyConfigClient.Environment, "17");
-                            Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", ElencyConfigClient.ConfigurationId, "18");
+                            Assert.AreEqual(3, client.GetAllKeys().Count, "12");
+                            Assert.AreEqual("KeyOneValue", client.Get("KeyOne"), "13");
+                            Assert.AreEqual("KeyTwoValueUpdated", client.Get("KeyTwo"), "14");
+                            Assert.AreEqual("KeyThreeValue", client.Get("KeyThree"), "15");
+                            Assert.AreEqual("1.1.1", client.AppVersion, "16");
+                            Assert.AreEqual("prod", client.Environment, "17");
+                            Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe07", client.ConfigurationId, "18");
                             break;
                         }
                         catch { }

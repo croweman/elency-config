@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("ElencyConfig")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("elency-config csharp client")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ElencyConfig")]

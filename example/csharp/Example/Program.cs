@@ -11,6 +11,7 @@ namespace Example
         const string HMACAuthorizationKey = "MzY4dUBKaTFhMjM0ODIxamhoRmEhYWE=";
         const string ConfigEncryptionKey = "NTY4dUppMWEyQDM0NThqaGhGYSFhYQ==";
 
+        static ElencyConfigClient Client;
 
         static void Main(string[] args)
         {
@@ -47,7 +48,8 @@ namespace Example
             configuration.Retrieved = Retrieved;
             configuration.RefreshFailure = RefreshFailure;
 
-            await ElencyConfigClient.Init(configuration);
+            Client = new ElencyConfigClient();
+            await Client.Init(configuration);
         }
 
         private static void Retrieved()
@@ -55,15 +57,15 @@ namespace Example
             Console.WriteLine();
             Console.WriteLine("__________________________________________");
             Console.WriteLine(string.Format("Configuration retrieved: {0}", DateTime.Now.ToString()));
-            Console.WriteLine(string.Format("Version: {0}", ElencyConfigClient.AppVersion));
-            Console.WriteLine(string.Format("Environment: {0}", ElencyConfigClient.Environment));
-            Console.WriteLine(string.Format("Configuration Id: {0}", ElencyConfigClient.ConfigurationId));
+            Console.WriteLine(string.Format("Version: {0}", Client.AppVersion));
+            Console.WriteLine(string.Format("Environment: {0}", Client.Environment));
+            Console.WriteLine(string.Format("Configuration Id: {0}", Client.ConfigurationId));
             Console.WriteLine("Keys and values:");
             Console.WriteLine();
 
-            ElencyConfigClient.GetAllKeys().ForEach(key =>
+            Client.GetAllKeys().ForEach(key =>
             {
-                Console.WriteLine("{0}: {1}", key, ElencyConfigClient.Get(key));
+                Console.WriteLine("{0}: {1}", key, Client.Get(key));
             });
 
             Console.WriteLine("__________________________________________");

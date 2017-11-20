@@ -22,7 +22,7 @@ This is a `c#` client for the `elency-config-server`.
 
 ## Install<a name="install"></a>
 
-Either reference the `ElencyConfigClient` assembly or Install from [nuget](https://www.nuget.org/packages/ElencyConfigClient/).
+Install from [nuget](https://www.nuget.org/packages/ElencyConfig/).
 
 ---
 
@@ -119,7 +119,13 @@ Once your `Retrieved` function has been called the client will have the followin
  - `Get`: A method that accepts a `key` argument and returns the value of the key or `null` if the key cannot be found.
  - `GetAllKeys`: A method that returns all of the `keys` within the configuration.
  - `Refresh`: A method that can be called to refresh the configuration.
-
+ - `GetBoolean`: (`key` string, `fallback` <optional>) gets the value of a key as a bool and falls back to fallback value if provided.
+ - `GetDateTime`: (`key` string, `fallback` <optional>) gets the value of a key as a DateTime and falls back to fallback value if provided.
+ - `GetInteger`: (`key` string, `fallback` <optional>) gets the value of a key as a int and falls back to fallback value if provided.
+ - `GetFloat`: (`key` string, `fallback` <optional>) gets the value of a key as a float and falls back to fallback value if provided.
+ - `GetDecimal`: (`key` string, `fallback` <optional>) gets the value of a key as a decimal and falls back to fallback value if provided.
+ - `GetDouble`: (`key` string, `fallback` <optional>) gets the value of a key as a double and falls back to fallback value if provided.
+ - `GetObject`: (`key` string, `fallback` <optional>) gets the value of a key as a specified type of object and falls back to fallback value if provided.
 ---
 
 ## Refresh Failure<a name="failure"></a>
