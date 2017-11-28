@@ -1,0 +1,50 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Teams
+
+    .container
+
+      if createATeam === true
+        div.input-group
+         a.btn.btn-primary.create-button(role="button", aria-pressed="true", href="/team/create") Create
+
+      +search(placeholder='Find a team...')
+
+      table#teams.table
+        thead.thead-default
+          tr
+            th Team Id
+            th Team name
+            th Description
+            th Edit
+        tbody
+          each team in teams
+            tr
+              td
+                - var url = '/team/' + team.teamId
+                a(href=url)= team.teamId
+              td= team.teamName
+              td= team.description
+              td
+                - var url = '/team/' + team.teamId + '/update';
+                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('teams', [0, 1]);
+      });
+

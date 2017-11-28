@@ -1,0 +1,30 @@
+nav.navbar.navbar-toggleable-md.navbar-inverse.fixed-top.bg-inverse
+  button.navbar-toggler.navbar-toggler-right(type='button', data-toggle='collapse', data-target='#navbarsExampleDefault', aria-controls='navbarsExampleDefault', aria-expanded='false', aria-label='Toggle navigation')
+    span.navbar-toggler-icon
+  a.navbar-brand(href='/') elency-config
+  #navbarsExampleDefault.collapse.navbar-collapse
+    ul.navbar-nav.mr-auto
+      li.nav-item.active
+        a.nav-link(href='/team')
+          | Teams
+      li.nav-item.active
+        if createAKey == true
+          a.nav-link(href='/key/all')
+            | Keys
+        else
+          a.nav-link.disabled(href='/key/all')
+            | Keys
+      li.nav-item.active
+        a.nav-link(href='/user/all')
+          | Users
+      if loggedIn == true
+        li.nav-item.active.dropdown
+          a.nav-link.dropdown-toggle(href="#", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false") #{userName}
+          div.dropdown-menu.nav-dropdown(aria-labelledby="dropdown01")
+            if userName !== 'admin' && changeAPassword === true
+              - onclick = "window.location='/user/" + user.userId + "/change-password';return false"
+              a.dropdown-item(href='#', onclick=onclick) Change password
+            if changeSettings === true
+              - onclick = "window.location='/settings';return false"
+              a.dropdown-item(href='#', onclick=onclick) Settings
+            a.dropdown-item(href='#', onclick='window.location="/logout";return false') Logout

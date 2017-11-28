@@ -1,0 +1,107 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Version Revisions
+
+    .container
+
+      input#teamid.input(style='display:none', value=appEnvironment.teamId)
+      input#appid.input(style='display:none', value=appEnvironment.appId)
+      input#environment.input(style='display:none', value=appEnvironment.environment)
+      input#version.input(style='display:none', value=version)
+
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + appEnvironment.teamId
+          span.info-value
+            a(href=url)= appEnvironment.teamId
+        div.col-md-5
+          strong App Id:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+          span.info-value
+            a(href=url)= appEnvironment.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= appEnvironment.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= appEnvironment.appName
+        div.col-md-5
+          strong Environment:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment
+          span.info-value
+            a(href=url)= appEnvironment.environment
+        div.col-md-5
+          strong Version:
+          span.info-value= version
+
+      div.breaker
+
+      if createAConfiguration === true
+        - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/configuration/create?version=' + version
+        a.btn.btn-primary.create-button(role="button", aria-pressed="true", href=url) Create configuration
+      button#compare.btn.btn-primary(type="button", data-toggle='modal', data-target='#compareModal') Compare
+      h3.breaker Configuration revisions
+
+      #compare-error.hide.alert.alert-danger(role='alert')
+        span You must select 2 revisions to compare!
+
+      +search(placeholder='Find a revision...')
+
+      table#revisions.table
+        thead.thead-default
+          tr
+            th Revision Id
+            th Modified By
+            th Published
+            th Published By
+            th Modified
+            th Compare
+            th Comment
+        tbody
+          each revision in revisions
+            - var className = (revision.published === true ? 'table-success' : 'table-warning')
+
+            if (selectedConfigurationId === revision.configurationId)
+              - className += ' table-highlight';
+
+            tr(class=className)
+              td.no-vertical-border
+                - var url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/version/' + version + '/configuration/' + revision.configurationId;
+                a(href=url, id=revision.configurationId)= revision.configurationId
+              td.no-vertical-border
+                - var url = '/user/all?userId=' + revision.updatedBy.userId
+                a(href=url)=revision.updatedBy.userName
+              td.no-vertical-border
+                = (revision.published === true ? 'Yes' : 'No')
+              td.no-vertical-border
+                if (revision.published === true)
+                  - var url = '/user/all?userId=' + revision.publishedBy.userId
+                  a(href=url)=revision.publishedBy.userName
+              td.no-vertical-border
+                = revision.updated
+              td.no-vertical-border
+                input.compare-check(type='checkbox', value=revision.configurationId)
+              td.no-vertical-border
+                = revision.comment
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('revisions', [0]);
+        elencyConfig.revisions();
+      });
+

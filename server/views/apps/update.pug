@@ -1,0 +1,50 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 App Update
+
+    .container
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + app.teamId
+          span.info-value
+            a(href=url)= app.teamId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= app.teamName
+        div.breaker
+          | &nbsp;
+
+      form
+
+        input#teamid.input(style='display:none', value=app.teamId)
+        #appid-form-group.form-group
+          label.form-control-label App Id
+          label
+          input.form-control(id='appid', type='text', readonly='' value=app.appId)
+        +inputGroup('appname', 'App name')(autocomplete='off', data-minlength='1', data-errormessage='App name must be at least 1 character', value=app.appName)
+        +inputGroup('description', 'Description')(autocomplete='off', value=app.description)
+
+        div.text-right
+          button#updateApp.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating app") Update app
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.updateApp();
+      });

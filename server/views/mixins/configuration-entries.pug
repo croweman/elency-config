@@ -1,0 +1,22 @@
+mixin configurationEntries(configurationKeys)
+  table#keys.table
+    thead.thead-default
+      tr
+        th Key
+        th Secure
+        th Value
+    tbody
+      each configurationKey in configurationKeys
+        tr(class=className)
+          td
+            = configurationKey.key
+          td
+            = configurationKey.encrypted === true ? 'Yes' : 'False'
+          td
+            if (configurationKey.encrypted === true && !configurationKey.decrypted)
+              div.encrypted-value
+                pre
+                 | ENCRYPTED VALUE
+            else
+              pre
+                = configurationKey.value

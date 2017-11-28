@@ -1,0 +1,40 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Team Update
+
+    .container
+
+      form
+
+        #teamid-form-group.form-group
+          label.form-control-label Team Id
+          label
+          input.form-control(id='teamid', type='text', readonly='' value=team.teamId)
+        +inputGroup('teamname', 'Team name')(autocomplete='off', data-minlength='1', data-errormessage='Team name must be at least 1 character', value=team.teamName)
+        +inputGroup('description', 'Description')(autocomplete='off', value=team.description)
+
+        div.text-right
+          button#updateTeam.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating team") Update team
+
+        #error-box.alert.alert-danger(role='alert')
+          strong Oh no!
+          |  An error occurred while trying to update a team.
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.updateTeam();
+      });

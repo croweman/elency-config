@@ -1,0 +1,196 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        - var text = (updating ? 'Configuration Update' : 'Configuration Create')
+        h2.display-6= text
+
+    .container
+
+      // Modal
+      #importModal.modal.fade(role='dialog')
+        .modal-dialog
+          // Modal content
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal') ×
+              h4.modal-title Import configuration items
+            .modal-body
+              div
+                div#importdata-form-group.form-group.col-md-12
+                  label.form-control-label(for="importdata") JSON Data
+                  div
+                    textarea#importdata(cols="2", rows="3")
+                  div#importdata-info.form-control-feedback
+            .modal-footer
+              button#importdata-button.btn.btn-primary(type='button', data-dismiss='modal', data-loading-text="<i class='icon-spinner icon-spin'></i> Importing") Import
+              button.btn.btn-primary(type='button', data-dismiss='modal') Close
+
+      div.row
+        if (updating === false)
+          div.col-md-5
+            strong Team Id:
+            - url = '/team/' + appEnvironment.teamId
+            span.info-value
+              a(href=url)= appEnvironment.teamId
+          div.col-md-5
+            strong App Id:
+            - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+            span.info-value
+              a(href=url)= appEnvironment.appId
+          div.col-md-5
+            strong Team Name:
+            span.info-value= appEnvironment.teamName
+          div.col-md-5
+            strong App Name:
+            span.info-value= appEnvironment.appName
+          div.col-md-5
+          div.col-md-5
+            strong Environment:
+            - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment
+            span.info-value
+              a(href=url)= appEnvironment.environment
+          div.breaker
+            | &nbsp;
+
+        else
+          div.col-md-5
+            strong Team Id:
+            - url = '/team/' + appEnvironment.teamId
+            span.info-value
+              a(href=url)= appEnvironment.teamId
+          div.col-md-5
+            strong Environment:
+            - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment
+            span.info-value
+              a(href=url)= appEnvironment.environment
+          div.col-md-5
+            strong Team Name:
+            span.info-value= appEnvironment.teamName
+          div.col-md-5
+            strong Revision Id
+            span.info-value= configuration.configurationId
+          div.col-md-5
+            strong App Id:
+            - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+            span.info-value
+              a(href=url)= appEnvironment.appId
+          div.col-md-5
+            strong Modified By:
+            - var url = '/user/all?userId=' + configuration.updatedBy.userId
+            span.info-value
+              a(href=url)=configuration.updatedBy.userName
+          div.col-md-5
+            strong App Name:
+            span.info-value= appEnvironment.appName
+          div.col-md-5
+            strong Modified:
+            span.info-value= configuration.updated
+          div.breaker
+            | &nbsp;
+      form
+
+        input#teamid.input(style='display:none', value=appEnvironment.teamId)
+        input#appid.input(style='display:none', value=appEnvironment.appId)
+        input#environment.input(style='display:none', value=appEnvironment.environment)
+        +inputGroup('version', 'Version', version)(autocomplete='off', data-regex='^[\\d]{1,}.[\\d]{1,}.[\\d]{1,}$', data-errormessage='Version is not valid e.g. 1.2.3 (^[\d]{1,}.[\d]{1,}.[\d]{1,}$)')
+        +inputGroup('comment', 'Comment', '')(autocomplete='off')
+
+        button#addConfigurationItem.btn.btn-primary.breaker(type="button") Add item
+        button#import.btn.btn-primary.breaker(type="button", data-toggle='modal', data-target='#importModal') Import
+        if (hasSecureItem === true)
+          button#decrypt.btn.btn-primary.breaker(type='button', data-toggle='modal', data-target='#decryptModal') Decrypt
+
+        #configuration-items
+          if (configurationEntries.length > 0)
+            - counter = 0
+            each entry in configurationEntries
+              - id = 'item' + counter;
+              - counter++;
+              div(id=id).panel.panel-default.configuration-item.col-md-12
+                .panel-body
+                  div.form-group.col-md-6(id=id + 'keyname-form-group')
+                    = entry.keyName
+                    label.form-control-label(for=id + 'keyname') Key name
+                    input.form-control.key-name(id=id + 'keyname', type='text', value=entry.key, autocomplete='off', data-minlength='1', data-errormessage='Key name must be at least 1 character and contain characters (a-zA-Z0-9_)', data-regex='^[a-zA-Z0-9_]+$')
+                    div.form-control-feedback(id=id + 'keyname-info')
+                  - onclick = "javascript:elencyConfig.deleteItem('" + id + "')"
+                  button.close(type='button', title='Delete', onclick=onclick) ×
+                  - onclick = "javascript:elencyConfig.moveUp(this, '" + id + "keyname')"
+                  button.close.move-up(type='button', title='Move up', onclick=onclick)
+                    i.icon-arrow-up
+                  - onclick = "javascript:elencyConfig.moveDown(this, '" + id + "keyname')"
+                  button.close.move-down(type='button', title='Move down', onclick=onclick)
+                    i.icon-arrow-down
+                  div.form-group.col-md-6.float-right(id=id + 'value-form-group')
+                    label.form-control-label(for=id + 'value') Value
+                    div
+                      if (entry.encrypted === true)
+                        div.encrypted-value
+                          pre ENCRYPTED VALUE
+                        textarea.key-value.hide(id=id + 'value', cols='2', rows='3', data-encrypted='true', data-originalkey=entry.key)
+                      else
+                        textarea.key-value(id=id + 'value', cols='2', rows='3')=entry.value
+                  div.form-group.col-md-6.secure-form-group(id=id + 'secure-form-group')
+                    .form-check
+                      label.form-check-label
+                        if (entry.encrypted === true)
+                          input.form-check-input.key-secure(id=id + 'secure', type='checkbox', checked='checked', onclick='return false;')
+                          |  Encrypted
+                        else
+                          input.form-check-input.key-secure(id=id + 'secure', type='checkbox')
+                          |  Encrypted
+
+        #additional-buttons.hide
+          button#addConfigurationItem2.btn.btn-primary.breaker(type="button") Add item
+          button#goTop.btn.btn-primary.breaker(type="button") Top
+
+        div.text-right
+          if (updating === true)
+            button#createConfiguration.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating configuration") Update configuration
+          else
+            button#createConfiguration.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating configuration") Create configuration
+      // Modal
+      #decryptModal.modal.fade(role='dialog')
+        .modal-dialog
+          // Modal content
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal') ×
+              h4.modal-title Decrypt configuration entries
+            .modal-body
+              div
+                +inputGroup('keyvalue', 'Key value')(autocomplete='off', data-length='32', data-regex='^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$', data-errormessage='Key value must be 32 characters in length and a Base64 encoded string')
+            .modal-footer
+              button#decryptconfigurationentriesbutton.btn.btn-primary(type='button', data-dismiss='modal', data-loading-text="<i class='icon-spinner icon-spin'></i> Decrypting") Decrypt
+              button.btn.btn-primary(type='button', data-dismiss='modal') Close
+              div.breaker
+              #error-box-key-decrypt.alert.alert-danger(role='alert')
+                strong Oh no!
+                span An error occurred while trying to decrypt configuration entries.  The key may be invalid!
+
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var itemCount = 10000;
+      var currentCount = 0;
+      var preload = #{preload};
+      var initialEntries = #{initialEntries};
+      var createFrom = '#{createFrom}';
+      var updating = #{updating};
+      $(function() {
+          elencyConfig.createConfiguration();
+      });

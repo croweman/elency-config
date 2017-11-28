@@ -1,0 +1,8 @@
+mixin userPermissionSelection(selectId, labelId, labelCssClass, ulId, cssSelector, visible, onText, offText)
+  - onclick = 'javascript:elencyConfig.selectAllChildCheckBoxes("' + selectId + '", "' + labelId + '", "' + ulId + '", "' + cssSelector + '", "' + onText + '", "' + offText + '")'
+  - cssClass = (visible === true ? '' : 'hide')
+  .form-check.form-check-inline
+    label.form-check-label(class=labelCssClass, class=cssClass)
+      input.form-check-input(type='checkbox', id=selectId, onclick=onclick)
+      span(id=labelId)
+        = onText

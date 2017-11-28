@@ -1,0 +1,176 @@
+.jumbotron {
+    padding-top: 2.5rem;
+    padding-bottom: 0.5rem;
+}
+
+#error-box, #error-box-key-decrypt, #error-box-export, #error-box-publish, #error-box-delete, #error-box-ldap-users, #error-box-ldap-select {
+    display: none;
+    margin-top: 1rem;
+}
+
+#error-box span, #error-box-key-decrypt span, #error-box-export span {
+    clear: left;
+    display: block;
+}
+
+.user-name {
+    color: white;
+    margin-right: 1rem;
+}
+
+.select-all-permissions, .select-all-teams, .label-info, #decryptKeyValue, #file, #goTop, #compare, .configuration-retrieval-button {
+    margin-left: 1rem;
+}
+
+#compare.no-left-margin {
+    margin-left: 0;
+}
+
+#addConfigurationItem, #edit, #import, #decrypt, #export, #publish, #delete, #copy {
+    margin-right: 1em;
+}
+
+.team-write {
+    margin-left: 0rem;
+}
+
+.create-button, #compare {
+    margin-bottom: 1rem;
+}
+
+.navbar-inverse .navbar-nav .nav-link {
+    color: rgba(255,255,255,1);
+}
+
+#change-key-value-container {
+    display: none;
+}
+
+#cancel {
+    margin-right: 1rem;
+}
+
+.breaker {
+    margin-bottom: 1rem;
+}
+
+.panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+
+.panel-default {
+    border-color: #ddd;
+}
+
+.panel-body {
+    padding: 15px;
+}
+
+textarea {
+    width: 100%;
+}
+
+.float-right {
+    float: right;
+}
+
+.secure-form-group {
+    clear:left;
+}
+
+.configuration-item, .configuration-item .form-group {
+    float:left;
+}
+
+.configuration-item .close {
+    color: #d9534f;
+    margin-right: -1rem;
+    opacity: 1;
+}
+
+.hide, #encrypted-entries-secure-container {
+    display: none;
+}
+
+.search {
+    display: none;
+    padding-left: 0;
+}
+
+.info-value {
+    margin-left:0.5rem;
+}
+
+.encrypted-value pre {
+    color: #d9534f;
+}
+
+.info-left {
+    float: left;
+    display: block;
+}
+
+.info-right {
+    float: right;
+    display: block;
+}
+
+.table-highlight, .table-highlight>td, .table-highlight>th {
+    background-color: #fdc548;
+}
+
+.table-highlight.no-vertical-border, .table-highlight>td.no-vertical-border, .table-highlight>th.no-vertical-border {
+    border-left: none;
+    border-right: none;
+}
+
+.move-up, .move-down {
+    font-size: 1rem;
+}
+
+.move-up {
+    margin-top: 2rem;
+}
+
+.move-down {
+    margin-top: 4rem;
+}
+
+.move-up i, .move-down i {
+    color: #5cb85c;
+}
+
+.comparison pre {
+    background-color: #fafbfc;
+    border: 1px solid #e1e4e8;
+    padding: 0.5rem;
+}
+
+pre.diff {
+
+}
+
+pre.added {
+    background-color: #cdffd8;
+}
+
+pre.removed {
+    background-color: #ffdce0;
+}
+
+pre code.added {
+    background-color: #cdffd8;
+}
+
+pre code.nochange {
+    background-color: #f1f8ff;
+}
+
+pre code.removed {
+    background-color: #ffdce0;
+}

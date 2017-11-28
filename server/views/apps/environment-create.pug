@@ -1,0 +1,64 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 App Environment
+
+    .container
+
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + app.teamId
+          span.info-value
+            a(href=url)= app.teamId
+        div.col-md-5
+          strong App Id:
+          - url = '/team/' + app.teamId + '/app/' + app.appId
+          span.info-value
+            a(href=url)= app.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= app.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= app.appName
+
+        div.breaker
+          | &nbsp;
+
+      form
+
+        input#teamid.input(style='display:none', value=app.teamId)
+        input#appid.input(style='display:none', value=app.appId)
+        +inputGroup('environment', 'Environment')(autocomplete='off', data-minlength='1', data-errormessage='Environment must be at least 1 character and contain characters (a-zA-Z0-9_-)', data-regex='^[a-zA-Z0-9\_\-]+$')
+
+        #keyId-form-group.form-group
+          label.form-control-label(for='password') Encrypted config item encryption key
+          select#keyId.form-control(, data-minlength='1', data-errormessage='You must select an encryption key')
+            option(value="") Please select
+            each key in keys
+              option(value=key.keyId)= key.keyName + ' - ' + key.keyId
+          #key-info.form-control-feedback
+
+        div.text-right
+          button#createAppEnvironment.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating app environment") Create app environment
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.createAppEnvironment();
+      });

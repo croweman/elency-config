@@ -1,0 +1,26 @@
+doctype html
+html(lang='en')
+
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Error
+
+    .container
+
+      #error-box.alert.alert-danger(role='alert', style='display:block')
+        strong You are not authorized to perform this action
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+      });
+

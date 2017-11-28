@@ -1,0 +1,60 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Team
+
+    .container
+
+      div.row
+        div.col-md-5
+          strong Team Id:
+          = ' ' + team.teamId
+        div.col-md-5
+          strong Team Name:
+          = ' ' + team.teamName
+      div.breaker
+
+      if createAnApp === true
+        div.input-group
+          - url = '/team/' + team.teamId + '/app/create'
+          a.btn.btn-primary.create-button(role="button", aria-pressed="true", href=url) Create App
+
+      +search(placeholder='Find an app...')
+
+      table#apps.table
+        thead.thead-default
+          tr
+            th App Id
+            th App name
+            th Description
+            th Edit
+        tbody
+          each app in team.apps
+            tr
+              td
+                 - var url = '/team/' + team.teamId + '/app/' + app.appId;
+                 a(href=url)= app.appId
+              td= app.appName
+              td= app.description
+              td
+                - var url = '/team/' + team.teamId + '/app/' + app.appId + '/update';
+                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('apps', [0, 1]);
+      });
+

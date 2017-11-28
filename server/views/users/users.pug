@@ -1,0 +1,88 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Users
+
+    .container
+
+      if createAUser === true
+        div.input-group
+          button#create-button.btn.btn-primary(type='button', data-toggle='modal', data-target='#ldapModal') Create
+        div.breaker
+
+      +search(placeholder='Find a user...')
+
+      table#users.table
+        thead.thead-default
+          tr
+            th User name
+            th Enabled
+            th Edit
+            if (ldapEnabled === false)
+              th Change password
+        tbody
+          each user in users
+            - var className = (selectedUserId !== undefined && user.userId === selectedUserId) ? 'table-success' : '';
+            tr(class=className)
+              td
+                a(id=user.userId)
+                = user.userName
+              td= user.enabled
+              td
+                - var url = '/user/' + user.userId + '/update';
+                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+              if (ldapEnabled === false)
+                td
+                  - var url = '/user/' + user.userId + '/change-password';
+                  a.btn.btn-primary(role="button", aria-pressed="true", href=url) Change password
+
+      #ldapModal.modal.fade(role='dialog')
+        .modal-dialog.modal-lg
+          // Modal content
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal') ×
+              h4.modal-title Create User
+            .modal-body
+              div
+                +inputGroup('username', 'Search for user')(autocomplete='off', data-minlength='2', data-errormessage='Search string must have at least 2 letters')
+                button#search-users.btn.btn-primary(type='button', data-loading-text="<i class='icon-spinner icon-spin'></i> Searching") Search
+              div#results
+
+            .modal-footer
+              button#adduserbutton.btn.btn-primary(type='button', data-dismiss='modal', data-loading-text="<i class='icon-spinner icon-spin'></i> Add User") Add User
+              button.btn.btn-primary(type='button', data-dismiss='modal') Close
+              div.breaker
+              #error-box-ldap-users.alert.alert-danger(role='alert')
+                strong Oh no!
+                span An error occurred while trying to find users!
+              #error-box-ldap-select.alert.alert-danger(role='alert')
+                strong Oh no!
+                span You must select a user!
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var ldapEnabled = #{ldapEnabled};
+      $(function() {
+        elencyConfig.users();
+        elencyConfig.search('users', [0]);
+        var userId = elencyConfig.getParameterByName('userId');
+
+        if (userId !== null) {
+            var element = document.getElementById(userId);
+            element.scrollIntoView();
+        }
+      });
+

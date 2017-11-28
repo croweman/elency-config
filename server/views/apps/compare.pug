@@ -1,0 +1,110 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+  include ../mixins/input-group.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Compare configuration revisions
+
+    .container
+
+      input#teamid.input(style='display:none', value=appEnvironment.teamId)
+      input#appid.input(style='display:none', value=appEnvironment.appId)
+      input#environment.input(style='display:none', value=appEnvironment.environment)
+
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + appEnvironment.teamId
+          span.info-value
+            a(href=url)= appEnvironment.teamId
+        div.col-md-5
+          strong App Id:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+          span.info-value
+            a(href=url)= appEnvironment.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= appEnvironment.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= appEnvironment.appName
+        div.col-md-5
+        div.col-md-5
+          strong Environment:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment
+          span.info-value
+            a(href=url)= appEnvironment.environment
+
+      div.breaker
+
+      div.row
+        #configuration-one-form-group.form-group.col-md-6
+          label.form-control-label(for='configuration-one') Revision from
+          input#configuration-one.typeahead.form-control(type='text', autocomplete='off', placeholder="Select a configuration", value=configurationIdOne, data-func="validateCompareConfigurationId", data-errormessage="Select a valid revision")
+          #configuration-one-info.form-control-feedback
+
+        #configuration-two-form-group.form-group.col-md-6
+          label.form-control-label(for='configuration-two') Revision to
+          input#configuration-two.typeahead.form-control(type='text', autocomplete='off', placeholder="Select a configuration", value=configurationIdTwo, data-func="validateCompareConfigurationId", data-errormessage="Select a valid revision")
+          #configuration-two-info.form-control-feedback
+
+      button#compare.btn.btn-primary.no-left-margin(type='button', data-loading-text="<i class='icon-spinner icon-spin'></i> Comparing") Compare
+
+      #error-box.alert.alert-danger(role='alert')
+        strong Oh no!
+        span(id='error-box-message')
+          | An error occurred while trying to compare configurations
+
+      div#differences
+
+      #encrytpedEntriesModal.modal.fade(role='dialog')
+        .modal-dialog
+          // Modal content
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal') ×
+              h4.modal-title Decrypt encrypted configuration entries
+            .modal-body
+              div
+                | There are encrypted entries. Do you want to decrypt them?
+            .modal-footer
+              button#encryptedentriesbutton.btn.btn-primary(type='button', data-dismiss='modal') Yes
+              button#encryptedentriesclosebutton.btn.btn-primary(type='button', data-dismiss='modal') No
+              div.breaker
+
+      #decryptModal.modal.fade(role='dialog')
+        .modal-dialog
+          // Modal content
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal') ×
+              h4.modal-title Decrypt configuration entries
+            .modal-body
+              div
+                +inputGroup('keyvalue', 'Key value')(autocomplete='off', data-length='32', data-regex='^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$', data-errormessage='Key value must be 32 characters in length and a Base64 encoded string')
+            .modal-footer
+              button#decryptconfigurationentriesbutton.btn.btn-primary(type='button', data-dismiss='modal', data-loading-text="<i class='icon-spinner icon-spin'></i> Comparing") Compare
+              button#decryptclosebutton.btn.btn-primary(type='button', data-dismiss='modal') Close
+              div.breaker
+              #error-box-key-decrypt.alert.alert-danger(role='alert')
+                strong Oh no!
+                span An error occurred while trying to compare configurations.  The key may be invalid!
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var configurations = !{JSON.stringify(configurations)};
+      $(function() {
+        elencyConfig.compare();
+      });
+

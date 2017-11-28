@@ -1,0 +1,82 @@
+
+
+rename to elency and git repo, enverty thing
+
+NEED TO DO FULL TEST
+Need to test all views with buttons on and off, so there is no text overlap!!!, breaking clearing
+
+DOCUMENT CONFIGURATION KEYS SHOULD PROBABLY BE BASE 64 ENCODED STRINGS? 32 chars
+HASHER IN BOTH NODE AND CSHARP ARE DOING THAT
+
+* CORS, user vulnerability posts etc, validation on request input
+
+https://medium.com/the-node-js-collection/news-node-js-8-moves-into-long-term-support-and-node-js-9-becomes-the-new-current-release-line-74cf754a10a0
+
+
+document health endpoint?
+
+  express session cookie.secure needs configuring on/off
+  ldap !!!!
+  should run securely, strong keys, encryption, pem key passwords etc
+  roles etc, how things work
+
+
+when konfig pems generated are they different, e.g. encrypt config with old, then overwrite files restart
+what happens when decrypting etc
+if new keys generated and app doesn't break bug
+
+
+auditing, view on user?
+config retrieval
+
+IS CERT encrypt/decrypt all wrong
+keys I am decrypting using private key, shouldn't I  encrypt with public, decrypt with p
+
+index.js to expose and destructuring to prevent fishing, makes refactoring easier!
+
+console.log
+
+document all options for config,env etc
+
+
+gzip and caching of sTatic files, minimizing?
+
+general logging of errors to file?
+
+express session cookie.secure needs configuring on/off? documentation?
+
+
+need to revisit all error dialogs
+
+
+logging, rotation?
+
+better error messages server and client
+
+return models from repositories without _id
+
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+
+
+// How to generate global public and private
+// this works but need a password always use this
+openssl genrsa -des3 -out elency-config.prv.pem 2048
+openssl rsa -in elency-config.prv.pem -outform PEM -pubout -out elency-config.pub.pem
+//without password
+openssl genrsa -out elency-config.prv.pem 2048
+openssl rsa -in elency-config.prv.pem -outform PEM -pubout -out elency-config.pub.pem
+
+
+
+cookies secure
+https everything secure
+
+
+publish scripts to generate server and clients
+e.g. clean clone
+npm install
+delete certs, config etc
+
+
+configurable option for slippage of timestamp?????? maybe turn offable?

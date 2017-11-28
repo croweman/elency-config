@@ -1,0 +1,109 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/user-permissions-selection.pug
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 User Create
+
+    .container
+
+      form
+
+        if (ldapEnabled === true)
+          input#userid.hide(value=LDAPUserId)
+          +inputGroup('username', 'User name')(readonly='readonly', value=LDAPUserName)
+        else
+          +inputGroup('username', 'User name')(autocomplete='off', data-minlength='3', data-errormessage='User name must be at least 3 characters')
+          +inputGroup('password', 'Password')(autocomplete='off', type='password', data-regex='^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})', data-errormessage='Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters')
+          +inputGroup('confirm-password', 'Confirm password')(autocomplete='off', type='password', data-regex='^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})', data-errormessage='Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters', data-comparison='password', data-comparisontype='equal-to', data-comparisonerrormessage='Passwords do not match!')
+
+        #roles-form-group.form-group
+          label.form-control-label(for='roles') Roles (multiple)
+          select#roles.form-control(multiple='')
+            option administrator
+            option team-writer
+            option key-writer
+
+        .form-group
+          .form-check
+            label.form-check-label
+              input#enabled.form-check-input(type='checkbox', checked='checked')
+              |  Enabled
+
+        .form-group
+          label
+            h4 Team Permissions
+
+            +userPermissionSelection('select_teams', 'label_teams', 'select-all-teams', 'team-permissions', 'team-write', teams.length > 0, 'Select all', 'Deselect all')
+
+            ul#team-permissions
+              each team in teams
+                li= team.teamId + ' (' + team.teamName + ')'
+                  .form-check.form-check-inline
+                    label.form-check-label
+                      input.form-check-input.team-write(type='checkbox', data-id=team.teamId)
+                      |  Write
+
+        .form-group
+          label
+            h4 App Configuration Permissions
+
+            ul
+              each team in teams
+                li= team.teamId + ' (' + team.teamName + ')'
+                  - ulId = 'team-' + team.teamId
+                  +userPermissionSelection('select_team_' + team.teamId + '_apps', 'label_team_' + team.teamId + '_apps', 'select-all-permissions', ulId, 'app-env', team.apps.length > 0, 'Select all', 'Deselect all')
+
+                  ul(id=ulId)
+                    each app in team.apps
+                      - ulId = 'container_' + app.appId
+                      li= app.appId + ' (' + app.appName + ')'
+                        +userPermissionSelection('select_all_' + app.appId, 'label_all_' + app.appId, 'select-all-permissions', 'container_' + app.appId, 'app-env', true, 'Select all', 'Deselect all')
+                        +userPermissionSelection('select_all_read' + app.appId, 'label_all_read' + app.appId, 'select-all-permissions', 'container_' + app.appId, 'app-read', true, 'Read', 'Read')
+                        +userPermissionSelection('select_all_write' + app.appId, 'label_all_write' + app.appId, 'select-all-permissions', 'container_' + app.appId, 'app-write', true, 'Write', 'Write')
+                        +userPermissionSelection('select_all_publish' + app.appId, 'label_all_publish' + app.appId, 'select-all-permissions', 'container_' + app.appId, 'app-publish', true, 'Publish', 'Publish')
+                        +userPermissionSelection('select_all_delete' + app.appId, 'label_all_delete' + app.appId, 'select-all-permissions', 'container_' + app.appId, 'app-delete', true, 'Delete', 'Delete')
+
+                      ul(id=ulId)
+                        each environment in app.environments
+                          li
+                            label
+                              strong= environment.name + ':  '
+                              .form-check.form-check-inline
+                                label.form-check-label
+                                  input.form-check-input.app-env.app-read(type='checkbox', data-id=app.appId, data-environment=environment.name, data-type='read')
+                                  |  Read
+                              .form-check.form-check-inline
+                                label.form-check-label
+                                  input.form-check-input.app-env.app-write(type='checkbox', data-id=app.appId, data-environment=environment.name, data-type='write')
+                                  |  Write
+                              .form-check.form-check-inline
+                                label.form-check-label
+                                  input.form-check-input.app-env.app-publish(type='checkbox', data-id=app.appId, data-environment=environment.name, data-type='publish')
+                                  |  Publish
+                              .form-check.form-check-inline
+                                label.form-check-label
+                                  input.form-check-input.app-env.app-delete(type='checkbox', data-id=app.appId, data-environment=environment.name, data-type='delete')
+                                  |  Delete
+        div.text-right
+          button#createUser.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating user") Create user
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var ldapEnabled = #{ldapEnabled};
+      $(function() {
+          elencyConfig.createUser();
+      });

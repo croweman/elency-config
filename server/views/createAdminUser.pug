@@ -1,0 +1,42 @@
+doctype html
+html(lang='en')
+
+  include includes/head.pug
+
+  body
+
+    include includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Welcome to elency-config
+
+    .container
+
+      p An "admin" user does not exist.  Please set the password for the admin user and store it safely somewhere!
+
+      form
+
+        #password-form-group.form-group
+          label.form-control-label(for='password') Password
+          input#password.form-control(type='password', autocomplete='off', data-regex='^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})', data-errormessage='Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters')
+          #password-info.form-control-feedback
+
+        #confirm-password-form-group.form-group
+          label.form-control-label(for='confirm-password') Confirm password
+          input#confirm-password.form-control(type='password', autocomplete='off', data-regex='^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})', data-errormessage='Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters', data-comparison='password', data-comparisontype='equal-to', data-comparisonerrormessage='Passwords do not match!')
+          #confirm-password-info.form-control-feedback
+        div.text-right
+          button#createUser.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Setting password") Set password
+
+        include includes/error-box.pug
+
+      include includes/footer.pug
+
+    include includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.createAdminUser();
+      });
+

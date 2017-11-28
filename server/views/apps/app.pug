@@ -1,0 +1,67 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 App
+
+    .container
+
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + app.teamId
+          span.info-value
+            a(href=url)= app.teamId
+        div.col-md-5
+          strong App Id:
+          span.info-value= app.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= app.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= app.appName
+
+      div.breaker
+
+      if createAnAppEnvironment === true
+        div.input-group
+          - url = '/team/' + app.teamId + '/app/' + app.appId + '/environment/create'
+          a.btn.btn-primary.create-button(role="button", aria-pressed="true", href=url) Create environment
+
+      h3.breaker Environments
+
+      +search(placeholder='Find an environment...')
+
+      table#environments.table
+        thead.thead-default
+          tr
+            th Environment
+            th Key
+        tbody
+          each appEnvironment in appEnvironments
+            tr
+              td
+                 - var url = '/team/' + app.teamId + '/app/' + app.appId + '/environment/' + appEnvironment.environment;
+                 a(href=url)= appEnvironment.environment
+              td
+                - var url = '/key/all/?keyId=' + appEnvironment.keyId;
+                a(href=url)= appEnvironment.keyName
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('environments', [0]);
+      });
+

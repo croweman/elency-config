@@ -1,0 +1,81 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 App Environment
+
+    .container
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + appEnvironment.teamId
+          span.info-value
+            a(href=url)= appEnvironment.teamId
+        div.col-md-5
+          strong App Id:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+          span.info-value
+            a(href=url)= appEnvironment.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= appEnvironment.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= appEnvironment.appName
+        div.col-md-5
+        div.col-md-5
+          strong Environment:
+          = ' ' + appEnvironment.environment
+
+      div.breaker
+
+      if createAConfiguration === true
+        div.input-group
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/configuration/create'
+          - configurationRetrievalUrl = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/configuration/retrieval'
+          - compareUrl = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/configuration/compare'
+          a.btn.btn-primary.breaker.create-button(role="button", aria-pressed="true", href=url) Create configuration
+          a.btn.btn-primary.breaker.configuration-retrieval-button(role="button", aria-pressed="true", href=configurationRetrievalUrl) Configuration retrieval
+          a#compare.btn.btn-primary.breaker(role='button', aria-pressed="true", href=compareUrl) Compare
+      else
+        div.input-group
+          - compareUrl = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/configuration/compare'
+          a#compare.btn.btn-primary.breaker.no-left-margin(role='button', aria-pressed="true", href=compareUrl) Compare
+
+      h3.breaker Configuration versions
+
+      +search(placeholder='Find a version...')
+
+      table#versions.table
+        thead.thead-default
+          tr
+            th Version
+            th Has Published instance
+        tbody
+          each version in appEnvironment.allVersions
+            - var published = (appEnvironment.versions.indexOf(version) !== -1)
+            - var className = (published ? 'table-success' : 'table-warning')
+            tr(class=className)
+              td
+                - var url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/version/' + version;
+                a(href=url)= version
+              td
+                = (published ? 'Yes' : 'No')
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('versions', [0]);
+      });
+

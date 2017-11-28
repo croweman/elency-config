@@ -1,0 +1,96 @@
+doctype html
+html(lang='en')
+
+  include includes/head.pug
+
+  body
+
+    include includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Settings
+
+    .container
+
+      form
+
+        h3 User Management
+
+        .form-group
+          .form-check
+            label.form-check-label
+              if (settings.ldapEnabled !== undefined && settings.ldapEnabled === true)
+                input#useLdap.form-check-input(type='checkbox', checked='checked')
+                |  Use LDAP
+              else
+                input#useLdap.form-check-input(type='checkbox')
+                |  Use LDAP
+
+        #uri-form-group.form-group
+          - var value = settings.ldapUri !== undefined ? settings.ldapUri : '';
+          label.form-control-label(for='uri') LDAP URI
+          input#uri.form-control(type='text', autocomplete='off', data-minlength='1', data-errormessage='You must provide a LDAP URI', value=value)
+          #uri-info.form-control-feedback
+
+        #manager-dn-form-group.form-group
+          - var value = settings.ldapManagerDn !== undefined ? settings.ldapManagerDn : '';
+          label.form-control-label(for='manager-dn') LDAP Manager DN
+          input#manager-dn.form-control(type='text', autocomplete='off', data-minlength='1', data-errormessage='You must provide a manager dn', value=value, placeholder='username@company.com')
+          #manager-dn-info.form-control-feedback
+
+        #manager-password-form-group.form-group
+          - var value = settings.ldapManagerPassword !== undefined ? settings.ldapManagerPassword : '';
+          label.form-control-label(for='manager-password') LDAP Manager password
+          if (settings.ldapManagerEncryptedPassword === true)
+            input#manager-password.form-control(type='password', autocomplete='off', data-minlength='1', data-errormessage='You must provide a manager password', value=value, readonly='readonly')
+          else
+            input#manager-password.form-control(type='password', autocomplete='off', data-minlength='1', data-errormessage='You must provide a manager password', value=value)
+          #manager-password-info.form-control-feedback
+
+        if (settings.ldapManagerEncryptedPassword === true)
+          #edit-password-container
+            button#edit-password.btn.btn-primary(type='button') Edit Password
+            br
+            br
+
+        button#check-ldap.btn.btn-primary(type='button', class='hide') Check LDAP
+
+        div.breaker
+
+        #ldap-error.hide.alert.alert-danger(role='alert')
+          span Connection was unsuccessful
+
+        #ldap-success.hide.alert.alert-success(role='alert')
+          span Connection success
+
+        br
+
+        #search-base-form-group.form-group
+          - var value = settings.ldapSearchBase !== undefined ? settings.ldapSearchBase : '';
+          label.form-control-label(for='search-base') LDAP Search Base
+          input#search-base.form-control(type='text', autocomplete='off', data-minlength='1', data-errormessage='You must provide a search base', placeholder='OU=Teams,DC=internal,DC=company,DC=com', value=value)
+          #search-base-info.form-control-feedback
+
+        #search-filter-form-group.form-group
+          - var value = settings.ldapSearchFilter !== undefined ? settings.ldapSearchFilter : '';
+          label.form-control-label(for='search-filter') LDAP Search Filter
+          input#search-filter.form-control(type='text', autocomplete='off', data-minlength='1', data-errormessage='You must provide a search filter', placeholder='(sAMAccountName={0})', value=value)
+          #search-filter-info.form-control-feedback
+
+        div.text-right
+          button#saveSettings.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Saving") Save
+
+        include includes/error-box.pug
+
+      include includes/footer.pug
+
+    include includes/scripts.pug
+
+    script(type='text/javascript').
+      var ldapManagerEncryptedPassword = #{settings.ldapManagerEncryptedPassword};
+      var ldapManagerEncryptedPasswordValue = '#{settings.ldapManagerEncryptedPasswordValue}';
+      $(function() {
+          elencyConfig.settings();
+      });
+

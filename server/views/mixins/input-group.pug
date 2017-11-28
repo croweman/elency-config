@@ -1,0 +1,10 @@
+mixin inputGroup(id, text, value)
+    - groupId = id + '-form-group'
+    - inputValue = value !== undefined ? value : ''
+    .form-group(id=groupId)
+        label.form-control-label(for=id)= text
+        input.form-control(id=id, value=value)&attributes(attributes)
+        .form-control-feedback(id=(id + '-info'))
+
+
+

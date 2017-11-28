@@ -1,0 +1,20 @@
+﻿{
+  "appId": "proj",
+  "appVersion": "1.1.1",
+  "environment": "prod",
+  "configurationId": "9b386d19-fa7a-40ba-b794-f961e56ffe07",
+  "configuration": [{
+    "key": "KeyOne",
+    "value": ["KeyOneValue"],
+    "encrypted": false
+  }, {
+    "key": "KeyTwo",
+    "value": ["5d86028fa1c3c19a6426a6c4c8a21ad7ebaea77c8267d04e6feebef535a1b023", "49b427d40cf0245c"],
+    "encrypted": true
+  }, {
+    "key": "KeyThree",
+    "value": ["KeyThreeValue"],
+    "encrypted": false
+  }],
+  "configurationHash": "tExQ/a1n0/isuPxqeAT/nw=="
+}

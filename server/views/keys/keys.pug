@@ -1,0 +1,70 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Keys
+
+    .container
+
+      if createAKey === true
+        div.input-group
+         a.btn.btn-primary.create-button(role="button", aria-pressed="true", href="/key/create") Create
+
+      +search(placeholder='Find a key...')
+
+      table#keys.table
+        thead.thead-default
+          tr
+            th Key name
+            th Key Id
+            th Description
+            th Edit
+        tbody
+          each key in keys
+            - var className = (selectedKeyId !== undefined && key.keyId === selectedKeyId) ? 'table-success' : '';
+            tr(class=className)
+              td
+                a(id=key.keyId)
+                span= key.keyName
+              td= key.keyId
+              td= key.description
+              td
+                - var url = '/key/' + key.keyId + '/update';
+                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+
+      #decryptModal.modal.fade(role='dialog')
+        .modal-dialog
+          // Modal content
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal') ×
+              h4.modal-title Decrypt key value
+            .modal-body
+              div
+                | You must select a elency-config private.pem key file to decrypt with
+            .modal-footer
+              button#decryptokbutton.btn.btn-primary(type='button', data-dismiss='modal') OK
+              button.btn.btn-primary(type='button', data-dismiss='modal') Close
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('keys', [0, 1]);
+        var keyId = elencyConfig.getParameterByName('keyId');
+
+        if (keyId !== null) {
+            var element = document.getElementById(keyId);
+            element.scrollIntoView();
+        }
+      });

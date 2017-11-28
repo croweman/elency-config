@@ -1,0 +1,16 @@
+﻿{
+  "appId": "proj",
+  "appVersion": "1.1.1",
+  "environment": "prod",
+  "configurationId": "9b386d19-fa7a-40ba-b794-f961e56ffe07",
+  "configuration": [{
+    "key": "KeyOne",
+    "value": ["KeyOneValue"],
+    "encrypted": false
+  }, {
+    "key": "KeyTwo",
+    "value": ["59ec069e61fc208b0eb88f73ef2044ef", "5fd094ba85e916cb"],
+    "encrypted": true
+  }],
+  "configurationHash": "Re10aakOhCrz488W6ws5/A=="
+}

@@ -1,0 +1,83 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Configuration retrieval
+
+    .container
+      .div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + appEnvironment.teamId
+          span.info-value
+            a(href=url)= appEnvironment.teamId
+        div.col-md-5
+          strong App Id:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+          span.info-value
+            a(href=url)= appEnvironment.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= appEnvironment.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= appEnvironment.appName
+        div.col-md-5
+        div.col-md-5
+          strong Environment:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment
+          span.info-value
+            a(href=url)= appEnvironment.environment
+
+      div.breaker
+
+      div
+        | A configuration will be matched based on the following criteria:
+        ul
+          li it is published
+          li the version is less than or equal to the given application version
+          li the version returned is the highest of all matches of the above criteria
+          li the configuration returned is the most recent revision of the above criteria
+
+      form
+
+        input#teamid.input(style='display:none', value=appEnvironment.teamId)
+        input#appid.input(style='display:none', value=appEnvironment.appId)
+        input#environment.input(style='display:none', value=appEnvironment.environment)
+        +inputGroup('version', 'Version', version)(autocomplete='off', data-regex='^[\\d]{1,}.[\\d]{1,}.[\\d]{1,}$', data-errormessage='Version is not valid e.g. 1.2.3 (^[\d]{1,}.[\d]{1,}.[\d]{1,}$)')
+
+        button#search.btn.btn-primary.breaker(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Searching") Search
+
+        #retrieval-info-box.hide.alert.alert-danger(role='alert')
+          strong No matches were found!
+
+        table#revisions.table.hide
+            thead.thead-default
+              tr
+                th Version
+                th Revision Id
+                th Created By
+                th Published By
+                th Modified
+                th Comment
+            tbody
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.configurationRetrieval();
+      });
+

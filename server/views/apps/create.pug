@@ -1,0 +1,48 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 App Create
+
+    .container
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + team.teamId
+          span.info-value
+            a(href=url)= team.teamId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= team.teamName
+
+        div.breaker
+          | &nbsp;
+
+      form
+
+        input#teamid.input(style='display:none', value=team.teamId)
+        +inputGroup('appid', 'App Id')(autocomplete='off', data-minlength='1', data-errormessage='App Id must be at least 1 character and contain characters (a-zA-Z0-9_-)', data-regex='^[a-zA-Z0-9\_\-]+$')
+        +inputGroup('appname', 'App name')(autocomplete='off', data-minlength='1', data-errormessage='App name must be at least 1 character')
+        +inputGroup('description', 'Description')(autocomplete='off')
+
+        div.text-right
+          button#createApp.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating app") Create app
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.createApp();
+      });

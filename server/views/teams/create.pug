@@ -1,0 +1,35 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Team Create
+
+    .container
+
+      form
+
+        +inputGroup('teamid', 'Team Id')(autocomplete='off', data-minlength='1', data-errormessage='Team Id must be at least 1 character and contain characters (a-zA-Z0-9_-)', data-regex='^[a-zA-Z0-9\_\-]+$')
+        +inputGroup('teamname', 'Team name')(autocomplete='off', data-minlength='1', data-errormessage='Team name must be at least 1 character')
+        +inputGroup('description', 'Description')(autocomplete='off')
+
+        div.text-right
+          button#createTeam.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating Team") Create Team
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.createTeam();
+      });

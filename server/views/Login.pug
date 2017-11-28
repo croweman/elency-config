@@ -1,0 +1,43 @@
+doctype html
+html(lang='en')
+
+  include includes/head.pug
+
+  body
+
+    include includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Login
+
+    .container
+
+      form(action='/login', method='post')
+
+        #username-form-group.form-group
+          label.form-control-label(for='username') User name
+          input#username.form-control(type='text', name='username', autocomplete='off', data-minlength='3', data-errormessage='User name must be at least 3 characters')
+          #username-info.form-control-feedback
+
+        #password-form-group.form-group
+          label.form-control-label(for='password') Password
+          input#password.form-control(type='password', name='password', autocomplete='off', data-regex='^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})', data-errormessage='Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters')
+          #password-info.form-control-feedback
+        div.text-right
+          button#login.btn.btn-primary(type="submit") Login
+
+        if showError === true
+          #error-box.alert.alert-danger(role='alert', style='display:block')
+            strong Login failed:
+            |  #{error}
+
+      include includes/footer.pug
+
+    include includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.login();
+      });
+
