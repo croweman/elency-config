@@ -65,6 +65,6 @@ server/sec/*.*
 **/bin
 **/.vs
 
-releasing/clients/csharp/package
-releasing/clients/node/package
-releasing/server/package
+releasing/clients/csharp/package/**
+releasing/clients/node/package/**
+releasing/server/package/**
