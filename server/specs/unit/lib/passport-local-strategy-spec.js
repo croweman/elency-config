@@ -22,7 +22,7 @@ describe('passport-local-strategy',() => {
     configEncryptionKey: 'th15154p455w0rd!th15154p455w0rd!'
   };
 
-  const elencyConfigUserId = '129bb9ca-afe9-11e7-abc4-cec278b6b50a';
+  const joeBloggsUserId = '26271726-1c91-48e5-ac40-70875d509cc5';
 
   function waitForLDAPServer() {
     return new Promise((resolve) => {
@@ -43,16 +43,17 @@ describe('passport-local-strategy',() => {
     await repos.user.removeAll();
 
     elencyConfigUser = new models.user({
-      userId: elencyConfigUserId,
-      userName: 'elencyConfig',
+      userId: joeBloggsUserId,
+      userName: 'joe.bloggs',
       password: 'aA1!aaaa',
       enabled: true,
-      roles: [ 'administrator', 'team-writer', 'key-writer' ],
+      roles: [ constants.roleIds.administrator, constants.roleIds.teamWriter, constants.roleIds.keyWriter ],
       teamPermissions: [],
       appConfigurationPermissions: []
     });
 
     elencyConfigUser.password = hasher.hashSync(elencyConfigUser.password, elencyConfig.configEncryptionKey);
+    elencyConfigUser.password = hasher.hashSync(elencyConfigUser.password, elencyConfigUser.salt);
 
     await repos.user.add(elencyConfigUser);
 
@@ -61,12 +62,13 @@ describe('passport-local-strategy',() => {
       userName: 'admin',
       password: 'aA1!aaaa',
       enabled: true,
-      roles: [ 'administrator' ],
+      roles: [ constants.roleIds.administrator ],
       teamPermissions: [],
       appConfigurationPermissions: []
     });
 
     adminUser.password = hasher.hashSync(adminUser.password, elencyConfig.configEncryptionKey);
+    adminUser.password = hasher.hashSync(adminUser.password, adminUser.salt);
     await repos.user.add(adminUser);
 
     enc = await encryption(elencyConfig);
@@ -89,7 +91,7 @@ describe('passport-local-strategy',() => {
         ldapManagerDn: 'cn=Bob Smith,dc=test,dc=com',
         ldapManagerPassword: 'f178hJ4$a!',
         ldapSearchBase: 'DC=test,DC=com',
-        ldapSearchFilter: '(sAMAccountName={{{0}}})'
+        ldapSearchFilter: '(sAMAccountName={0})'
       });
 
       settings.ldapManagerPassword = await enc.encrypt(settings.ldapManagerPassword);
@@ -99,17 +101,9 @@ describe('passport-local-strategy',() => {
     describe('authentication succeeds', () => {
 
       it('when valid LDAP and mongo user provided', (done) => {
-        strategy._verify(elencyConfigUser.userName, elencyConfigUser.password, (err, user, message) => {
+        strategy._verify('joe.bloggs', 'aA1!aaaa', (err, user, message) => {
           expect(err).to.eql(null);
-          expect(user.userName).to.eql('elencyconfig');
-          done();
-        });
-      });
-
-      it('when valid admin mongo user provided', (done) => {
-        strategy._verify(adminUser.userName, 'aA1!aaaa', (err, user, message) => {
-          expect(err).to.eql(null);
-          expect(user.userName).to.eql('admin');
+          expect(user.userName).to.eql('joe.bloggs');
           done();
         });
       });
@@ -127,7 +121,7 @@ describe('passport-local-strategy',() => {
       });
 
       it('when valid LDAP user but invalid mongo user', (done) => {
-        strategy._verify('bob.smith', elencyConfigUser.password, (err, user, message) => {
+        strategy._verify('bob.smith', 'f178hJ4$a!', (err, user, message) => {
           expect(err).to.eql(null);
           expect(user).to.eql(false);
           expect(message.message).to.eql('Unknown user bob.smith');
@@ -146,7 +140,7 @@ describe('passport-local-strategy',() => {
             ldapManagerDn: 'cn=Bob Smith,dc=test,dc=com',
             ldapManagerPassword: 'f178hJ4$a!',
             ldapSearchBase: 'DC=test,DC=com',
-            ldapSearchFilter: '(sAMAccountName={{{0}}})'
+            ldapSearchFilter: '(sAMAccountName={0})'
           });
 
           settings.ldapManagerPassword = await enc.encrypt(settings.ldapManagerPassword);
@@ -157,7 +151,7 @@ describe('passport-local-strategy',() => {
           strategy._verify(elencyConfigUser.userName, elencyConfigUser.password, (err, user, message) => {
             expect(err).to.eql(null);
             expect(user).to.eql(false);
-            expect(message.message).to.eql('Unexpected error, check LDAP connectivity settings');
+            expect(message.message).to.eql('Unexpected error, check whether LDAP connectivity settings are invalid');
             done();
           });
         });

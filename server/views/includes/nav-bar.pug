@@ -11,20 +11,26 @@ nav.navbar.navbar-toggleable-md.navbar-inverse.fixed-top.bg-inverse
         if createAKey == true
           a.nav-link(href='/key/all')
             | Keys
-        else
-          a.nav-link.disabled(href='/key/all')
-            | Keys
       li.nav-item.active
-        a.nav-link(href='/user/all')
-          | Users
+        if createAUser == true
+          a.nav-link(href='/user/all')
+            | Users
+      li.nav-item.active
+        if createARole == true
+          a.nav-link(href='/role/all')
+            | Roles
+      li.nav-item.active
+        if createAUser == true
+          a.nav-link(href='/user/audit')
+            | Audit
       if loggedIn == true
+        if changeSettings === true
+          li.nav-item.active
+            a.nav-link(href='/settings') Settings
         li.nav-item.active.dropdown
           a.nav-link.dropdown-toggle(href="#", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false") #{userName}
           div.dropdown-menu.nav-dropdown(aria-labelledby="dropdown01")
-            if userName !== 'admin' && changeAPassword === true
+            if userName !== 'admin' && ldapEnabled === false
               - onclick = "window.location='/user/" + user.userId + "/change-password';return false"
               a.dropdown-item(href='#', onclick=onclick) Change password
-            if changeSettings === true
-              - onclick = "window.location='/settings';return false"
-              a.dropdown-item(href='#', onclick=onclick) Settings
             a.dropdown-item(href='#', onclick='window.location="/logout";return false') Logout

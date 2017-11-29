@@ -1,0 +1,47 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/search.pug
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Roles
+
+    .container
+
+      if createARole === true
+        div.input-group
+          a.btn.btn-primary.create-button(role="button", aria-pressed="true", href="/role/create") Create
+
+      +search(placeholder='Find a role...')
+
+      table#roles.table
+        thead.thead-default
+          tr
+            th Role name
+            th Edit
+        tbody
+          each role in availableRoles
+            tr
+              td
+                a(id=role.roleId)
+                = role.roleName
+              td
+                - var url = '/role/' + role.roleId + '/update';
+                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+        elencyConfig.search('roles', [0]);
+      });
+

@@ -15,14 +15,15 @@ describe('node client and node server acceptance tests', () => {
   const appName = 'awesome micro service';
   const environment = 'production';
   const elencyConfigUserId = '129bb9ca-afe9-11e7-abc4-cec278b6b50a';
+  const roleId = 'f667c22a-af7e-4733-ab15-31540686372c';
 
   const elencyConfig = {
     mongoUrl: 'mongodb://localhost:27017/elency-config',
-    HMACAuthorizationKey: 'MzY4dUBKaTFhMjM0ODIxamhoRmEhYWE=',
-    configEncryptionKey: 'NTY4dUppMWEyQDM0NThqaGhGYSFhYQ=='
+    HMACAuthorizationKey: 'YWJlZjYwNzQwYzk4NDY4Zjg3ZTg5MWU0',
+    configEncryptionKey: 'M2VlMzRiOTFiNmM0NDY2YWI0MTAxZmZi'
   };
 
-  const keyEncryptionKey = 'NTY4dUppMWEyQDM0NThqaGhGYSFhYQ==';
+  const keyEncryptionKey = 'ZTk0YTU5YjNhMjk4NGI3NmIxNWExNzdi';
 
   let repos;
   let enc;
@@ -54,6 +55,7 @@ describe('node client and node server acceptance tests', () => {
     await repos.token.removeAll();
     await repos.user.removeAll();
     await repos.settings.removeAll();
+    await repos.role.removeAll();
 
 
     let adminUser = new models.user({
@@ -61,20 +63,20 @@ describe('node client and node server acceptance tests', () => {
       userName: 'admin',
       password: 'aA1!aaaa',
       enabled: true,
-      roles: [ 'administrator' ],
+      roles: [ constants.roleIds.administrator ],
       teamPermissions: [],
       appConfigurationPermissions: []
     });
 
-    adminUser.password = hasher.hashSync(adminUser.password, elencyConfig.configEncryptionKey);
+    adminUser.password = adminUser.getHashedPassword(hasher, adminUser.password, elencyConfig.configEncryptionKey);
     await repos.user.add(adminUser);
 
     let elencyConfigUser = new models.user({
       userId: elencyConfigUserId,
       userName: 'elencyConfig',
-      password: 'aA1!aaaa',
+      password: 'bB1!bbbb',
       enabled: true,
-      roles: [ 'administrator', 'team-writer', 'key-writer' ],
+      roles: [ constants.roleIds.administrator, constants.roleIds.teamWriter, constants.roleIds.keyWriter, roleId ],
       teamPermissions: [
         new models.teamPermission({
           id: teamId,
@@ -87,14 +89,36 @@ describe('node client and node server acceptance tests', () => {
           environment: environment,
           read: true,
           write: true,
-          publish: true,
-          delete: true
+          publish: false,
+        })
+      ]
+    });
+    
+    elencyConfigUser.password = elencyConfigUser.getHashedPassword(hasher, elencyConfigUser.password, elencyConfig.configEncryptionKey);
+    await repos.user.add(elencyConfigUser);
+
+    let role = new models.role({
+      roleId,
+      roleName: 'awesome role',
+      enabled: true,
+      teamPermissions: [
+        new models.teamPermission({
+          id: teamId,
+          write: true
+        })
+      ],
+      appConfigurationPermissions: [
+        new models.appConfigurationPermission({
+          id: appId,
+          environment: environment,
+          read: true,
+          write: true,
+          publish: true
         })
       ]
     });
 
-    elencyConfigUser.password = hasher.hashSync(elencyConfigUser.password, elencyConfig.configEncryptionKey);
-    await repos.user.add(elencyConfigUser);
+    await repos.role.add(role);
 
     let settings = new models.settings({
       settingsId: uuid(),
@@ -103,7 +127,7 @@ describe('node client and node server acceptance tests', () => {
       ldapManagerDn: 'cn=Bob Smith,dc=test,dc=com',
       ldapManagerPassword: 'f178hJ4$a!',
       ldapSearchBase: 'DC=test,DC=com',
-      ldapSearchFilter: '(sAMAccountName={{{0}}})'
+      ldapSearchFilter: '(sAMAccountName={0})'
     });
 
     settings.ldapManagerPassword = await enc.encrypt(settings.ldapManagerPassword);
@@ -244,7 +268,7 @@ describe('node client and node server acceptance tests', () => {
         environment,
         refreshInterval: 3000,
         HMACAuthorizationKey: elencyConfig.HMACAuthorizationKey,
-        configEncryptionKey: elencyConfig.configEncryptionKey,
+        configEncryptionKey: keyEncryptionKey,
         retrieved: async () => {
           console.log('** RETRIEVED CONFIG **');
         },
@@ -318,7 +342,7 @@ describe('node client and node server acceptance tests', () => {
         environment,
         refreshInterval: 3000,
         HMACAuthorizationKey: elencyConfig.HMACAuthorizationKey,
-        configEncryptionKey: elencyConfig.configEncryptionKey,
+        configEncryptionKey: keyEncryptionKey,
         retrieved: async () => {
           console.log('** RETRIEVED CONFIG **');
         },
@@ -357,7 +381,7 @@ describe('node client and node server acceptance tests', () => {
         environment,
         refreshInterval: 3000,
         HMACAuthorizationKey: elencyConfig.HMACAuthorizationKey,
-        configEncryptionKey: elencyConfig.configEncryptionKey,
+        configEncryptionKey: keyEncryptionKey,
         retrieved: async () => {
           console.log('** RETRIEVED CONFIG **');
         },
@@ -395,7 +419,7 @@ describe('node client and node server acceptance tests', () => {
         environment: 'test',
         refreshInterval: 3000,
         HMACAuthorizationKey: elencyConfig.HMACAuthorizationKey,
-        configEncryptionKey: elencyConfig.configEncryptionKey,
+        configEncryptionKey: keyEncryptionKey,
         retrieved: async () => {
           console.log('** RETRIEVED CONFIG **');
         },
@@ -432,7 +456,7 @@ describe('node client and node server acceptance tests', () => {
         environment,
         refreshInterval: 3000,
         HMACAuthorizationKey: elencyConfig.HMACAuthorizationKey,
-        configEncryptionKey: elencyConfig.configEncryptionKey,
+        configEncryptionKey: keyEncryptionKey,
         retrieved: async () => {
           console.log('** RETRIEVED CONFIG **');
         },
@@ -469,7 +493,7 @@ describe('node client and node server acceptance tests', () => {
         environment,
         refreshInterval: 3000,
         HMACAuthorizationKey: elencyConfig.HMACAuthorizationKey.substr(0, elencyConfig.HMACAuthorizationKey.length - 1) + 'z',
-        configEncryptionKey: elencyConfig.configEncryptionKey,
+        configEncryptionKey: keyEncryptionKey,
         retrieved: async () => {
           console.log('** RETRIEVED CONFIG **');
         },

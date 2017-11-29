@@ -60,6 +60,10 @@ function add(configuration) {
   return base.insertOne(configuration);
 }
 
+function addMany(configurations) {
+  return base.insertMany(configurations);
+}
+
 function update(configuration) {
   return base.updateOne({ configurationId: configuration.configurationId }, configuration);
 }
@@ -72,12 +76,20 @@ function updateApp(app) {
   return base.updateMany({ teamId: app.teamId, appId: app.appId }, { $set: { appName: app.appName }});
 }
 
+function updateAppTeam(app, originalTeamId, team) {
+  return base.updateMany({ appId: app.appId, teamId: originalTeamId }, { $set : { teamId: team.teamId, teamName: team.teamName }});
+}
+
 function remove(configuration) {
   return base.removeOne({ configurationId: configuration.configurationId, published: false });
 }
 
 function removeAll() {
   return base.removeMany({});
+}
+
+function updateEnvironment(environment, appEnvironment) {
+  return base.updateMany({ appId: appEnvironment.appId, environment }, { $set: { environment: appEnvironment.environment }});
 }
 
 function addIndexes() {
@@ -92,6 +104,7 @@ module.exports = (mongoClientInstance) => {
 
   return {
     add,
+    addMany,
     find,
     findByConfigurationId,
     findAll,
@@ -99,7 +112,9 @@ module.exports = (mongoClientInstance) => {
     update,
     updateApp,
     updateTeam,
+    updateAppTeam,
     remove,
-    removeAll
+    removeAll,
+    updateEnvironment
   };
 };

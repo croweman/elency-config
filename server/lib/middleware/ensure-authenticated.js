@@ -15,7 +15,7 @@ function getOriginalUrl(originalUrl) {
 }
 
 function redirectToLogin(req, res, originalUrl) {
-  if (req.session && req.session) {
+  if (req.session) {
     req.session.returnTo = originalUrl;
   }
 
@@ -43,7 +43,7 @@ async function process(req, res, next) {
       const user = req.user;
 
       if (user.isNull() || user.enabled !== true) {
-        return redirectToLogin(req, res, originalUrl);
+        return redirectToLogin(req, res, req.originalUrl);
       }
 
       next();
@@ -57,10 +57,10 @@ async function process(req, res, next) {
         }
 
         adminUserExists = true;
-        return redirectToLogin(req, res, originalUrl);
+        return redirectToLogin(req, res, req.originalUrl);
       }
       else {
-        return redirectToLogin(req, res, originalUrl);
+        return redirectToLogin(req, res, req.originalUrl);
       }
     }
   }

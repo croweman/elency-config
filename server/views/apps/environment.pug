@@ -10,7 +10,8 @@ html(lang='en')
 
     #top.jumbotron
       .container
-        h2.display-6 App Environment
+        h2.display-6
+          = 'App Environment - ' + appEnvironment.environment
 
     .container
       div.row
@@ -34,6 +35,16 @@ html(lang='en')
         div.col-md-5
           strong Environment:
           = ' ' + appEnvironment.environment
+        div.col-md-5
+        div.col-md-5
+          strong Modified:
+          span.info-value= appEnvironment.updated
+        div.col-md-5
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + appEnvironment.updatedBy.userId
+          span.info-value
+            a(href=url)=appEnvironment.updatedBy.userName
 
       div.breaker
 

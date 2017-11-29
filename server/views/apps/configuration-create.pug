@@ -102,7 +102,7 @@ html(lang='en')
         input#appid.input(style='display:none', value=appEnvironment.appId)
         input#environment.input(style='display:none', value=appEnvironment.environment)
         +inputGroup('version', 'Version', version)(autocomplete='off', data-regex='^[\\d]{1,}.[\\d]{1,}.[\\d]{1,}$', data-errormessage='Version is not valid e.g. 1.2.3 (^[\d]{1,}.[\d]{1,}.[\d]{1,}$)')
-        +inputGroup('comment', 'Comment', '')(autocomplete='off')
+        +inputGroup('comment', 'Comment', comment)(autocomplete='off')
 
         button#addConfigurationItem.btn.btn-primary.breaker(type="button") Add item
         button#import.btn.btn-primary.breaker(type="button", data-toggle='modal', data-target='#importModal') Import
@@ -123,12 +123,12 @@ html(lang='en')
                     input.form-control.key-name(id=id + 'keyname', type='text', value=entry.key, autocomplete='off', data-minlength='1', data-errormessage='Key name must be at least 1 character and contain characters (a-zA-Z0-9_)', data-regex='^[a-zA-Z0-9_]+$')
                     div.form-control-feedback(id=id + 'keyname-info')
                   - onclick = "javascript:elencyConfig.deleteItem('" + id + "')"
-                  button.close(type='button', title='Delete', onclick=onclick) ×
+                  button.close(type='button', title='Delete', onclick=onclick, tabindex='-1') ×
                   - onclick = "javascript:elencyConfig.moveUp(this, '" + id + "keyname')"
-                  button.close.move-up(type='button', title='Move up', onclick=onclick)
+                  button.close.move-up(type='button', title='Move up', onclick=onclick, tabindex='-1')
                     i.icon-arrow-up
                   - onclick = "javascript:elencyConfig.moveDown(this, '" + id + "keyname')"
-                  button.close.move-down(type='button', title='Move down', onclick=onclick)
+                  button.close.move-down(type='button', title='Move down', onclick=onclick, tabindex='-1')
                     i.icon-arrow-down
                   div.form-group.col-md-6.float-right(id=id + 'value-form-group')
                     label.form-control-label(for=id + 'value') Value
@@ -149,7 +149,8 @@ html(lang='en')
                           input.form-check-input.key-secure(id=id + 'secure', type='checkbox')
                           |  Encrypted
 
-        #additional-buttons.hide
+        - hideAdditionalButtonsClass = (currentCount > 1 ? '' : 'hide')
+        #additional-buttons(class=hideAdditionalButtonsClass)
           button#addConfigurationItem2.btn.btn-primary.breaker(type="button") Add item
           button#goTop.btn.btn-primary.breaker(type="button") Top
 
@@ -178,7 +179,7 @@ html(lang='en')
                 span An error occurred while trying to decrypt configuration entries.  The key may be invalid!
 
 
-        include ../includes/error-box.pug
+      include ../includes/error-box.pug
 
       include ../includes/footer.pug
 
@@ -186,7 +187,7 @@ html(lang='en')
 
     script(type='text/javascript').
       var itemCount = 10000;
-      var currentCount = 0;
+      var currentCount = #{currentCount};
       var preload = #{preload};
       var initialEntries = #{initialEntries};
       var createFrom = '#{createFrom}';

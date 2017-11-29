@@ -7,6 +7,8 @@ class Team {
     this.teamId = obj.teamId || uuid();
     this.teamName = obj.teamName || '';
     this.description = obj.description || '';
+    this.updated = obj.updated || new Date();
+    this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
 
     this.teamId = this.teamId.trim();
     this.teamName = this.teamName.trim();

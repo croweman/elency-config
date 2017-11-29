@@ -3,6 +3,7 @@ const general = require('./general');
 const key = require('./key');
 const team = require('./team');
 const user = require('./user');
+const role = require('./role');
 
 module.exports = (configuration, repositories, encryption) => {
   return {
@@ -10,6 +11,7 @@ module.exports = (configuration, repositories, encryption) => {
     general: general(configuration, repositories, encryption),
     key: key(configuration, repositories, encryption),
     team: team(configuration, repositories, encryption),
-    user: user(configuration, repositories, encryption)
+    user: user(configuration, repositories, encryption),
+    role: role(configuration, repositories, encryption)
   };
 };

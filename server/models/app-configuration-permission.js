@@ -7,7 +7,6 @@ class AppConfigurationPermission {
     this.read = obj.read;
     this.write = obj.write;
     this.publish = obj.publish;
-    this.delete = obj.delete;
   }
 
   isNull() {

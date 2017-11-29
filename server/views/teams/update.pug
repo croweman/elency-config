@@ -14,6 +14,24 @@ html(lang='en')
 
     .container
 
+      div.row
+        div.col-md-5
+          strong Team Id:
+          = ' ' + team.teamId
+        div.col-md-5
+          strong Modified:
+          span.info-value= team.updated
+        div.col-md-5
+          strong Team Name:
+          = ' ' + team.teamName
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + team.updatedBy.userId
+          span.info-value
+            a(href=url)=team.updatedBy.userName
+
+      div.breaker
+
       form
 
         #teamid-form-group.form-group

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cp ./support/config.json ./configuration_files/config.json
+cp ./support/keys.json ./configuration_files/keys.json
+cp ./support/elency-config.private.pem ./configuration_files/elency-config.private.pem
+cp ./support/elency-config.public.pem ./configuration_files/elency-config.public.pem
+
+node ./insert-data.js
+node ./wait.js
+node ./index.js

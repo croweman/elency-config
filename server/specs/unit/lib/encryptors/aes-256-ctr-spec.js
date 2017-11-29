@@ -3,7 +3,7 @@ const expect = require('chai').expect,
 
 describe('aes-256-ctr lib', function() {
 
-    const password = 'th15154p455w0rd!';
+    const password = 'th15154p455w0rd!th15154p455w0rd!';
 
     it('correctly encrypts a string', async () => {
         const val = await encryptor.encrypt('TheValueToEncrypt', password);

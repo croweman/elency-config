@@ -1,0 +1,56 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Role Create
+
+    .container
+
+      form
+
+        +inputGroup('rolename', 'Role name')(autocomplete='off', data-minlength='3', data-errormessage='Role name must be at least 3 characters')
+
+        div.panel.panel-default.permissions.col-md-12
+          div.permissions-heading
+            | Team Permissions
+          div#team-permissions
+
+          #add-team.form-group.col-md-12.team
+            label.form-control-label(for='team') Add a team:
+            input#team.typeahead.form-control.col-md-8(type='text', autocomplete='off', placeholder="Select a team", value='', data-errormessage="Select a valid team")
+            #team-info.form-control-feedback
+
+        div.panel.panel-default.permissions.col-md-12
+          div.permissions-heading
+            | App Configuration Permissions
+          div#app-permissions
+
+          #add-app.form-group.col-md-12.team
+            label.form-control-label(for='app') Add an app:
+            input#app.typeahead.form-control.col-md-8(type='text', autocomplete='off', placeholder="Select an app", value='', data-errormessage="Select a valid app")
+            #app-info.form-control-feedback
+
+        div.text-right
+          button#createRole.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating role") Create role
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var availableTeams = !{JSON.stringify(available.teams)};
+      var availableApps = !{JSON.stringify(available.apps)};
+      var appEnvironments = !{JSON.stringify(available.appEnvironments)};
+      $(function() {
+          elencyConfig.createRole();
+      });

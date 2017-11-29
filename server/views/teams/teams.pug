@@ -26,7 +26,8 @@ html(lang='en')
             th Team Id
             th Team name
             th Description
-            th Edit
+            if updateATeam === true
+              th Edit
         tbody
           each team in teams
             tr
@@ -35,9 +36,10 @@ html(lang='en')
                 a(href=url)= team.teamId
               td= team.teamName
               td= team.description
-              td
-                - var url = '/team/' + team.teamId + '/update';
-                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+              if updateATeam === true
+                td
+                  - var url = '/team/' + team.teamId + '/update';
+                  a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
 
       include ../includes/footer.pug
 

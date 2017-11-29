@@ -16,12 +16,12 @@ exec('openssl rsa -in ./server/sec/elency-config.private.pem -outform PEM -pubou
 
 const elencyConfig = {
   mongoUrl: 'mongodb://localhost:27017/elency-config',
-  HMACAuthorizationKey: 'MzY4dUBKaTFhMjM0ODIxamhoRmEhYWE=',
+  HMACAuthorizationKey: 'YWJlZjYwNzQwYzk4NDY4Zjg3ZTg5MWU0',
   exposeUIRoutes: true
 };
 
 let keys = {
-  configEncryptionKey: 'NTY4dUppMWEyQDM0NThqaGhGYSFhYQ=='
+  configEncryptionKey: 'M2VlMzRiOTFiNmM0NDY2YWI0MTAxZmZi'
 };
 
 let keysContent = JSON.stringify(keys);

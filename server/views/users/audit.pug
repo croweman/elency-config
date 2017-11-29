@@ -1,0 +1,59 @@
+doctype html
+html(lang='en')
+
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6
+          | Audit Log
+
+    .container
+
+      div.row
+
+        #action-form-group.form-group.col-md-6
+          label.form-control-label(for='action-type') Action
+          select#action.form-control
+            option(value='') All
+            each actionType in actionTypes
+              option(value=actionType)=actionType
+
+        #user-form-group.form-group.col-md-6
+          label.form-control-label(for='user') User
+          select#user.form-control
+            option(value='') All
+            each user in users
+              option(value=user.userId)=user.userName
+
+      button#getlogs.btn.btn-primary.no-left-margin(type='button', data-loading-text="<i class='icon-spinner icon-spin'></i> Getting Logs") Get Logs
+
+      #pagination-container-1
+
+      table#audit.table.audit-hidden
+        thead.thead-default
+          tr
+            th Action
+            th Data
+            th Changed
+            th User
+        tbody(id='paginated-content')
+
+
+      #pagination-container-2
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var pageSize = #{pageSize};
+      var numberOfPagesInNavigation = 5;
+      var getLogsUrl = '#{url}';
+      $(function() {
+        elencyConfig.audit();
+      });

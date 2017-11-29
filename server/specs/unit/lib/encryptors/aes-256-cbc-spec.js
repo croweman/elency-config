@@ -5,7 +5,6 @@ const crypto = require('crypto'),
 describe('aes-256-cbc lib', function() {
 
     const password = 'th15154p455w0rd!th15154p455w0rd!';
-    //const iv = crypto.randomBytes(16).toString('hex').slice(0, 16);
     const iv = '42d1e9706b63140c';
 
     it('correctly encrypts a string', async () => {

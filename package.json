@@ -11,11 +11,11 @@
     "test": "sh ./test.sh",
     "consumertests": "istanbul test ./node_modules/mocha/bin/_mocha -- specs -R spec --recursive --timeout 20000"
   },
-  "author": "Lee Crowe",
-  "license": "ISC",
+  "author": "Lee Crowe a.k.a croweman",
+  "license": "MIT",
   "dependencies": {
-    "debug": "^3.1.0",
-    "uuid": "^3.0.1"
+    "debug": "~3.1.0",
+    "uuid": "~3.0.1"
   },
   "devDependencies": {
     "chai": "~3.5.0",

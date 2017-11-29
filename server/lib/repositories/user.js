@@ -12,8 +12,15 @@ function findByUserName(userName) {
   return base.findOne({ userName });
 };
 
-function findAll() {
-  return base.find({ userName: { $ne: 'admin' } }, {
+function findAll(options) {
+  options = options || {};
+  let query = { userName: { $ne: 'admin' } };
+
+  if (options.includeAdmin === true) {
+    query = {};
+  }
+
+  return base.find(query, {
     sort: {
       enabled: -1,
       userName: 1
@@ -29,8 +36,45 @@ function add(user) {
   return base.insertOne(user);
 }
 
+function addMany(users) {
+  return base.insertMany(users);
+}
+
 function update(user) {
   return base.updateOne({ userId: user.userId }, user);
+}
+
+function updateTeamNameInFavourites(team) {
+  return base.updateMany({
+      "favourites.teams.teamId": team.teamId
+    },
+    {
+      $set: {
+        "favourites.teams.$.teamName": team.teamName
+      }
+    });
+}
+
+function updateAppNameInFavourites(app) {
+  return base.updateMany({
+      "favourites.apps.appId": app.appId
+    },
+    {
+      $set: {
+        "favourites.apps.$.appName": app.appName
+      }
+    });
+}
+
+function updateEnvironment(environment, appEnvironment) {
+  return base.updateMany({ 
+      "appConfigurationPermissions.id": appEnvironment.appId,
+      "appConfigurationPermissions.environment": environment
+    }, { 
+    $set: {
+      "appConfigurationPermissions.$.environment": appEnvironment.environment
+    }
+  });
 }
 
 function remove(user) {
@@ -44,6 +88,9 @@ function removeAll() {
 function addIndexes() {
   base.addIndex({ userId: 1 }, { unique: true });
   base.addIndex({ userName: 1 }, { unique: true });
+  base.addIndex({ "favourites.teams.teamId": 1 }, { unique: false, background: true });
+  base.addIndex({ "favourites.apps.appId": 1 }, { unique: false, background: true });
+  base.addIndex({ "appConfigurationPermissions.id": 1, "appConfigurationPermissions.environment": 1 }, { unique: false, background: true });
 }
 
 module.exports = (mongoClientInstance) => {
@@ -54,11 +101,15 @@ module.exports = (mongoClientInstance) => {
 
   return {
     add,
+    addMany,
     find,
     findByUserName,
     findAll,
     update,
     remove,
-    removeAll
+    removeAll,
+    updateTeamNameInFavourites,
+    updateAppNameInFavourites,
+    updateEnvironment
   };
 };

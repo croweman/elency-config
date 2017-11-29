@@ -1,4 +1,5 @@
 const app = require('./app');
+const logger = require('./lib/logger');
 
 async function startup() {
   try {
@@ -6,21 +7,20 @@ async function startup() {
 
     const port = process.env.PORT || 3000;
     const server = application.listen(port, '0.0.0.0', () => {
-      console.log(`elency-config listening on ${port}`);
+      logger.info(`elency-config listening on ${port}`);
     });
 
     process.on('SIGTERM', () => {
-      console.log('Recieved SIGTERM: attempting gracefull shutdown.');
+      logger.info('Recieved SIGTERM: attempting gracefull shutdown.');
 
       server.close(() => {
-        console.log('Closed out remaining connections. Shutting down...');
+        logger.info('Closed out remaining connections. Shutting down...');
         process.exit();
       });
     });
   }
   catch (err) {
-    // log error
-    console.log(err);
+    logger.fatal(err);
     process.exit(1);
   }
 }

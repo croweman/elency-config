@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const expect = require('chai').expect;
 
 const aes256cbc = require('../../../../lib/encryptors/aes-256-cbc');
+const { generateIV } = require('../../../../lib/keys');
 
 const Encryption = require('../../../../lib/utils/encryption'),
   models = require('../../../../models');
@@ -27,7 +28,7 @@ describe('utils - encryption', () => {
         encrypted: false
       });
 
-      const iv = crypto.randomBytes(16).toString('hex').slice(0, 16);
+      const iv = generateIV();
 
       const configurationKey2 = new models.configurationKey({
         key: 'KeyTwo',

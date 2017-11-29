@@ -11,12 +11,15 @@ async function start() {
   function retrieved() {
     console.log();
     console.log('__________________________________________');
-    console.log(new Date().toString());
-    console.log(`Version: ${elencyConfigInstance.appVersion()}`);
-    console.log(`Environment: ${elencyConfigInstance.environment()}`);
-    console.log(`Configuration Id: ${elencyConfigInstance.configurationId()}`);
+    console.log(`Configuration retrieved: ${new Date().toString()}`);
+    console.log('Version: ' + elencyConfigInstance.appVersion());
+    console.log('Environment: ' + elencyConfigInstance.environment());
+    console.log('Configuration Id: ' + elencyConfigInstance.configurationId());
+    console.log('Keys and values:');
+    console.log();
+    
     elencyConfigInstance.getAllKeys().forEach((key) => {
-      console.log(`${key}: ${elencyConfigInstance.get(key)}`)
+      console.log(key + ': ' + elencyConfigInstance.get(key));
     });
     console.log('__________________________________________');
   }
@@ -43,6 +46,8 @@ async function start() {
   }
   catch (err) {
     console.log(`An error occurred while initialising elencyConfig client: ` + JSON.stringify(err));
+    console.log(err);
+    process.exit(1);
   }
 }
 

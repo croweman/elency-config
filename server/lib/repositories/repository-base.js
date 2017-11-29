@@ -85,6 +85,21 @@ function insertOne(mongoClient, collectionName) {
   }
 }
 
+function insertMany(mongoClient, collectionName) {
+
+  return function(data) {
+    return new Promise((resolve, reject) => {
+      mongoClient
+        .collection(collectionName)
+        .insertMany(data)
+        .then(() => {
+          resolve(data);
+        })
+        .catch(reject)
+    });
+  }
+}
+
 function updateOne(mongoClient, collectionName) {
 
   return function(query, data) {
@@ -156,6 +171,7 @@ module.exports = (mongoClient, collectionName, model) => {
     find: find(mongoClient, collectionName, model),
     count: count(mongoClient, collectionName),
     insertOne: insertOne(mongoClient, collectionName),
+    insertMany: insertMany(mongoClient, collectionName),
     updateOne: updateOne(mongoClient, collectionName),
     updateMany: updateMany(mongoClient, collectionName),
     removeOne: removeOne(mongoClient, collectionName),

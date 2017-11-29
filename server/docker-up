@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ ! -d "./configuration_files_from_secure_location" ]; then
+    mkdir ./configuration_files_from_secure_location
+fi
+
+if [ ! -d "./configuration_files" ]; then
+    mkdir ./configuration_files
+fi
+
+if [ ! -f "./configuration_files_from_secure_location/hasRun.json" ]; then
+    cd ./configuration_files_from_secure_location
+
+    openssl genrsa -out ./elency-config.private.pem 2048
+    openssl rsa -in ./elency-config.private.pem -outform PEM -pubout -out ./elency-config.public.pem
+
+    echo "{ \"mongoUrl\": \"mongodb://mongodb:27017/elency-config\", \"HMACAuthorizationKey\": \"NGM5YjYwZjhjZmQ4NGE5YWE1MmVhMTg3\", \"exposeUIRoutes\": true, \"maxJsonPostSize\": \"1mb\", \"runOverHttp\": true, \"sessionLifeTimeInMinutes\": 20160, \"validateAuthorizationTokenWindow\": true, \"authorizationTokenValidationWindowInSeconds\": 300 }" >> config.json
+    echo "{ \"configEncryptionKey\": \"MDdiNjYwNzFiYjk2NDgwMzliMTZkZmI1\" }" >> keys.json
+    cat ./config.json
+    CONFIG_FOLDER_PATH=./configuration_files_from_secure_location SEC_FOLDER_PATH=./configuration_files_from_secure_location node ../encrypt-configuration-files.js
+    echo "{ \"hasRun\": true }" >> hasRun.json
+    cd ..
+fi
+
+cp ./configuration_files_from_secure_location/config.json ./configuration_files/config.json
+cp ./configuration_files_from_secure_location/keys.json ./configuration_files/keys.json
+cp ./configuration_files_from_secure_location/elency-config.private.pem ./configuration_files/elency-config.private.pem
+cp ./configuration_files_from_secure_location/elency-config.public.pem ./configuration_files/elency-config.public.pem
+
+docker-compose up

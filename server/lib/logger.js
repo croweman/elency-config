@@ -160,6 +160,6 @@ class logger {
   }
 }
 
-const loggerInstance = new logger(process.env.LOG_LEVEL || 'NONE');
+const loggerInstance = new logger(process.env.LOG_LEVEL || 'INFO');
 
 module.exports = loggerInstance;

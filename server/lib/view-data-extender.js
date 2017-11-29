@@ -14,6 +14,8 @@ async function extendNoState(viewData, req){
   viewData.changeSettings = false;
   viewData.createAUser = false;
   viewData.updateAUser = false;
+  viewData.createARole = false;
+  viewData.updateARole = false;
   viewData.createATeam = false;
   viewData.updateATeam = false;
   viewData.createAnApp = false;
@@ -30,6 +32,8 @@ async function extendNoState(viewData, req){
   viewData.updateAKey = false;
   viewData.changeAPassword = false;
   viewData.ldapEnabled = false;
+  viewData.elencyConfigJsFileName = process.env.elencyConfigJsFileName;
+  viewData.elencyConfigCssFileName = process.env.elencyConfigCssFileName;
 
   return viewData;
 }
@@ -45,6 +49,8 @@ async function extend(viewData, req){
   viewData.changeSettings = await authorizationInstance.changeSettings(user, req.params);
   viewData.createAUser = await authorizationInstance.createAUser(user, req.params);
   viewData.updateAUser = await authorizationInstance.updateAUser(user, req.params);
+  viewData.createARole = await authorizationInstance.createARole(user, req.params);
+  viewData.updateARole = await authorizationInstance.updateARole(user, req.params);
   viewData.createATeam = await authorizationInstance.createATeam(user, req.params);
   viewData.updateATeam = await authorizationInstance.updateATeam(user, req.params);
   viewData.createAnApp = await authorizationInstance.createAnApp(user, req.params);
@@ -61,6 +67,8 @@ async function extend(viewData, req){
   viewData.updateAKey = await authorizationInstance.updateAKey(user, req.params);
   viewData.changeAPassword = await authorizationInstance.changeAPassword(user, req.params);
   viewData.ldapEnabled = await ldapEnabled();
+  viewData.elencyConfigJsFileName = process.env.elencyConfigJsFileName;
+  viewData.elencyConfigCssFileName = process.env.elencyConfigCssFileName;
 
   return viewData;
 }

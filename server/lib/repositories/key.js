@@ -20,6 +20,10 @@ function add(key) {
   return base.insertOne(key);
 }
 
+function addMany(keys) {
+  return base.insertMany(keys);
+}
+
 function update(key) {
   return base.updateOne({ keyId: key.keyId }, key);
 }
@@ -45,6 +49,7 @@ module.exports = (mongoClientInstance) => {
 
   return {
     add,
+    addMany,
     find,
     findAll,
     update,

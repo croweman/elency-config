@@ -3,14 +3,6 @@
   "appVersion": "1.1.1",
   "environment": "prod",
   "configurationId": "9b386d19-fa7a-40ba-b794-f961e56ffe07",
-  "configuration": [{
-    "key": "KeyOne",
-    "value": ["KeyOneValue"],
-    "encrypted": false
-  }, {
-    "key": "KeyTwo",
-    "value": ["59ec069e61fc208b0eb88f73ef2044ef", "5fd094ba85e916cb"],
-    "encrypted": true
-  }],
+  "configuration": ["00f42afad19c178194b55ccbde31b6aabd076853091b1f5ec1d32b0b1f10663373bf67554ed6dbce1af719ffc023badfe7df6a81329621546bf42539341e61e7350839b4642787b4de0bf041a6e151e91b77ebce8d1d3cc841dfc266382c5855c1b4a06ab5c49ed9e938af4fdb1f8d0a48e1013e4cc3eac1260041c090655692f9e28a23bb5a542bd6eb794ad08359ced7988eb6ec272b98300468e6cc079a90","5fd084ba85e916cz"],
   "configurationHash": "Re10aakOhCrz488W6ws5/A=="
 }

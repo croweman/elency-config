@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cp -r ../../../server/specs/support/ldap-mock-server/* ./
+
+rm -rf ./node_modules
+
+#docker build -t croweman/elency-config-demo-ldap-mock-server:0.0.3-beta .
+#docker push croweman/elency-config-demo-ldap-mock-server:0.0.3-beta
+docker build -t ldap-mock-server .
+
+rm -rf ./lib
+rm -rf ./node_modules
+rm ./index.js
+rm ./package.json
+rm ./package-lock.json
+
+

@@ -1,6 +1,7 @@
 const uuid = require('uuid').v4;
 const express = require('express');
 const passport = require('passport');
+const moment = require('moment');
 const constants = require('../lib/constants');
 const models = require('../models');
 const noCache = require('../lib/middleware/no-cache');
@@ -10,23 +11,52 @@ const logger = require('../lib/logger');
 const isAuthorizedTo = require('../lib/middleware/is-authorized-to');
 const ldap = require('../lib/ldap');
 const authorization = require('../domain/authorization');
+const domain = require('../domain');
 
 module.exports = (config, repositories, encryption) => {
 
   const ensureAuthenticatedInstance = ensureAuthenticated(repositories);
   const { createAUser, changeSettings } = authorization(repositories);
   const ldapInstance = ldap(encryption);
+  const domainInstance = domain(repositories, encryption);
   const router = express.Router();
 
   router.use(noCache);
 
   router.get('/', ensureAuthenticatedInstance, async (req, res, next) => {
-    try {
-      res.redirect('/team');
-    }
-    catch (err) {
-      next(err);
-    }
+      try {
+        const favouriteApps = [];
+        const favouriteTeams = [];
+
+        req.user.favourites.apps.forEach((app) => {
+          favouriteApps.push({
+            appId: app.appId,
+            appName: app.appName,
+            url: `/team/${app.teamId}/app/${app.appId}`
+          });
+        });
+
+        req.user.favourites.teams.forEach((team) => {
+          favouriteTeams.push({
+            teamId: team.teamId,
+            teamName: team.teamName,
+            url: `/team/${team.teamId}`
+          });
+        });
+
+        favouriteApps.sort(compare('appName'));
+        favouriteTeams.sort(compare('teamName'));
+
+        const viewData = {
+          favouriteApps,
+          favouriteTeams
+        };
+
+        return await res.renderView({ view: 'home', viewData });
+      }
+      catch (err) {
+        return next(err);
+      }
   });
 
   router.get('/favicon.ico', function(req, res) {
@@ -68,14 +98,14 @@ module.exports = (config, repositories, encryption) => {
         userName: 'admin',
         password: body.password,
         enabled: true,
-        roles: ['administrator']
+        roles: [constants.roleIds.administrator]
       });
         
       if (!user.isValid()) {
         return res.sendStatus(400);
       }
 
-      user.password = await hasher.hash(user.password, config.configEncryptionKey);
+      user.password = user.getHashedPassword(hasher, user.password, config.configEncryptionKey);
       await repositories.user.add(user);
       return res.status(200).send({ location: '/login' });
     }
@@ -98,13 +128,15 @@ module.exports = (config, repositories, encryption) => {
         settings.ldapManagerPassword = await encryption.decrypt(settings.ldapManagerPassword);
         settings.ldapManagerEncryptedPassword = true;
         settings.ldapManagerPassword = ''.padEnd(settings.ldapManagerPassword.length, '*');
-        viewData.settings = settings;
       }
       else {
         settings.ldapManagerEncryptedPassword = false;
         settings.ldapManagerEncryptedPasswordValue = '';
       }
 
+      settings.updated = moment(settings.updated).format('DD/MM/YYYY HH:mm:ss');
+
+      viewData.settings = settings;
       return await res.renderView({ view: 'settings', viewData });
     }
     catch (err) {
@@ -147,15 +179,23 @@ module.exports = (config, repositories, encryption) => {
         return res.sendStatus(400);
       }
 
-      if (!(body.ldapManagerEncryptedPassword === true || body.ldapManagerEncryptedPassword === 'true')) {
+      if (body.ldapManagerEncryptedPassword === '') {
         settings.ldapManagerPassword = await encryption.encrypt(settings.ldapManagerPassword);
       }
+      else {
+        settings.ldapManagerPassword = body.ldapManagerEncryptedPassword;
+      }
+
+      settings.updated = new Date();
+      settings.updatedBy = { userId: req.user.userId, userName: req.user.userName };
 
       if (newSettings === true) {
         await repositories.settings.add(settings);
+        await domainInstance.audit.addEntry(req.user, constants.actions.createSettings, {});
       }
       else {
         await repositories.settings.update(settings);
+        await domainInstance.audit.addEntry(req.user, constants.actions.updateSettings, {});
       }
 
       return res.status(200).send({ location: '/' });
@@ -236,7 +276,7 @@ module.exports = (config, repositories, encryption) => {
         showError: error.length > 0
       };
 
-      return await res.renderView({view: 'login', viewData});
+      return await res.renderView({view: 'Login', viewData});
     }
     catch (err) {
       return next(err);
@@ -249,6 +289,17 @@ module.exports = (config, repositories, encryption) => {
     req.logout();
     res.redirect('/');
   });
+
+  function compare(propertyName) {
+    return function(a, b) {
+      if (a[propertyName].toLowerCase() < b[propertyName].toLowerCase())
+        return -1;
+      if (a[propertyName].toLowerCase() > b[propertyName].toLowerCase())
+        return 1;
+      return 0;
+    }
+
+  }
 
   return router;
 };

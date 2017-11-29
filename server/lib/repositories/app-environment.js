@@ -29,8 +29,12 @@ function add(appEnvironment) {
   return base.insertOne(appEnvironment);
 }
 
-function update(appEnvironment) {
-  return base.updateOne({ appId: appEnvironment.appId, environment: appEnvironment.environment }, appEnvironment);
+function addMany(appEnvironments) {
+  return base.insertMany(appEnvironments);
+}
+
+function update(originalEnvironment, appEnvironment) {
+  return base.updateOne({ appId: appEnvironment.appId, environment: originalEnvironment }, appEnvironment);
 }
 
 function remove(appEnvironment) {
@@ -47,6 +51,10 @@ function updateTeam(team) {
 
 function updateApp(app) {
   return base.updateMany({ teamId: app.teamId, appId: app.appId }, { $set: { appName: app.appName }});
+}
+
+function updateAppTeam(app, originalTeamId, team) {
+  return base.updateMany({ appId: app.appId, teamId: originalTeamId }, { $set : { teamId: team.teamId, teamName: team.teamName }});
 }
 
 function updateKey(key) {
@@ -67,12 +75,14 @@ module.exports = (mongoClientInstance) => {
 
   return {
     add,
+    addMany,
     find,
     findAll,
     update,
     updateApp,
     updateKey,
     updateTeam,
+    updateAppTeam,
     remove,
     removeAll
   };

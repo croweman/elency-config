@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  mongodb:
+    container_name: mongodb-elency-config-server
+    image: mongo:3.4
+    expose:
+      - 27017
+    logging:
+      driver: none
+  app:
+    #build: .
+    container_name: elency-config-server
+    image: croweman/elency-config-server:0.0.9-beta
+    restart: "on-failure:10"
+    volumes:
+      - ./configuration_files:/app/configuration_files
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+    environment:
+      CONFIG_JSON_VALUE:
+      KEYS_JSON_VALUE:
+      PRIVATE_PEM_VALUE:
+      PUBLIC_PEM_VALUE:

@@ -54,10 +54,12 @@ namespace Example
         {
             Console.WriteLine();
             Console.WriteLine("__________________________________________");
-            Console.WriteLine(DateTime.Now.ToString());
+            Console.WriteLine(string.Format("Configuration retrieved: {0}", DateTime.Now.ToString()));
             Console.WriteLine(string.Format("Version: {0}", ElencyConfigClient.AppVersion));
             Console.WriteLine(string.Format("Environment: {0}", ElencyConfigClient.Environment));
             Console.WriteLine(string.Format("Configuration Id: {0}", ElencyConfigClient.ConfigurationId));
+            Console.WriteLine("Keys and values:");
+            Console.WriteLine();
 
             ElencyConfigClient.GetAllKeys().ForEach(key =>
             {

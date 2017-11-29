@@ -30,6 +30,10 @@ function add(app) {
   return base.insertOne(app);
 }
 
+function addMany(apps) {
+  return base.insertMany(apps);
+}
+
 function update(app) {
   return base.updateOne({ appId: app.appId }, app);
 }
@@ -60,6 +64,7 @@ module.exports = (mongoClientInstance) => {
 
   return {
     add,
+    addMany,
     find,
     findAll,
     findByTeam,

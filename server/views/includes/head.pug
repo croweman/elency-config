@@ -9,4 +9,5 @@ head
     link(href='/css/jumbotron.css', rel='stylesheet')
     link(href='/css/font-awesome.min.css', rel='stylesheet')
     link(href='/css/typeaheadjs.css', rel='stylesheet')
-    link(href='/css/elency-config.css', rel='stylesheet')
+    - cssUrl = '/css/' + elencyConfigCssFileName
+    link(href=cssUrl, rel='stylesheet')

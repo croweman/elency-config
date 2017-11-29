@@ -1,0 +1,80 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 App Environment Update
+
+    .container
+
+      div.row
+        div.col-md-5
+          strong Team Id:
+          - url = '/team/' + appEnvironment.teamId
+          span.info-value
+            a(href=url)= appEnvironment.teamId
+        div.col-md-5
+          strong App Id:
+          - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+          span.info-value
+            a(href=url)= appEnvironment.appId
+        div.col-md-5
+          strong Team Name:
+          span.info-value= appEnvironment.teamName
+        div.col-md-5
+          strong App Name:
+          span.info-value= appEnvironment.appName
+        div.col-md-5
+          strong Modified:
+          span.info-value= appEnvironment.updated
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + appEnvironment.updatedBy.userId
+          span.info-value
+            a(href=url)=appEnvironment.updatedBy.userName
+
+        div.breaker
+          | &nbsp;
+
+      form
+
+        input#teamid.input(style='display:none', value=appEnvironment.teamId)
+        input#appid.input(style='display:none', value=appEnvironment.appId)
+        input#originalenvironment.input(style='display:none', value=appEnvironment.environment)
+
+        div.warning
+          | Caution: Be cautious when changing environment name and encryption keys.  A changed environment name or key value will be used when an app environment configuration linked to this key is published.  A client consumer would not be able to pull down the configuration if the environment name changes or it contains secure keys (and the key changes) and it does not have an updated environment or configuration encryption key!
+
+        div.breaker
+        +inputGroup('environment', 'Environment')(autocomplete='off', data-minlength='1', data-errormessage='Environment must be at least 1 character and contain characters (a-zA-Z0-9_-)', data-regex='^[a-zA-Z0-9\_\-]+$', value=appEnvironment.environment)
+
+        #keyId-form-group.form-group
+          label.form-control-label(for='password') Encrypted config item encryption key
+          select#keyId.form-control(, data-minlength='1', data-errormessage='You must select an encryption key')
+            each key in keys
+              if (appEnvironment.keyId === key.keyId)
+                option(value=key.keyId, selected='true')= key.keyName + ' - ' + key.keyId
+              else
+                option(value=key.keyId)= key.keyName + ' - ' + key.keyId
+          #key-info.form-control-feedback
+
+        div.text-right
+          button#createAppEnvironment.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating app environment") Update app environment
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.updateAppEnvironment();
+      });

@@ -8,13 +8,19 @@ const key = require('./key');
 const team = require('./team');
 const token = require('./token');
 const user = require('./user');
+const role = require('./role');
 const settings = require('./settings');
 
 let mongoClient;
+let repositoriesInstance;
 
 function isDuplicate(err) {
   return (err && (err.toString !== undefined && err.toString().toLowerCase().indexOf('duplicate') !== -1) ||
   (err.code && err.code === 11000));
+}
+
+async function isHealthy() {
+  await repositoriesInstance.user.findAll();
 }
 
 async function createRepositories(elencyConfig) {
@@ -38,10 +44,13 @@ async function createRepositories(elencyConfig) {
     team: team(mongoClient),
     token: token(mongoClient),
     user: user(mongoClient),
+    role: role(mongoClient),
     settings: settings(mongoClient),
-    isDuplicate
+    isDuplicate,
+    isHealthy
   };
 
+  repositoriesInstance = repositories;
   return repositories
 }
 

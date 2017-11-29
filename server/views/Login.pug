@@ -17,12 +17,17 @@ html(lang='en')
 
         #username-form-group.form-group
           label.form-control-label(for='username') User name
-          input#username.form-control(type='text', name='username', autocomplete='off', data-minlength='3', data-errormessage='User name must be at least 3 characters')
+          - minlength = ldapEnabled === true ? '3' : '2'
+          - errormessage = ldapEnabled === true ? 'User name must be at least 3 characters' : 'User name must be at least 2 characters'
+          input#username.form-control(type='text', name='username', autocomplete='off', data-minlength=minlength, data-errormessage=errormessage)
           #username-info.form-control-feedback
 
         #password-form-group.form-group
+          - regex = ldapEnabled === true ? '' : '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})'
+          - minlength = ldapEnabled === true ? '2' : ''
+          - errormessage = ldapEnabled === true ? 'Must be greater than or equal to 2 characters' : 'Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters'
           label.form-control-label(for='password') Password
-          input#password.form-control(type='password', name='password', autocomplete='off', data-regex='^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})', data-errormessage='Must be greater than or equal to 8 characters and contain lower and upper case characters with numbers and special characters')
+          input#password.form-control(type='password', name='password', autocomplete='off', data-regex=regex, data-minlength=minlength, data-errormessage=errormessage)
           #password-info.form-control-feedback
         div.text-right
           button#login.btn.btn-primary(type="submit") Login

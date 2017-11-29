@@ -22,12 +22,29 @@ html(lang='en')
         div.col-md-5
           strong Team Name:
           span.info-value= app.teamName
+        div.col-md-5
+          strong Modified:
+          span.info-value= app.updated
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + app.updatedBy.userId
+          span.info-value
+            a(href=url)=app.updatedBy.userName
         div.breaker
           | &nbsp;
 
       form
 
-        input#teamid.input(style='display:none', value=app.teamId)
+        #teamid-form-group.form-group
+          label.form-control-label(for='teamid') Team
+          select#teamid.form-control(data-minlength='1', data-errormessage='You must select a team')
+            each team in teams
+              if (team.teamId === app.teamId)
+                option(value=team.teamId, selected='true')= team.teamName + ' (' + team.teamId + ')'
+              else
+                option(value=team.teamId)= team.teamName + ' (' + team.teamId + ')'
+          #teamid-info.form-control-feedback
+
         #appid-form-group.form-group
           label.form-control-label App Id
           label

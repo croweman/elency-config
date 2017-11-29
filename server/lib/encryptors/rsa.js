@@ -6,7 +6,6 @@ const crypto = require('crypto'),
   debug = require('debug')('elency-config:rsa');
 
 async function encrypt(value, relativeOrAbsolutePathToPublicKey) {
-
   const absolutePath = path.resolve(relativeOrAbsolutePathToPublicKey);
   const publicKey = fs.readFileSync(absolutePath, "utf8");
   return crypto.publicEncrypt(publicKey, new Buffer(value)).toString("base64");

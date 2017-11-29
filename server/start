@@ -1,0 +1,19 @@
+#!/bin/bash
+
+npm list --depth 0 --global v8-profiler
+
+if [ $? -neq 0 ]
+then
+  npm install v8-profiler -g
+fi
+
+npm list --depth 0 --global pm2
+
+if [ $? -neq 0 ]
+then
+  npm install pm2 -g
+fi
+
+pm2 startup systemd
+pm2 start index.js -i 1 --name elency-config-server
+

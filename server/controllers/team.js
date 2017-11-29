@@ -14,6 +14,7 @@ const logger = require('../lib/logger');
 const aes256cbc = require('../lib/encryptors/aes-256-cbc');
 const domain = require('../domain');
 const diff = require('diff');
+const constants = require('../lib/constants');
 
 module.exports = (config, repositories, encryption) => {
 
@@ -28,6 +29,7 @@ module.exports = (config, repositories, encryption) => {
     updateAnApp,
     readAnApp,
     createAnAppEnvironment,
+    updateAnAppEnvironment,
     createAConfiguration,
     updateAConfiguration,
     readAConfiguration,
@@ -58,7 +60,7 @@ module.exports = (config, repositories, encryption) => {
       next(err);
     }
   });
-  
+
   router.post('/create', isAuthorizedTo(createATeam), async (req, res) => {
     res.set('Content-Type', 'application/json; charset=utf-8');
 
@@ -69,8 +71,12 @@ module.exports = (config, repositories, encryption) => {
       return res.sendStatus(400);
     }
 
+    team.updated = new Date();
+    team.updatedBy = { userId: req.user.userId, userName: req.user.userName };
+
     try {
       await repositories.team.add(team);
+      await domainInstance.audit.addEntry(req.user, constants.actions.createTeam, { teamId: team.teamId, teamName: team.teamName });
       return res.status(200).send({location: '/team'});
     }
     catch (err) {
@@ -89,6 +95,7 @@ module.exports = (config, repositories, encryption) => {
     try {
       const team = await dataRetrieval.getTeam(req.params.teamId);
       const viewData = { team };
+      viewData.team.updated = moment(team.updated).format('DD/MM/YYYY HH:mm:ss');
       return await res.renderView({ view: 'teams/update', viewData });
     }
     catch (err) {
@@ -106,10 +113,13 @@ module.exports = (config, repositories, encryption) => {
       let originalTeamName = team.teamName;
       team.teamName = body.teamName || '';
       team.description = body.description || '';
-      
+
       if (!team.isValid()) {
         return res.sendStatus(400);
       }
+
+      team.updated = new Date();
+      team.updatedBy = { userId: req.user.userId, userName: req.user.userName };
 
       await repositories.team.update(team);
 
@@ -117,7 +127,10 @@ module.exports = (config, repositories, encryption) => {
         await repositories.app.updateTeam(team);
         await repositories.appEnvironment.updateTeam(team);
         await repositories.configuration.updateTeam(team);
+        await repositories.user.updateTeamNameInFavourites(team);
       }
+
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateTeam, { teamId: team.teamId, teamName: team.teamName });
 
       return res.status(200).send({ location: '/team' });
     }
@@ -138,6 +151,8 @@ module.exports = (config, repositories, encryption) => {
       const team = await dataRetrieval.getTeam(req.params.teamId);
       const viewData = { team };
       viewData.team.apps = await repositories.app.findByTeam(team.teamId);
+      viewData.favourite = req.user.favourites.teams.find(item => item.teamId === team.teamId) ? 'active' : '';
+      viewData.team.updated = moment(team.updated).format('DD/MM/YYYY HH:mm:ss');
       return res.renderView({ view: 'teams/team', viewData });
     }
     catch (err) {
@@ -146,7 +161,7 @@ module.exports = (config, repositories, encryption) => {
   });
 
   router.get('/:teamId/app/create', isAuthorizedTo(createAnApp), async (req, res, next) => {
-    
+
     try {
       const team = await dataRetrieval.getTeam(req.params.teamId);
       const viewData = { team };
@@ -171,7 +186,12 @@ module.exports = (config, repositories, encryption) => {
       if (!app.isValid()) {
         return res.sendStatus(400);
       }
+
+      app.updated = new Date();
+      app.updatedBy = { userId: req.user.userId, userName: req.user.userName };
+
       await repositories.app.add(app);
+      await domainInstance.audit.addEntry(req.user, constants.actions.createApp, { teamId: app.teamId, teamName: app.teamName, appId: app.appId, appName: app.appName });
       return res.status(200).send({ location: `/team/${team.teamId}` });
     }
     catch (err) {
@@ -189,7 +209,12 @@ module.exports = (config, repositories, encryption) => {
     try {
 
       const app = await dataRetrieval.getApp(req.params.appId);
-      const viewData = { app };
+      const teams = await repositories.team.findAll();
+      const viewData = {
+        app,
+        teams
+      };
+      viewData.app.updated = moment(app.updated).format('DD/MM/YYYY HH:mm:ss');
       return await res.renderView({ view: 'apps/update', viewData });
     }
     catch (err) {
@@ -204,21 +229,43 @@ module.exports = (config, repositories, encryption) => {
 
     try {
       let app = await dataRetrieval.getApp(req.params.appId);
+      let originalTeamId = app.teamId;
       let originalAppName = app.appName;
       app.appName = body.appName;
       app.description = body.description;
+      app.teamId = body.teamId;
 
       if (!app.isValid()) {
         return res.sendStatus(400);
       }
+
+      let team = await dataRetrieval.getTeam(app.teamId);
+
+      let canMoveApp = await createAnApp(req.user, { teamId: team.teamId });
+
+      if (!canMoveApp) {
+        return res.status(200).send({error: `You are not authorized to create apps under the selected team '${team.teamName}'` });
+      }
+
+      app.teamId = team.teamId;
+      app.teamName = team.teamName;
+      app.updated = new Date();
+      app.updatedBy = { userId: req.user.userId, userName: req.user.userName };
 
       await repositories.app.update(app);
 
       if (app.appName !== originalAppName) {
         await repositories.appEnvironment.updateApp(app);
         await repositories.configuration.updateApp(app);
+        await repositories.user.updateAppNameInFavourites(app);
       }
 
+      if (app.teamId !== originalTeamId) {
+        await repositories.appEnvironment.updateAppTeam(app, originalTeamId, team);
+        await repositories.configuration.updateAppTeam(app, originalTeamId, team);
+      }
+
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateApp, { teamId: app.teamId, teamName: app.teamName, appId: app.appId, appName: app.appName });
       return res.status(200).send({ location: `/team/${req.params.teamId}` });
     }
     catch (err) {
@@ -238,7 +285,9 @@ module.exports = (config, repositories, encryption) => {
       const app = await dataRetrieval.getApp(req.params.appId);
       const viewData = { app };
       viewData.appEnvironments = await repositories.appEnvironment.findAll(app.appId);
-
+      viewData.favourite = req.user.favourites.apps.find(item => item.appId === app.appId) ? 'active' : '';
+      viewData.app.updated = moment(app.updated).format('DD/MM/YYYY HH:mm:ss');
+      viewData.canWrite = await await updateAnAppEnvironment(req.user, req.params);
       return await res.renderView({ view: 'apps/app', viewData });
     }
     catch (err) {
@@ -247,7 +296,7 @@ module.exports = (config, repositories, encryption) => {
   });
 
   router.get('/:teamId/app/:appId/environment/create', isAuthorizedTo(createAnAppEnvironment), async (req, res, next) => {
-    
+
     try {
       const app = await dataRetrieval.getApp(req.params.appId);
       const viewData = { app };
@@ -283,8 +332,70 @@ module.exports = (config, repositories, encryption) => {
         return res.sendStatus(400);
       }
 
+      appEnvironment.updated = new Date();
+      appEnvironment.updatedBy = { userId: req.user.userId, userName: req.user.userName };
+
       await repositories.appEnvironment.add(appEnvironment);
+      await domainInstance.audit.addEntry(req.user, constants.actions.createAppEnvironment, { teamId: appEnvironment.teamId, teamName: appEnvironment.teamName, appId: appEnvironment.appId, appName: appEnvironment.appName, environment: appEnvironment.environment, keyId: appEnvironment.keyId });
       return res.status(200).send({ location: `/team/${app.teamId}/app/${app.appId}` });
+    }
+    catch (err) {
+      if (repositories.isDuplicate(err)) {
+        res.status(200).send({error: 'The environment you have specified is already in use'});
+      }
+      else {
+        logger.error(err);
+        res.sendStatus(500);
+      }
+    }
+  });
+
+  router.get('/:teamId/app/:appId/environment/:environment/update', isAuthorizedTo(updateAnAppEnvironment), async (req, res, next) => {
+
+    try {
+      const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, req.params.environment);
+      const viewData = {
+        appEnvironment
+      };
+      viewData.keys = await repositories.key.findAll();
+      viewData.appEnvironment.updated = moment(appEnvironment.updated).format('DD/MM/YYYY HH:mm:ss');
+      return await res.renderView({ view: 'apps/environment-update', viewData });
+    }
+    catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/:teamId/app/:appId/environment/:environment/update', isAuthorizedTo(updateAnAppEnvironment), async (req, res) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+
+    try {
+      let body = req.body || {};
+      const originalEnvironment = req.params.environment;
+      const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, originalEnvironment);
+      const key = await dataRetrieval.getKey(body.keyId);
+
+      appEnvironment.environment = body.environment;
+      appEnvironment.keyId = key.keyId;
+      appEnvironment.keyName = key.keyName;
+
+      if (!appEnvironment.isValid()) {
+        return res.sendStatus(400);
+      }
+
+      appEnvironment.updated = new Date();
+      appEnvironment.updatedBy = { userId: req.user.userId, userName: req.user.userName };
+
+      await repositories.appEnvironment.update(originalEnvironment, appEnvironment);
+
+      if (appEnvironment.environment !== originalEnvironment) {
+        await repositories.user.updateEnvironment(originalEnvironment, appEnvironment);
+        await repositories.role.updateEnvironment(originalEnvironment, appEnvironment);
+        await repositories.configuration.updateEnvironment(originalEnvironment, appEnvironment);
+      }
+
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateAppEnvironment, { teamId: appEnvironment.teamId, teamName: appEnvironment.teamName, appId: appEnvironment.appId, appName: appEnvironment.appName, environment: appEnvironment.environment, keyId: appEnvironment.keyId });
+      return res.status(200).send({ location: `/team/${appEnvironment.teamId}/app/${appEnvironment.appId}` });
     }
     catch (err) {
       if (repositories.isDuplicate(err)) {
@@ -430,10 +541,31 @@ module.exports = (config, repositories, encryption) => {
         configurationIdTwo: ''
       };
 
-      for (let i = 0; i < configurations.length; i++) {
-        let configuration = configurations[i];
-        viewData.configurations.push(`${configuration.appVersion}:${configuration.configurationId}:${configuration.hasSecureItems === true}`);
-      };
+      const allVersions = [];
+
+      configurations.forEach((configuration) => {
+        if (allVersions.indexOf(configuration.appVersion) !== -1) {
+          return;
+        }
+
+        allVersions.push(configuration.appVersion);
+      });
+
+      versionSorter(allVersions, true);
+
+      for (let i = 0; i < allVersions.length; i++) {
+        const version = allVersions[i];
+
+        for (let j = 0; j < configurations.length; j++) {
+          let configuration = configurations[j];
+
+          if (configuration.appVersion !== version) {
+            continue;
+          }
+
+          viewData.configurations.push(`${configuration.appVersion}:${configuration.configurationId}:${configuration.hasSecureItems === true}`);
+        };
+      }
 
       if (req.query.configurationIdOne !== undefined && req.query.configurationIdOne.trim().length > 0) {
         let configuration = configurations.find((item) => { return item.configurationId === req.query.configurationIdOne.trim(); });
@@ -608,14 +740,16 @@ module.exports = (config, repositories, encryption) => {
         userId: req.user.userId,
         userName: req.user.userName
       };
-      
+
       await repositories.configuration.update(configuration);
 
       if (appEnvironment.versions.indexOf(configuration.appVersion) === -1) {
         appEnvironment.versions.push(configuration.appVersion);
         appEnvironment.versions = versionSorter(appEnvironment.versions, true);
-        await repositories.appEnvironment.update(appEnvironment);
+        await repositories.appEnvironment.update(appEnvironment.environment, appEnvironment);
       }
+
+      await domainInstance.audit.addEntry(req.user, constants.actions.publishConfiguration, { configurationId: configuration.configurationId, teamId: configuration.teamId, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, keyId: configuration.key.keyId, appVersion: configuration.appVersion });
 
       return res.status(200).send({ location: `/team/${configuration.teamId}/app/${configuration.appId}/environment/${appEnvironment.environment}/version/${configuration.appVersion}?configurationId=${configuration.configurationId}` });
     }
@@ -639,12 +773,12 @@ module.exports = (config, repositories, encryption) => {
       if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(keyValue.trim())) {
         return res.sendStatus(400);
       }
-      
+
       const configuration = await dataRetrieval.getConfiguration(req.params.configurationId);
       const viewData = { configuration };
 
       viewData.configuration = await encryption.decryptConfiguration(viewData.configuration);
-      
+
       for (let i = 0; i < viewData.configuration.configuration.length; i++)
       {
         if (!viewData.configuration.configuration[i].encrypted) {
@@ -654,7 +788,7 @@ module.exports = (config, repositories, encryption) => {
         viewData.configuration.configuration[i].value = await aes256cbc.decrypt(viewData.configuration.configuration[i].value, keyValue);
         viewData.configuration.configuration[i].decrypted = true;
       }
-      
+
       if (req.query && req.query.json && req.query.json === 'true') {
         res.set('Content-Type', 'application/json; charset=utf-8');
         res.json(viewData.configuration.configuration);
@@ -667,19 +801,19 @@ module.exports = (config, repositories, encryption) => {
       next(err);
     }
   });
-  
+
   router.post('/:teamId/app/:appId/environment/:environment/version/:version/configuration/:configurationId/delete', isAuthorizedTo(deleteAConfiguration), async (req, res, next) => {
     res.set('Content-Type', 'text/html; charset=utf-8');
 
     try {
       const configuration = await dataRetrieval.getConfiguration(req.params.configurationId);
-      
+
       if (configuration.published === true) {
         res.status(200).send({ error: 'The configuration cannot be deleted as it is published' });
       }
-      
-      await repositories.configuration.remove(configuration);
 
+      await repositories.configuration.remove(configuration);
+      await domainInstance.audit.addEntry(req.user, constants.actions.deleteConfiguration, { configurationId: configuration.configurationId, teamId: configuration.teamId, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, keyId: configuration.key.keyId, appVersion: configuration.appVersion });
       return res.status(200).send({ location: `/team/${configuration.teamId}/app/${configuration.appId}/environment/${configuration.environment}/version/${configuration.appVersion}` });
     }
     catch (err) {
@@ -687,11 +821,12 @@ module.exports = (config, repositories, encryption) => {
       logger.error(err);
     }
   });
-  
+
   router.get('/:teamId/app/:appId/environment/:environment/version/:version/configuration/:configurationId', isAuthorizedTo(readAConfiguration), async (req, res, next) => {
 
     try {
-      const configuration = await dataRetrieval.getConfiguration(req.params.configurationId);
+      const configurationId = req.params.configurationId;
+      const configuration = await dataRetrieval.getConfiguration(configurationId);
       const viewData = { configuration };
 
       viewData.configuration = await encryption.decryptConfiguration(viewData.configuration);
@@ -700,13 +835,24 @@ module.exports = (config, repositories, encryption) => {
       viewData.configuration.configuration.forEach((item) => {
         item.decryped = false;
       });
+
+      if (configuration.published === true) {
+        viewData.retrievals = await repositories.configRetrieval.count(configurationId);
+        viewData.lastRetrieved = '';
+        const retrieval = await repositories.configRetrieval.last(configurationId);
+
+        if (retrieval && retrieval.retrieved) {
+          viewData.lastRetrieved = moment(retrieval.retrieved).format('DD/MM/YYYY HH:mm:ss');
+        }
+      }
+
       return await res.renderView({ view: 'apps/configuration', viewData });
     }
     catch (err) {
       next(err);
     }
   });
-  
+
   router.get('/:teamId/app/:appId/environment/:environment/version/:version', isAuthorizedTo(readAConfiguration), async (req, res, next) => {
 
     try {
@@ -726,20 +872,21 @@ module.exports = (config, repositories, encryption) => {
       viewData.revisions.forEach((revision) => {
         revision.updated = moment(revision.updated).format('DD/MM/YYYY HH:mm:ss');
       });
-      
+
       return await res.renderView({ view: 'apps/version-revisions', viewData });
     }
     catch (err) {
       next(err);
     }
   });
-  
+
   router.get('/:teamId/app/:appId/environment/:environment', isAuthorizedTo(readAnApp), async (req, res, next) => {
 
     try {
       const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, req.params.environment);
       const viewData = { appEnvironment };
       versionSorter(viewData.appEnvironment.versions, true);
+      viewData.appEnvironment.updated = moment(appEnvironment.updated).format('DD/MM/YYYY HH:mm:ss');
       return await res.renderView({ view: 'apps/environment', viewData });
     }
     catch (err) {
@@ -756,6 +903,8 @@ module.exports = (config, repositories, encryption) => {
       let initialEntries = 0;
       let createFrom = '';
       let updating = false;
+      let comment = '';
+      let currentCount = 0;
 
       if (req.query && req.query.createFrom) {
         createFrom = req.query.createFrom;
@@ -780,6 +929,7 @@ module.exports = (config, repositories, encryption) => {
         }
 
         version = configuration.appVersion;
+        comment = configuration.comment;
         const decryptedConfiguration = await encryption.decryptConfiguration(configuration);
         configurationEntries = decryptedConfiguration.configuration;
         preload = true;
@@ -796,7 +946,9 @@ module.exports = (config, repositories, encryption) => {
         initialEntries,
         createFrom,
         updating,
-        configuration
+        configuration,
+        comment,
+        currentCount: configurationEntries.length
       };
 
       viewData.hasSecureItem = (viewData.configurationEntries.find((item) => { return item.encrypted === true }) !== undefined);
@@ -900,6 +1052,7 @@ module.exports = (config, repositories, encryption) => {
       else {
         configuration = originalConfiguration;
         configuration.appVersion = version;
+        configuration.comment = comment;
         configuration.configuration = configurationKeys;
         configuration.updated = new Date();
         configuration.updatedBy = {
@@ -920,15 +1073,17 @@ module.exports = (config, repositories, encryption) => {
 
       if (updating) {
         await repositories.configuration.update(configuration);
+        await domainInstance.audit.addEntry(req.user, constants.actions.updateConfiguration, { teamId: configuration.teamId, teamName: configuration.teamName, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, keyId: configuration.key.keyId });
       }
       else {
         await repositories.configuration.add(configuration);
+        await domainInstance.audit.addEntry(req.user, constants.actions.createConfiguration, { teamId: configuration.teamId, teamName: configuration.teamName, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, keyId: configuration.key.keyId });
       }
 
       if (appEnvironment.allVersions.indexOf(version) === -1) {
         appEnvironment.allVersions.push(version);
         appEnvironment.allVersions = versionSorter(appEnvironment.allVersions, true);
-        await repositories.appEnvironment.update(appEnvironment);
+        await repositories.appEnvironment.update(appEnvironment.environment, appEnvironment);
       }
       return res.status(200).send({ location: `/team/${req.params.teamId}/app/${appEnvironment.appId}/environment/${configuration.environment}/version/${configuration.appVersion}?configurationId=${configuration.configurationId}` });
     }

@@ -13,6 +13,19 @@ html(lang='en')
 
     .container
 
+      if (settings.updatedBy.userName.length > 0)
+        div.row
+          div.col-md-5
+            strong Modified:
+            span.info-value= settings.updated
+          div.col-md-5
+            strong Modified By:
+            - var url = '/user/all?userId=' + settings.updatedBy.userId
+            span.info-value
+              a(href=url)=settings.updatedBy.userName
+
+      div.breaker
+
       form
 
         h3 User Management

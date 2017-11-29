@@ -1,7 +1,9 @@
-module.exports = (respositories, encryption) => {
+const constants = require('../lib/constants');
+
+module.exports = (repositories, encryption) => {
 
   async function getTeams() {
-    const teams = await respositories.team.findAll();
+    const teams = await repositories.team.findAll();
 
     teams.forEach((team) => {
       team.apps = [];
@@ -13,8 +15,8 @@ module.exports = (respositories, encryption) => {
   async function getTeamsAndApps(currentUser) {
 
     const teams = await getTeams();
-    const allApps = await respositories.app.findAll();
-    const appEnvironments = await respositories.appEnvironment.findAll();
+    const allApps = await repositories.app.findAll();
+    const appEnvironments = await repositories.appEnvironment.findAll();
 
     let apps = [];
 
@@ -35,7 +37,8 @@ module.exports = (respositories, encryption) => {
             {
               name: appEnvironment.environment
             }
-          ]
+          ],
+          hasPermissions: false
         };
 
         apps.push(newApp);
@@ -60,7 +63,6 @@ module.exports = (respositories, encryption) => {
             appEnvironment.read = false;
             appEnvironment.write = false;
             appEnvironment.publish = false;
-            appEnvironment.delete = false;
 
             let match = currentUser.appConfigurationPermissions.find((item) => {
               return item.id === app.appId && item.environment === appEnvironment.name;
@@ -70,17 +72,110 @@ module.exports = (respositories, encryption) => {
               appEnvironment.read = match.read;
               appEnvironment.write = match.write;
               appEnvironment.publish = match.publish;
-              appEnvironment.delete = match.delete;
+            }
+
+            if (appEnvironment.read || appEnvironment.write || appEnvironment.publish) {
+              app.hasPermissions = true;
             }
           });
         });
       });
     }
 
-    return teams;
+    apps.sort(compare('appName'));
+
+    return {
+      teams,
+      apps
+    };
   };
 
+  function getPermissionsData(teamsAndApps) {
+    const teams = [];
+    const apps = [];
+    const appEnvironments = [];
+
+    teamsAndApps.teams.forEach((team) => {
+      teams.push(`${team.teamName} (${team.teamId})`)
+    });
+
+    teamsAndApps.apps.forEach((app) => {
+      apps.push(`${app.appName} (${app.appId})`);
+      let environments = [];
+
+      app.environments.forEach((appEnvironment) => {
+        environments.push(appEnvironment.name);
+      });
+
+      appEnvironments.push({ appId: app.appId, environments });
+    });
+
+    return {
+      teams,
+      apps,
+      appEnvironments
+    };
+  }
+  
+  async function getAllRoles(currentUser) {
+    let additionalRoles = await repositories.role.findAll();
+    let standardRoles = [
+      {
+        roleId: constants.roleIds.administrator,
+        roleName: constants.roleIds.administrator,
+        selected: currentUser !== undefined && currentUser.roles.indexOf(constants.roleIds.administrator) !== -1
+      },
+      {
+        roleId: constants.roleIds.keyWriter,
+        roleName: constants.roleIds.keyWriter,
+        selected: currentUser !== undefined && currentUser.roles.indexOf(constants.roleIds.keyWriter) !== -1
+      },
+      {
+        roleId: constants.roleIds.teamWriter,
+        roleName: constants.roleIds.teamWriter,
+        selected: currentUser !== undefined && currentUser.roles.indexOf(constants.roleIds.teamWriter) !== -1
+      }
+    ];
+
+    const roles = [];
+    
+    additionalRoles.forEach((role) => {
+      roles.push({
+        roleId: role.roleId,
+        roleName: role.roleName,
+        selected: false
+      });
+    });
+
+    if (currentUser) {
+      currentUser.roles.forEach((roleId) => {
+        let match = roles.find(role => role.roleId === roleId);
+
+        if (match) {
+          match.selected = true;
+        }
+      });
+    }
+
+    roles.sort(compare('roleName'));
+    
+    roles.unshift(...standardRoles);
+    return roles;
+  }
+
+  function compare(propertyName) {
+    return function(a, b) {
+      if (a[propertyName].toLowerCase() < b[propertyName].toLowerCase())
+        return -1;
+      if (a[propertyName].toLowerCase() > b[propertyName].toLowerCase())
+        return 1;
+      return 0;
+    }
+  }
+
   return {
-    getTeamsAndApps
+    getTeamsAndApps,
+    getPermissionsData,
+    getAllRoles
   };
 };

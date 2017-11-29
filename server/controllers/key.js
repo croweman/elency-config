@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const moment = require('moment');
 
 const noCache = require('../lib/middleware/no-cache');
 const ensureAuthenticated = require('../lib/middleware/ensure-authenticated');
@@ -11,6 +12,8 @@ const models = require('../models');
 const uuid = require('uuid').v4;
 const logger = require('../lib/logger');
 const domain = require('../domain');
+const constants = require('../lib/constants');
+const { generateBase64Key } = require('../lib/keys');
 
 module.exports = (config, repositories, encryption) => {
 
@@ -25,6 +28,12 @@ module.exports = (config, repositories, encryption) => {
   const router = express.Router();
 
   router.use(noCache);
+
+  router.get('/generate', (req, res) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    return res.status(200).send({ key: generateBase64Key() });
+  });
+
   router.use(ensureAuthenticatedInstance);
 
   router.get('/create', isAuthorizedTo(createAKey), async (req, res, next) => {
@@ -52,6 +61,7 @@ module.exports = (config, repositories, encryption) => {
       key.updated = new Date();
       key.updatedBy = { userId: req.user.userId, userName: req.user.userName };
       await repositories.key.add(key);
+      await domainInstance.audit.addEntry(req.user, constants.actions.createKey, { keyId: key.keyId, keyName: key.keyName });
       return res.status(200).send({ location: '/key/all' });
     }
     catch (err) {
@@ -97,6 +107,7 @@ module.exports = (config, repositories, encryption) => {
     try {
       const key = await dataRetrieval.getKey(req.params.keyId);
       const viewData = { key };
+      viewData.key.updated = moment(key.updated).format('DD/MM/YYYY HH:mm:ss');
       return await res.renderView({ view: 'keys/update', viewData });
     }
     catch (err) {
@@ -146,6 +157,7 @@ module.exports = (config, repositories, encryption) => {
         await repositories.appEnvironment.updateKey(key);
       }
 
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateKey, { keyId: key.keyId, keyName: key.keyName });
       return res.status(200).send({ location: '/key/all' });
     }
     catch (err) {

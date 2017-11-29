@@ -192,9 +192,12 @@ module.exports = (configuration) => {
         const configurationData = {};
         let body = response.body;
 
+        body.configuration = await aes256cbc.decrypt(body.configuration, configuration.configEncryptionKey);
+        body.configuration = JSON.parse(body.configuration);
+
         for (let i = 0; i < body.configuration.length; i++) {
           let item = body.configuration[i];
-
+          
           if(item.encrypted !== true) {
             configurationData[item.key] = item.value[0];
             continue;

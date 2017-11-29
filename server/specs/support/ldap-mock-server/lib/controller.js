@@ -1,27 +1,36 @@
 const configuration = require('./configuration.js'),
   databaseProvider = require('./database-provider.js');
 
+const ldap = require('ldapjs');
 
-function bind(request, response) {
-  response.end();
+function bind(req, res, next) {
+
+  const requestedDn = req.dn.toString().replace(/, /g, ',');
+  const match = configuration.users.find(user => user.dn === requestedDn);
+
+  if (match && req.credentials === match.password) {
+    res.end();
+    return next();
+  }
+
+  next(new ldap.InvalidCredentialsError());
+  res.end();
 }
 
-function search(request, response) {
+function search(req, res) {
   const filterPattern = configuration.server.searchFilter;
-  const searchFilter = request.filter.toString();
-
-  let userName = searchFilter.substr(filterPattern.indexOf('{{') + 2);
-  userName = userName.substr(0, userName.indexOf('}}'));
-
+  const searchFilter = req.filter.toString();
+  let userName = searchFilter.substr(filterPattern.indexOf('=') + 1);
+  userName = userName.substr(0, userName.indexOf(')'));
   const users = databaseProvider.getUsers(userName);
 
   if (users.length > 0) {
     users.forEach((user) => {
-      response.send(user);
+      res.send(user);
     });
   }
 
-  response.end();
+  res.end();
 };
 
 module.exports = {

@@ -10,6 +10,7 @@ const TeamPermissionModel = require('./team-permission');
 const TeamModel = require('./team');
 const TokenModel = require('./token');
 const UserModel = require('./user');
+const RoleModel = require('./role');
 const SettingsModel = require('./settings');
 
 module.exports = {
@@ -25,5 +26,6 @@ module.exports = {
   team: TeamModel,
   token: TokenModel,
   user: UserModel,
+  role: RoleModel,
   settings: SettingsModel
 };

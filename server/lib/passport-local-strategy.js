@@ -19,7 +19,7 @@ module.exports = (repositories, encryption, config) => {
                   return done(null, false, {message: 'Unknown user ' + username});
                 }
 
-                var passwordHash = hasher.hashSync(password, config.configEncryptionKey);
+                const passwordHash = user.getHashedPassword(hasher, password, config.configEncryptionKey);
 
                 if (passwordHash !== user.password) {
                   return done(null, false, {message: 'Invalid password'});
@@ -59,8 +59,8 @@ module.exports = (repositories, encryption, config) => {
 
           repositories.settings.find()
             .then((settings) => {
-              const queryMongo = (username.toLowerCase() === 'admin' || (!settings.isNull() && settings.ldapEnabled !== true));
-              
+              const queryMongo = (username.toLowerCase() === 'admin' || settings.isNull() || (!settings.isNull() && settings.ldapEnabled !== true));
+
               if (queryMongo === true) {
                 return findUserByUserName();
               }
@@ -78,12 +78,17 @@ module.exports = (repositories, encryption, config) => {
                       })
                       .catch((err) => {
                         logger.error(err);
-                        return done(null, false, { message: `Unknown user ${username}` });
+                        if (err.toString().indexOf('InvalidCredentialsError') !== -1) {
+                          return done(null, false, {message: 'Invalid password'});
+                        }
+                        else {
+                          return done(null, false, {message: `Unknown user ${username}`});
+                        }
                       });
                   })
                   .catch((err) => {
                     logger.error(err);
-                    return done(null, false, { message: `Unexpected error, check LDAP connectivity settings` });
+                    return done(null, false, { message: `Unexpected error, check whether LDAP connectivity settings are invalid` });
                   });
               }
             })

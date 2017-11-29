@@ -1,20 +1,23 @@
 const express = require('express');
-const passport = require('passport');
+const moment = require('moment');
 
 const noCache = require('../lib/middleware/no-cache');
 const ensureAuthenticated = require('../lib/middleware/ensure-authenticated');
 const isAuthorizedTo = require('../lib/middleware/is-authorized-to');
 const authorization = require('../domain/authorization');
+const { getPermissions } = require('../domain/permissions');
 
 const models = require('../models');
 const hasher = require('../lib/hashers/hmac-sha256');
 const domain = require('../domain');
 const logger = require('../lib/logger');
+const constants = require('../lib/constants');
 
 module.exports = (config, repositories, encryption) => {
 
   const ensureAuthenticatedInstance = ensureAuthenticated(repositories);
   const domainInstance = domain(repositories);
+  const AuditPageSize = 10;
 
   const {
     createAUser,
@@ -32,7 +35,7 @@ module.exports = (config, repositories, encryption) => {
     try {
       const user = await domainInstance.dataRetrieval.getUser(req.params.userId);
 
-      if (req.user.userName === 'admin' && user.userName === 'admin') {
+      if (req.user.userName === 'admin') {
         return await res.renderUnauthorized();
       }
 
@@ -55,7 +58,7 @@ module.exports = (config, repositories, encryption) => {
       let body = req.body || {};
       const user = await domainInstance.dataRetrieval.getUser(req.params.userId);
 
-      if (req.user.userName === 'admin' && user.userName === 'admin') {
+      if (req.user.userName === 'admin') {
         return res.sendStatus(401);
       }
 
@@ -65,11 +68,12 @@ module.exports = (config, repositories, encryption) => {
         return res.sendStatus(400);
       }
 
-      user.password = hasher.hashSync(user.password, config.configEncryptionKey);
+      user.password = user.getHashedPassword(hasher, user.password, config.configEncryptionKey);
       user.updated = new Date();
       user.updatedBy = { userId: req.user.userId, userName: req.user.userName };
 
       await repositories.user.update(user);
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateUserPassword, { userId: user.userId, userName: user.userName });
       return res.status(200).send({});
     }
     catch (err) {
@@ -82,10 +86,18 @@ module.exports = (config, repositories, encryption) => {
 
     try {
       let teamsAndApps = await domainInstance.user.getTeamsAndApps();
+      let availableRoles = await domainInstance.user.getAllRoles();
+
+      availableRoles.forEach((role) => {
+        delete role.selected;
+      });
+
       let viewData = {
-        teams: teamsAndApps,
+        teams: teamsAndApps.teams,
+        apps: teamsAndApps.apps,
         LDAPUserName: req.query.username || '',
-        LDAPUserId: req.query.userid || ''
+        LDAPUserId: req.query.userid || '',
+        availableRoles
       };
 
       if (viewData.LDAPUserName.length > 0) {
@@ -94,7 +106,9 @@ module.exports = (config, repositories, encryption) => {
         viewData.LDAPUserName = await encryption.decrypt(viewData.LDAPUserName);
         viewData.LDAPUserId = await encryption.decrypt(viewData.LDAPUserId);
       }
-      
+
+      viewData.available = domainInstance.user.getPermissionsData(teamsAndApps);
+
       return await res.renderView({view: 'users/create', viewData});
     }
     catch (err) {
@@ -123,8 +137,9 @@ module.exports = (config, repositories, encryption) => {
       
       user.updated = new Date();
       user.updatedBy = { userId: req.user.userId, userName: req.user.userName };
-      user.password = hasher.hashSync(user.password, config.configEncryptionKey);
+      user.password = user.getHashedPassword(hasher, user.password, config.configEncryptionKey);
       await repositories.user.add(user);
+      await domainInstance.audit.addEntry(req.user, constants.actions.createUser, { userId: user.userId, userName: user.userName });
       return res.status(200).send({ location: '/user/all' });
     }
     catch (err) {
@@ -138,6 +153,76 @@ module.exports = (config, repositories, encryption) => {
     }
   });
 
+  router.get('/audit', isAuthorizedTo(createAUser), async (req, res, next) => {
+
+    let users = [];
+
+    try {
+      users = await repositories.user.findAll({ includeAdmin: true });
+    }
+    catch (err) {
+      return next(err);
+    }
+
+    const actionTypes = Object.keys(constants.actions)
+      .map(key => constants.actions[key]);
+    actionTypes.sort();
+
+    let viewData = {
+      pageSize: AuditPageSize,
+      url: `/user/audit-data`,
+      actionTypes,
+      users
+    };
+
+    return await res.renderView({ view: 'users/audit', viewData });
+  });
+  
+  router.get('/audit-data', isAuthorizedTo(createAUser), async (req, res, next) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    
+    let action = req.query.action || '';
+    let userId = req.query.userId || '';
+    let pageNumber = req.query.pageNumber || 1;
+    let forceCount = req.query.forceCount !== undefined;
+
+    if (isNaN(parseInt(pageNumber))) {
+      return res.status(400).send({ html: '' });
+    }
+
+    const filters = {};
+    if (action) {
+      filters.action = action;
+    }
+    if (userId) {
+      filters.userId = userId;
+    }
+
+    try {
+      let count;
+
+      if (forceCount) {
+        count = await repositories.audit.count(filters);
+      }
+      
+      pageNumber = parseInt(pageNumber);
+      let skip = (pageNumber * AuditPageSize) - AuditPageSize;
+      const auditHistory = await repositories.audit.find(filters, { skip, limit: AuditPageSize });
+
+      let html = '';
+
+      auditHistory.forEach((audit) => {
+        html += '<tr><td>' + audit.action + '</td><td><pre>' + JSON.stringify(audit.data, null, 2) + '</pre></td><td>' + moment(audit.changed).format('DD/MM/YYYY HH:mm:ss') + '</td><td><a href="/user/all?userId=' + audit.changedBy.userId + '">' + audit.changedBy.userName + '</a></td></tr>';
+      });
+
+      return res.status(200).send({ count, html });
+    }
+    catch (err) {
+      console.log(err)
+      return res.status(200).send({ html: '' });
+    }
+  });
+
   router.get('/:userId/update', isAuthorizedTo(updateAUser), async (req, res, next) => {
 
     let user;
@@ -148,18 +233,31 @@ module.exports = (config, repositories, encryption) => {
 
     try {
       user = await domainInstance.dataRetrieval.getUser(req.params.userId);
+      user.updated = moment(user.updated).format('DD/MM/YYYY HH:mm:ss');
     }
     catch (err) {
       return next(err);
     }
 
     let teamsAndApps = await domainInstance.user.getTeamsAndApps(user);
+    let availableRoles = await domainInstance.user.getAllRoles(user);
     
+    let selectedRoles = availableRoles.filter(role => role.selected === true);
+
+    availableRoles.forEach((role) => {
+      delete role.selected;
+    });
+
     let viewData = {
       selectedUser: user,
-      teams: teamsAndApps,
-      userId: user.userId
+      teams: teamsAndApps.teams,
+      apps: teamsAndApps.apps,
+      userId: user.userId,
+      availableRoles,
+      selectedRoles
     };
+
+    viewData.available = domainInstance.user.getPermissionsData(teamsAndApps);
 
     return await res.renderView({ view: 'users/update', viewData });
   });
@@ -184,6 +282,7 @@ module.exports = (config, repositories, encryption) => {
       user.updated = new Date();
       user.updatedBy = { userId: req.user.userId, userName: req.user.userName };
       await repositories.user.update(user);
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateUser, { userId: user.userId, userName: user.userName });
       return res.status(200).send({ location: '/user/all' });
     }
     catch (err) {
@@ -224,42 +323,53 @@ module.exports = (config, repositories, encryption) => {
     }
   });
 
-  function getPermissions(body) {
-    const teamPermissions = [];
-    const appConfigurationPermissions = [];
+  router.post('/favourite', async (req, res) => {
 
-    body.teamPermissions = body.teamPermissions || [];
-    body.appConfigurationPermissions = body.appConfigurationPermissions || [];
+    res.set('Content-Type', 'application/json; charset=utf-8');
 
-    body.teamPermissions.forEach((id) => {
-      teamPermissions.push(new models.teamPermission({
-        id: id,
-        write: true
-      }))
-    });
+    if (!req.body || !req.body.type || !req.body.action || !req.body.ids || !Array.isArray(req.body.ids) || !req.body.name) {
+      return res.sendStatus(400);
+    }
 
-    Object.keys(body.appConfigurationPermissions).forEach((appId) => {
-      Object.keys(body.appConfigurationPermissions[appId]).forEach((environment) => {
+    try {
+      const user = await domainInstance.dataRetrieval.getUser(req.user.userId);
+      let array = user.favourites.apps;
+      let idProperties = [ 'appId', 'teamId'];
+      let nameProperty = 'appName';
+      
+      if (req.body.type === 'team') {
+        array = user.favourites.teams;
+        idProperties = [ 'teamId' ];
+        nameProperty = 'teamName';
+      }
+      
+      const favourite = array.find(item => item[idProperties.slice(0, 1)] === req.body.ids[0]);
 
-        var environmentPermissions = body.appConfigurationPermissions[appId][environment];
-        var model = new models.appConfigurationPermission({
-          id: appId,
-          environment,
-          read: (environmentPermissions.read && environmentPermissions.read.toString() === 'true') === true,
-          write: (environmentPermissions.write && environmentPermissions.write.toString() === 'true') === true,
-          publish: (environmentPermissions.publish && environmentPermissions.publish.toString() === 'true') === true,
-          delete: (environmentPermissions.delete && environmentPermissions.delete.toString() === 'true') === true
-        });
-        appConfigurationPermissions.push(model);
+      if (req.body.action === 'add') {
+        if (!favourite) {
+          let obj = {};
+          for (let i = 0; i < idProperties.length; i++) {
+            obj[idProperties[i]] = req.body.ids[i];
+          }
+          obj[nameProperty] = req.body.name;
+          array.push(obj);
+        }
+      }
+      else {
+        if (favourite !== undefined) {
+          const index = array.indexOf(favourite);
+          array.splice(index, 1);
+        }
+      }
 
-      });
-    });
-
-    return {
-      teamPermissions,
-      appConfigurationPermissions
-    };
-  }
+      await repositories.user.update(user);
+      return res.status(200).send({});
+    }
+    catch (err) {
+      res.sendStatus(500);
+      logger.error(err);
+    }
+  });
   
   return router;
 };

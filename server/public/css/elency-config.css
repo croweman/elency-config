@@ -34,7 +34,7 @@
     margin-left: 0rem;
 }
 
-.create-button, #compare {
+.create-button, #compare, #generate-key {
     margin-bottom: 1rem;
 }
 
@@ -83,7 +83,7 @@ textarea {
     clear:left;
 }
 
-.configuration-item, .configuration-item .form-group {
+.configuration-item, .configuration-item .form-group, .permissions {
     float:left;
 }
 
@@ -173,4 +173,128 @@ pre code.nochange {
 
 pre code.removed {
     background-color: #ffdce0;
+}
+
+#star {
+    font-family: 'Roboto', sans-serif;
+    color: #ccd6dd;
+    cursor: pointer;
+    display: inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-left: 0.75rem;
+}
+#star:hover, #star.active {
+    color: #ffac33;
+}
+/*https://github.com/argelius/favorite-star/blob/master/favorite-star.html*/
+#star.selected.bounce {
+    animation: favorite-star-bounce 0.3s ease-in-out;
+}
+
+@-webkit-keyframes favorite-star-bounce {
+    0% {
+        -webkit-transform: scale3d(1.0, 1.0, 1.0);
+    }
+    50% {
+        -webkit-transform: scale3d(1.4, 1.4, 1.0);
+    }
+    to {
+        -webkit-transform: scale3d(1.0, 1.0, 1.0);
+    }
+}
+@-moz-keyframes favorite-star-bounce {
+    0% {
+        -moz-transform: scale3d(1.0, 1.0, 1.0);
+    }
+    50% {
+        -moz-transform: scale3d(1.4, 1.4, 1.0);
+    }
+    to {
+        -moz-transform: scale3d(1.0, 1.0, 1.0);
+    }
+}
+
+@keyframes favorite-star-bounce {
+    0% {
+        transform: scale3d(1.0, 1.0, 1.0);
+    }
+    50% {
+        transform: scale3d(1.4, 1.4, 1.0);
+    }
+    100% {
+        transform: scale3d(1.0, 1.0, 1.0);
+    }
+}
+
+.permissions {
+    padding:0;
+}
+
+.permissions .permissions-heading {
+    background-color: #f6f8fa;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight:bold;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+}
+
+.permissions .team {
+    float: left;
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #eceeef;
+}
+
+.permissions .team div {
+    float: left;
+}
+
+.permissions .close {
+    color: #d9534f;
+    opacity: 1;
+}
+
+#add-team, #add-app, #add-role {
+    padding-bottom: 0;
+}
+
+#add-team label, #add-team input, #add-team div, #add-app label, #add-app input, #add-app div {
+    float:left;
+}
+
+#add-team label, #add-app label {
+    margin-right: 1rem;
+}
+
+.role-selection {
+    padding-top: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+div.col-md-12.app-permission {
+    padding-bottom: 5px;
+}
+
+.tt-dataset, .tt-suggestion {
+    width:100%
+}
+
+.warning {
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.audit-hidden {
+    display:none
 }

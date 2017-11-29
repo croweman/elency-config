@@ -60,11 +60,28 @@ server/elency-config.pub.pem
 server/server.key
 server/config/*.*
 server/sec/*.*
+server/public/css/elency-config_*
+server/public/js/elency-config_*
+server/configuration_files/**
+server/configuration_files_from_secure_location/**
 
 **/obj
 **/bin
 **/.vs
 
-releasing/clients/csharp/package/**
-releasing/clients/node/package/**
-releasing/server/package/**
+#releases/clients/csharp/package/**
+#releases/clients/node/package/**
+#releases/server/package/**
+
+/elency-config-server-*
+elency-config-server/**
+
+/elency-config-node-client-*
+elency-config-client/**
+
+demo/docker/support/repositories/**
+demo/docker/ldap-mock-server/lib/**
+demo/docker/ldap-mock-server/index.js
+demo/docker/ldap-mock-server/package.json
+demo/docker/ldap-mock-server/package-lock.json
+

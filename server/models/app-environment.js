@@ -11,6 +11,8 @@ class AppEnvironment {
     this.allVersions = obj.allVersions || [];
     this.keyId = obj.keyId || '';
     this.keyName = obj.keyName || '';
+    this.updated = obj.updated || new Date();
+    this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
 
     this.environment = this.environment.trim();
     this.keyId = this.keyId.trim();

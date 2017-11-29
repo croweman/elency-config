@@ -10,7 +10,9 @@ html(lang='en')
 
     #top.jumbotron
       .container
-        h2.display-6 Team
+        h2.display-6
+          = 'Team - ' + team.teamName
+          div#star.bounce(data-teamid=team.teamId, data-teamname=team.teamName, class=favourite) ★
 
     .container
 
@@ -19,8 +21,17 @@ html(lang='en')
           strong Team Id:
           = ' ' + team.teamId
         div.col-md-5
+          strong Modified:
+          span.info-value= team.updated
+        div.col-md-5
           strong Team Name:
           = ' ' + team.teamName
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + team.updatedBy.userId
+          span.info-value
+            a(href=url)=team.updatedBy.userName
+
       div.breaker
 
       if createAnApp === true
@@ -36,7 +47,8 @@ html(lang='en')
             th App Id
             th App name
             th Description
-            th Edit
+            if updateAnApp === true
+              th Edit
         tbody
           each app in team.apps
             tr
@@ -45,9 +57,10 @@ html(lang='en')
                  a(href=url)= app.appId
               td= app.appName
               td= app.description
-              td
-                - var url = '/team/' + team.teamId + '/app/' + app.appId + '/update';
-                a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
+              if updateAnApp === true
+                td
+                  - var url = '/team/' + team.teamId + '/app/' + app.appId + '/update';
+                  a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
 
       include ../includes/footer.pug
 
@@ -56,5 +69,6 @@ html(lang='en')
     script(type='text/javascript').
       $(function() {
         elencyConfig.search('apps', [0, 1]);
+        elencyConfig.teamFavourite();
       });
 

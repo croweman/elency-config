@@ -71,6 +71,13 @@ html(lang='en')
         div.col-md-5
           strong Comment:
           span.info-value= configuration.comment
+        if (configuration.published === true)
+          div.col-md-5
+            strong Last retrieved:
+            span.info-value= lastRetrieved
+          div.col-md-5
+            strong Total retrievals:
+            span.info-value= retrievals
 
         div.breaker
           | &nbsp;

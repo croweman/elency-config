@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  ldapmockserver:
+    build: .
+    container_name: elency-config-demo-ldap-mock-server
+    #image: croweman/elency-config-demo-ldap-mock-server:0.0.3-beta .
+    ports:
+      - "3001:3001"
+    expose:
+      - 3001

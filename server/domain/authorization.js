@@ -1,3 +1,5 @@
+const constants = require('../lib/constants');
+
 let repos;
 
 function createAUser(user) {
@@ -6,7 +8,17 @@ function createAUser(user) {
       return resolve(false);
     }
 
-    resolve(user.userName.toLowerCase().trim() === 'admin' || user.hasRole('administrator'));
+    resolve(user.userName.toLowerCase().trim() === 'admin' || user.hasRole(constants.roleIds.administrator));
+  });
+}
+
+function createARole(user) {
+  return new Promise((resolve) => {
+    if (!user) {
+      return resolve(false);
+    }
+
+    resolve(user.userName.toLowerCase().trim() === 'admin' || user.hasRole(constants.roleIds.administrator));
   });
 }
 
@@ -16,7 +28,7 @@ function changeSettings(user) {
       return resolve(false);
     }
 
-    resolve(user.userName.toLowerCase().trim() === 'admin' || user.hasRole('administrator'));
+    resolve(user.userName.toLowerCase().trim() === 'admin' || user.hasRole(constants.roleIds.administrator));
   });
 }
 
@@ -41,7 +53,7 @@ function changeAPassword(user, params) {
           ldapEnabled = settings.ldapEnabled === true;
         }
         
-        const isAdmin = (user.userName.toLowerCase().trim() === 'admin' || user.hasRole('administrator'));
+        const isAdmin = (user.userName.toLowerCase().trim() === 'admin' || user.hasRole(constants.roleIds.administrator));
         resolve(!ldapEnabled && (isAdmin || user.userId === userId));
       })
       .catch(() => {
@@ -56,7 +68,7 @@ function createATeam(user) {
       return resolve(false);
     }
 
-    resolve(user.userName.toLowerCase() !== 'admin' && (user.hasRole('administrator') || user.hasRole('team-writer')));
+    resolve(user.userName.toLowerCase() !== 'admin' && (user.hasRole(constants.roleIds.administrator) || user.hasRole(constants.roleIds.teamWriter)));
   });
 }
 
@@ -93,6 +105,7 @@ function readAnApp(user, params) {
     }
 
     const appId = params.appId;
+    const environment = params.environment;
 
     if (!paramsDefined(appId)) {
       return resolve(false);
@@ -103,7 +116,7 @@ function readAnApp(user, params) {
     }
 
     for (let i = 0; i < user.appConfigurationPermissions.length; i++) {
-      if (user.appConfigurationPermissions[i].read === true && user.appConfigurationPermissions[i].id === appId) {
+      if (user.appConfigurationPermissions[i].read === true && user.appConfigurationPermissions[i].environment === environment && user.appConfigurationPermissions[i].id === appId) {
         return resolve(true);
       }
     }
@@ -245,7 +258,7 @@ function deleteAConfiguration(user, params) {
     for (let i = 0; i < user.appConfigurationPermissions.length; i++) {
       const permission = user.appConfigurationPermissions[i];
 
-      if (permission.id === appId && permission.environment === environment && permission.delete === true) {
+      if (permission.id === appId && permission.environment === environment && permission.write === true) {
         return resolve(true);
       }
     }
@@ -265,7 +278,7 @@ function createAKey(user) {
       return resolve(false);
     }
 
-    resolve(user.userName.toLowerCase() !== 'admin' && (user.hasRole('administrator') || user.hasRole('key-writer')));
+    resolve(user.userName.toLowerCase() !== 'admin' && (user.hasRole(constants.roleIds.administrator) || user.hasRole(constants.roleIds.keyWriter)));
   });
 }
 
@@ -289,6 +302,8 @@ module.exports = (repositories) => {
     changeSettings,
     createAUser,
     updateAUser: createAUser,
+    createARole,
+    updateARole: createARole,
     changeAPassword,
     createATeam,
     updateATeam: createATeam,

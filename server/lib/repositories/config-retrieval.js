@@ -4,16 +4,38 @@ const model = require('../../models/config-retrieval');
 let mongoClient;
 let base;
 
-function find(appId, environment, published) {
-  return base.findOne({ appId, environment, published });
-};
-
-function findAll(appId, environment) {
-  return base.find({ appId, environment });
+function count(configurationId) {
+  return base.count({ configurationId });
 }
 
-function add(audit) {
-  return base.insertOne(audit);
+function last(configurationId) {
+  return base.findOne({ configurationId }, {
+    sort: {
+      retrieved: -1
+    }
+  });
+}
+
+function find(configurationId, pagination) {
+  const options = {
+    sort: {
+      retrieved: -1
+    }
+  };
+
+  if (pagination && pagination.skip) {
+    options.skip = pagination.skip;
+  }
+
+  if (pagination && pagination.limit) {
+    options.limit = pagination.limit;
+  }
+
+  return base.find({ configurationId }, options);
+}
+
+function add(configRetrieval) {
+  return base.insertOne(configRetrieval);
 }
 
 function removeAll() {
@@ -21,7 +43,7 @@ function removeAll() {
 }
 
 function addIndexes() {
-  base.addIndex({ appId: 1, environment: 1 }, { background: true });
+  base.addIndex({ configurationId: 1, retrieved: -1 }, { background: true });
 }
 
 module.exports = (mongoClientInstance) => {
@@ -32,8 +54,9 @@ module.exports = (mongoClientInstance) => {
 
   return {
     add,
+    count,
     find,
-    findAll,
+    last,
     removeAll
   };
 };

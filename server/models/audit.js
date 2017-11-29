@@ -4,16 +4,11 @@ class Audit {
   constructor(obj) {
     var obj = obj || {};
 
-    this.auditId = uuid();
-    this.appId = obj.appId
-    this.environment = obj.environment;
-    this.appVersion = obj.appVersion;
-    this.type = obj.type
-    this.changed = new Date();
-    this.changedBy = {
-      userId: obj.userId,
-      userName: obj.userName
-    };
+    this.auditId = obj.auditId || uuid();
+    this.action = obj.action;
+    this.data = obj.data || {};
+    this.changed = obj.changed || new Date();
+    this.changedBy = obj.changedBy || { userId: '', userName: '' };
   }
 
   isNull() {

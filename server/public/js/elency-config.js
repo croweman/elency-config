@@ -147,7 +147,7 @@ var elencyConfig = function() {
       self.validate(false);
     });
 
-    let obj = {
+    var obj = {
       id: id,
       isValid: function() {
         return inputSuccess === true;
@@ -304,16 +304,25 @@ var elencyConfig = function() {
     });
   };
 
-  self.getSelecedTeamPermissions = function() {
-    var teamPermissions = [];
-    var matches = $('.team-write');
+  self.getSelecedRolePermissions = function() {
+    var rolePermissions = [];
+    var matches = $('#role-permissions .role-permission');
 
     for (var i = 0; i < matches.length; i++) {
       var current = $(matches[i]);
+      rolePermissions.push(current.data().roleid);
+    };
 
-      if (current.is(':checked')) {
-        teamPermissions.push(current.data().id);
-      }
+    return rolePermissions;
+  };
+
+  self.getSelecedTeamPermissions = function() {
+    var teamPermissions = [];
+    var matches = $('#team-permissions .team-permission');
+
+    for (var i = 0; i < matches.length; i++) {
+      var current = $(matches[i]);
+      teamPermissions.push(current.data().teamid);
     };
 
     return teamPermissions;
@@ -321,26 +330,24 @@ var elencyConfig = function() {
 
   self.getSelectedAppConfigurationPermissions = function() {
     var appConfigurationPermissions = {};
-    var matches = $('.app-env');
+    var matches = $('#app-permissions .app-environment');
 
     for (var i = 0; i < matches.length; i++) {
       var current = $(matches[i]);
+      var select = $(current).find('select');
 
-      if (current.is(':checked')) {
+
+      if (select.val().length > 0) {
         var data = current.data();
-        var appId = data.id;
+        var appId = data.appid;
         var environment = data.environment;
-        var type = data.type;
+        var type = select.val();
 
         if (!appConfigurationPermissions[appId]) {
           appConfigurationPermissions[appId] = {};
         }
 
-        if (!appConfigurationPermissions[appId][environment]) {
-          appConfigurationPermissions[appId][environment] = {};
-        }
-
-        appConfigurationPermissions[appId][environment][type] = true;
+        appConfigurationPermissions[appId][environment] = type;
       }
     }
 
@@ -368,6 +375,7 @@ var elencyConfig = function() {
         $('#search-base').attr('disabled', 'disabled');
         $('#search-filter').attr('disabled', 'disabled');
         $('#check-ldap').addClass('hide');
+        $('#edit-password-container').addClass('hide');
         self.demonitor('uri');
         self.demonitor('manager-dn');
         self.demonitor('manager-password');
@@ -387,6 +395,7 @@ var elencyConfig = function() {
         $('#search-base').removeAttr('disabled');
         $('#search-filter').removeAttr('disabled');
         $('#check-ldap').removeClass('hide');
+        $('#edit-password-container').removeClass('hide');
         uri = self.monitor('uri');
         managerDn = self.monitor('manager-dn');
         managerPassword = self.monitor('manager-password');
@@ -414,15 +423,15 @@ var elencyConfig = function() {
         payload: function() {
 
           var ldapEnabled = $(useLdap).is(':checked');
-
+          
           return {
             ldapEnabled: ldapEnabled,
-            ldapUri: uri.value(),
-            ldapManagerDn: managerDn.value(),
-            ldapManagerPassword: managerPassword.value(),
-            ldapSearchBase: searchBase.value(),
-            ldapSearchFilter: searchFilter.value(),
-            ldapManagerEncryptedPassword: ldapManagerEncryptedPassword
+            ldapUri: ldapEnabled ? uri.value() : $('#uri').val(),
+            ldapManagerDn: ldapEnabled ? managerDn.value() : $('#manager-dn').val(),
+            ldapManagerPassword: ldapEnabled ? managerPassword.value() : $('#manager-password').val(),
+            ldapSearchBase: ldapEnabled ? searchBase.value() : $('#search-base').val(),
+            ldapSearchFilter: ldapEnabled ? searchFilter.value() : $('#search-filter').val(),
+            ldapManagerEncryptedPassword: ldapManagerEncryptedPasswordValue
           };
         }
       }
@@ -475,6 +484,254 @@ var elencyConfig = function() {
     });
   };
 
+  var rolePermissionIndex = 10000;
+  var teamPermissionIndex = 10000;
+  var appPermissionIndex = 10000;
+
+  self.addRolePermission = function(roleId, displayText) {
+    rolePermissionIndex++;
+
+    var existingPermissions = $('#role-permissions .role-permission');
+
+    for (var i = 0; i < existingPermissions.length; i++) {
+      if ($(existingPermissions[i]).data().roleid === roleId) {
+        $('#role').typeahead('val', '');
+        return;
+      }
+    }
+
+    var id = 'role-permission-' + rolePermissionIndex;
+    var selector = '#' + id;
+    var html = '<div id="' + id + '" class="role role-permission col-md-12" data-roleid="' + roleId + '"><button class="close" type="button" title="Remove" onclick="javascript:$(\'' + selector + '\').remove();elencyConfig.rolePermissionSetup();">×</button><div class="col-md-6 role-selection">' + displayText + '</div></div>';
+    $('#role-permissions').append(html);
+    self.rolePermissionSetup();
+    $('#role').typeahead('val', '');
+  };
+
+  self.addTeamPermission = function(teamId, displayText) {
+    teamPermissionIndex++;
+
+    var existingPermissions = $('#team-permissions .team-permission');
+
+    for (var i = 0; i < existingPermissions.length; i++) {
+      if ($(existingPermissions[i]).data().teamid === teamId) {
+        $('#team').typeahead('val', '');
+        return;
+      }
+    }
+
+    var id = 'team-permission-' + teamPermissionIndex;
+    var selector = '#' + id;
+    var html = '<div id="' + id + '" class="team team-permission col-md-12" data-teamid="' + teamId + '"><div class="col-md-6">' + displayText + '</div><div class="col-md-4"><select><option value="w">Write</option></select></div><button class="close" type="button" title="Remove" onclick="javascript:$(\'' + selector + '\').remove();elencyConfig.teamPermissionSetup();">×</button></div>';
+    $('#team-permissions').append(html);
+    self.teamPermissionSetup();
+    $('#team').typeahead('val', '');
+  };
+
+  self.addAppPermission = function(appId, displayText) {
+    appPermissionIndex++;
+
+    var existingPermissions = $('#app-permissions .app-permission');
+
+    for (var i = 0; i < existingPermissions.length; i++) {
+      if ($(existingPermissions[i]).data().appid === appId) {
+        $('#app').typeahead('val', '');
+        return;
+      }
+    }
+
+    var id = 'app-permission-' + appPermissionIndex;
+    var selector = '#' + id;
+    var html = '<div id="' + id + '" class="team app-permission col-md-12" data-appid="' + appId + '"><button class="app-delete close" type="button" title="Remove" onclick="javascript:$(\'' + selector + '\').remove();elencyConfig.appPermissionSetup();">×</button><div class="col-md-11">' + displayText;
+
+    for (var i = 0; i < appEnvironments.length; i++) {
+      if (appEnvironments[i].appId === appId) {
+        for (var j = 0; j < appEnvironments[i].environments.length; j++) {
+          var environment = appEnvironments[i].environments[j];
+          html += '<div class="col-md-12 app-permission app-environment" data-appid="' + appId + '" data-environment="' + environment + '"><div class="col-md-1">&nbsp;</div><div class="col-md-5 strong">' + environment + '</div><div class="col-md-4"><select><option value="">None</option><option value="r" selected="true">Read</option><option value="rw">Write</option><option value="rwp">Publish</option></select></div></div>';
+        }
+        break;
+      }
+    }
+
+    html += '</div></div>';
+    $('#app-permissions').append(html);
+    self.appPermissionSetup();
+    $('#app').typeahead('val', '');
+  };
+
+  self.getIdFromLookupValue = function(value) {
+    var id = value.substr(0, value.length - 1);
+    return id.substr(id.lastIndexOf('(') + 1);
+  };
+
+  self.getIdFromLookupValueRole = function(value) {
+    for (var i = 0; i < availableRoles.length; i++) {
+      if (availableRoles[i].roleName === value) {
+        return availableRoles[i].roleId;
+      }
+    }
+    return undefined;
+  };
+
+  self.lookupMatcher = function(item, selector, idAttr) {
+    return function findMatches(q, cb) {
+      var matches, substringRegex;
+      matches = [];
+      substrRegex = new RegExp(q, 'i');
+
+      $.each(item, function(i, config) {
+        if (substrRegex.test(config)) {
+          matches.push(config);
+        }
+      });
+
+      var selectedItems = $(selector);
+      var selections = [];
+      for (var i = 0; i < selectedItems.length; i++) {
+        selections.push($(selectedItems[i]).data()[idAttr])
+      }
+
+      var filteredMatches = [];
+
+      for (var i = 0; i < matches.length; i++) {
+        var id = self.getIdFromLookupValue(matches[i]);
+        var match = false;
+
+        for (var j = 0; j < selections.length; j++) {
+          if (selections[j] === id) {
+            match = true;
+            break;
+          }
+        }
+
+        if (!match) {
+          filteredMatches.push(matches[i]);
+        }
+      }
+
+      cb(filteredMatches);
+    };
+  };
+
+  self.lookupMatcherRole = function(item, selector, idAttr) {
+    return function findMatches(q, cb) {
+      var matches, substringRegex;
+      matches = [];
+      substrRegex = new RegExp(q, 'i');
+
+      $.each(item, function(i, config) {
+        if (substrRegex.test(config.roleName)) {
+          matches.push(config.roleName);
+        }
+      });
+
+      var selectedItems = $(selector);
+      var selections = [];
+      for (var i = 0; i < selectedItems.length; i++) {
+        selections.push($(selectedItems[i]).data()[idAttr])
+      }
+
+      var filteredMatches = [];
+
+
+      for (var i = 0; i < matches.length; i++) {
+        var id = self.getIdFromLookupValueRole(matches[i]);
+
+        if (id === undefined) {
+          break;
+        }
+
+        var match = false;
+
+        for (var j = 0; j < selections.length; j++) {
+          if (selections[j] === id) {
+            match = true;
+            break;
+          }
+        }
+
+        if (!match) {
+          filteredMatches.push(matches[i]);
+        }
+      }
+
+      cb(filteredMatches);
+    };
+  };
+
+  self.userPermissionsSetup = function() {
+
+    self.rolePermissionSetup();
+    self.teamPermissionSetup();
+    self.appPermissionSetup();
+  };
+
+  self.rolePermissionSetup = function() {
+    if (typeof availableRoles === 'undefined') {
+      return;
+    }
+
+    var options = {
+      hint: true,
+      highlight: true,
+      minLength: 0
+    };
+
+    $('#role').typeahead('destroy','NoCached');
+
+    $('#role').typeahead(options, {
+      name: 'roles',
+      source: self.lookupMatcherRole(availableRoles, '#role-permissions .role-permission', 'roleid'),
+      limit: 10
+    });
+
+    $('#role').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+      self.addRolePermission(self.getIdFromLookupValueRole(datum), datum);
+    });
+  };
+
+  self.teamPermissionSetup = function() {
+    var options = {
+      hint: true,
+      highlight: true,
+      minLength: 0
+    };
+
+    $('#team').typeahead('destroy','NoCached');
+
+    $('#team').typeahead(options, {
+      name: 'teams',
+      source: self.lookupMatcher(availableTeams, '#team-permissions .team-permission', 'teamid'),
+      limit: 10
+    });
+
+    $('#team').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+      self.addTeamPermission(self.getIdFromLookupValue(datum), datum);
+    });
+  };
+
+  self.appPermissionSetup = function() {
+    var options = {
+      hint: true,
+      highlight: true,
+      minLength: 0
+    };
+
+    $('#app').typeahead('destroy','NoCached')
+
+    $('#app').typeahead(options, {
+      name: 'apps',
+      source: self.lookupMatcher(availableApps, '#app-permissions .app-permission', 'appid'),
+      limit: 10
+    });
+
+    $('#app').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+      self.addAppPermission(self.getIdFromLookupValue(datum), datum);
+    });
+
+  };
+
   self.createUser = function() {
     var userName = self.monitor('username');
     var password;
@@ -491,10 +748,11 @@ var elencyConfig = function() {
 
           var teamPermissions = self.getSelecedTeamPermissions();
           var appConfigurationPermissions = self.getSelectedAppConfigurationPermissions();
+          var rolePermissions = self.getSelecedRolePermissions();
 
           var payload = {
             enabled: $('#enabled').is(':checked'),
-            roles: $('#roles').val() || [],
+            roles: rolePermissions,
             teamPermissions: teamPermissions,
             appConfigurationPermissions: appConfigurationPermissions,
             ldapEnabled: ldapEnabled
@@ -513,6 +771,7 @@ var elencyConfig = function() {
         }
       }
     });
+    self.userPermissionsSetup();
   };
 
   self.updateUser = function() {
@@ -524,16 +783,18 @@ var elencyConfig = function() {
 
           var teamPermissions = self.getSelecedTeamPermissions();
           var appConfigurationPermissions = self.getSelectedAppConfigurationPermissions();
+          var rolePermissions = self.getSelecedRolePermissions();
 
           return {
             enabled: $('#enabled').is(':checked'),
-            roles: $('#roles').val() || [],
+            roles: rolePermissions,
             teamPermissions: teamPermissions,
             appConfigurationPermissions: appConfigurationPermissions
           };
         }
       }
     });
+    self.userPermissionsSetup();
   };
   
   self.changePassword = function() {
@@ -561,19 +822,49 @@ var elencyConfig = function() {
     });
   };
 
-  self.selectAllChildCheckBoxes = function(selectId, labelId, selectorParent, className, onText, offText) {
-    var select = $('#' + selectId).is(':checked');
-    onText = onText || 'Select all';
-    offText = offText || 'Deselect all';
+  self.createRole = function() {
+    var roleName = self.monitor('rolename');
 
-    $('#' + labelId).text(select ? offText : onText);
-    var matches = $('#' + selectorParent + ' input.' + className);
+    self.fireActionOn('createRole', {
+      ajax: {
+        url: '/role/create',
+        payload: function() {
+          var teamPermissions = self.getSelecedTeamPermissions();
+          var appConfigurationPermissions = self.getSelectedAppConfigurationPermissions();
 
-    for (var i = 0; i < matches.length; i++) {
-      $(matches[i]).prop('checked', select);
-    }
+          return {
+            roleName: roleName.value(),
+            teamPermissions: teamPermissions,
+            appConfigurationPermissions: appConfigurationPermissions
+          };
+        }
+      }
+    });
+    self.userPermissionsSetup();
   };
 
+  self.updateRole = function() {
+
+    var roleName = self.monitor('rolename');
+    self.fireActionOn('updateRole', {
+      ajax: {
+        url: '/role/' + $('#roleid').val() + '/update',
+        payload: function() {
+
+          var teamPermissions = self.getSelecedTeamPermissions();
+          var appConfigurationPermissions = self.getSelectedAppConfigurationPermissions();
+
+          return {
+            roleName: roleName.value(),
+            teamPermissions: teamPermissions,
+            appConfigurationPermissions: appConfigurationPermissions
+          };
+        }
+      }
+    });
+    self.userPermissionsSetup();
+  };
+  
   self.createTeam = function() {
     var teamId = self.monitor('teamid');
     var teamName = self.monitor('teamname');
@@ -612,7 +903,33 @@ var elencyConfig = function() {
     });
   };
 
+  self.generateKey = function() {
+    $('#generateKey').on('click', function() {
+      var $this = $(this);
+      $this.button('loading');
+      $.ajax({
+        type: 'GET',
+        url: '/key/generate',
+        success: function(data) {
+          if (data !== undefined && typeof data === 'string' && data.indexOf('elencyConfig.login();') !== -1) {
+            window.location = '/login';
+            return;
+          }
+          $('#keyvalue').val(data.key);
+          $this.button('reset');
+        },
+        error: function() {
+          $('#error-box-key-decrypt').css('display', 'block');
+          $this.button('reset');
+        },
+        dataType: 'json'
+      });
+      return false;
+    });
+  }
+
   self.createKey = function() {
+    self.generateKey();
     var keyName = self.monitor('keyname');
     var description = self.monitor('description');
     var keyValue = self.monitor('keyvalue');
@@ -635,6 +952,7 @@ var elencyConfig = function() {
 
     var keyValue = undefined;
     var changingKeyValue = false;
+    self.generateKey();
 
     $('#changeKeyValue').on('click', function() {
       changingKeyValue = true;
@@ -737,16 +1055,17 @@ var elencyConfig = function() {
   self.updateApp = function() {
     var appName = self.monitor('appname');
     var description = self.monitor('description');
-    var teamId = $('#teamid').val();
+    var teamId = self.monitor('teamid');
     var appId = $('#appid').val();
 
     self.fireActionOn('updateApp', {
       ajax: {
-        url: '/team/' + teamId + '/app/' + appId + '/update',
+        url: '/team/' + teamId.value() + '/app/' + appId + '/update',
         payload: function() {
           return {
             appName: appName.value(),
-            description: description.value()
+            description: description.value(),
+            teamId: teamId.value()
           };
         }
       }
@@ -762,6 +1081,26 @@ var elencyConfig = function() {
     self.fireActionOn('createAppEnvironment', {
       ajax: {
         url: '/team/' + teamId + '/app/' + appId + '/environment/create',
+        payload: function() {
+          return {
+            environment: environment.value(),
+            keyId: keyId.value()
+          };
+        }
+      }
+    });
+  };
+
+  self.updateAppEnvironment = function() {
+    var environment = self.monitor('environment');
+    var keyId = self.monitor('keyId');
+    var teamId = $('#teamid').val();
+    var appId = $('#appid').val();
+    var originalEnvironment = $('#originalenvironment').val();
+
+    self.fireActionOn('createAppEnvironment', {
+      ajax: {
+        url: '/team/' + teamId + '/app/' + appId + '/environment/'  + originalEnvironment + '/update',
         payload: function() {
           return {
             environment: environment.value(),
@@ -936,7 +1275,7 @@ var elencyConfig = function() {
       keyName = keyName.trim();
 
       //[ { "keyName":"first", "value": "cheese", "secure": true },{ "keyName":"second", "value": "second\npeas", "secure": false }]
-      var html = '<div id="' + itemName + '" class="panel panel-default configuration-item col-md-12"><div class="panel-body"><div class="form-group col-md-6" id="' + itemName + 'keyname-form-group"><label class="form-control-label" for="' + itemName + 'keyname">Key name</label><input class="form-control key-name" id="' + itemName + 'keyname" type="text" value="' + keyName + '" autocomplete="off" data-minlength="1" data-errormessage="Key name must be at least 1 character and contain characters (a-zA-Z0-9_)" data-regex="^[a-zA-Z0-9\_]+$"><div class="form-control-feedback" id="' + itemName + 'keyname-info"></div></div> <button class="close" type="button" title="Delete" onclick="javascript:elencyConfig.deleteItem(\'' + itemName + '\')">×</button><button class="close move-up" type="button" title="Move up" onclick="javascript:elencyConfig.moveUp(this, \'' + itemName + 'keyname\')"><i class="icon-arrow-up"></i></button><button class="close move-down" type="button" title="Move down" onclick="javascript:elencyConfig.moveDown(this, \'' + itemName + 'keyname\')"><i class="icon-arrow-down"></i></button>  <div class="form-group col-md-6 float-right" id="' + itemName + 'value-form-group"><label class="form-control-label" for="' + itemName + 'value">Value</label><div><textarea id="' + itemName + 'value" cols="2" rows="3" class="key-value">' + value +'</textarea></div></div><div id="' + itemName + 'secure-form-group" class="form-group col-md-6 secure-form-group"><div class="form-check"><label class="form-check-label"><input class="form-check-input key-secure" id="' + itemName + 'secure" type="checkbox"' + encrypted + '> Secure</label></div></div></div></div>';
+      var html = '<div id="' + itemName + '" class="panel panel-default configuration-item col-md-12"><div class="panel-body"><div class="form-group col-md-6" id="' + itemName + 'keyname-form-group"><label class="form-control-label" for="' + itemName + 'keyname">Key name</label><input class="form-control key-name" id="' + itemName + 'keyname" type="text" value="' + keyName + '" autocomplete="off" data-minlength="1" data-errormessage="Key name must be at least 1 character and contain characters (a-zA-Z0-9_)" data-regex="^[a-zA-Z0-9\_]+$"><div class="form-control-feedback" id="' + itemName + 'keyname-info"></div></div> <button class="close" type="button" title="Delete" onclick="javascript:elencyConfig.deleteItem(\'' + itemName + '\')" tabindex="-1">×</button><button class="close move-up" type="button" title="Move up" onclick="javascript:elencyConfig.moveUp(this, \'' + itemName + 'keyname\')" tabindex="-1"><i class="icon-arrow-up"></i></button><button class="close move-down" type="button" title="Move down" onclick="javascript:elencyConfig.moveDown(this, \'' + itemName + 'keyname\')" tabindex="-1"><i class="icon-arrow-down"></i></button>  <div class="form-group col-md-6 float-right" id="' + itemName + 'value-form-group"><label class="form-control-label" for="' + itemName + 'value">Value</label><div><textarea id="' + itemName + 'value" cols="2" rows="3" class="key-value">' + value +'</textarea></div></div><div id="' + itemName + 'secure-form-group" class="form-group col-md-6 secure-form-group"><div class="form-check"><label class="form-check-label"><input class="form-check-input key-secure" id="' + itemName + 'secure" type="checkbox"' + encrypted + '> Encrypted</label></div></div></div></div>';
       $('#configuration-items').append(html);
       self.monitor(itemName + 'keyname');
       //window.location = '#' + itemName;
@@ -963,7 +1302,7 @@ var elencyConfig = function() {
       $('#importdata').removeClass('form-control-success form-control-warning form-control-danger');
       $('#importdata-form-group').removeClass('has-success has-warning has-danger');
       $('#importdata-info').text('');
-      let value = $('#importdata').val().trim();
+      var value = $('#importdata').val().trim();
 
       if (value.length === 0) {
         $('#importdata').addClass('form-control-danger');
@@ -1043,7 +1382,8 @@ var elencyConfig = function() {
             for (var j = 0; j < encryptedEntries.length; j++) {
               var encryptedEntry = $(encryptedEntries[j]);
               var textArea = encryptedEntry.parent().parent().find('textarea');
-              if (textArea.data().originalkey === entry.key) {
+              var textAreaData = textArea.data();
+              if (textAreaData && textAreaData.originalkey && textAreaData.originalkey === entry.key) {
                 textArea.removeClass('hide');
                 textArea.removeAttr('data-encrypted data-originalkey');
                 encryptedEntry.parent().find('div').remove();
@@ -1506,7 +1846,7 @@ var elencyConfig = function() {
 
       var val = value.replace(' - ', ':');
 
-      for (let i = 0; i < configurations.length; i++) {
+      for (var i = 0; i < configurations.length; i++) {
         var configuration = configurations[i];
         var splitted = configuration.split(':');
         configuration = configuration.replace(':true', '');
@@ -1672,7 +2012,7 @@ var elencyConfig = function() {
   self.validateCompareConfigurationId = function(value) {
     var val = value.replace(' - ', ':');
 
-    for (let i = 0; i < configurations.length; i++) {
+    for (var i = 0; i < configurations.length; i++) {
       var configuration = configurations[i];
       configuration = configuration.replace(':true', '');
       configuration = configuration.replace(':false', '');
@@ -1682,6 +2022,55 @@ var elencyConfig = function() {
       }
     }
     return false;
+  };
+
+  self.favourite = function(type, dataIds, dataName) {
+
+    $('#star').on('click', function() {
+      $(this).removeClass('selected');
+      var isActive = $(this).hasClass('active');
+
+      if (!isActive) {
+        $(this).addClass('selected');
+      }
+
+      var ids = [];
+      var data = $(this).data();
+      for (var i = 0; i < dataIds.length; i++) {
+        ids.push(data[dataIds[i]]);
+      }
+      var name = data[dataName];
+
+      $.post({
+        type: 'POST',
+        url: '/user/favourite',
+        data: {
+          ids: ids,
+          name: name,
+          type: type,
+          action: isActive ? 'remove' : 'add'
+        },
+        success: function() {
+          if (isActive === true) {
+            $('#star').removeClass('active');
+          }
+          else {
+            $('#star').addClass('active');
+          }
+        },
+        error: function() {},
+        dataType: 'json'
+      });
+      return false;
+    });
+  };
+
+  self.teamFavourite = function() {
+    self.favourite('team', ['teamid'], 'teamname');
+  };
+
+  self.appFavourite = function() {
+    self.favourite('app', ['appid', 'teamid'], 'appname');
   };
 
   self.getParameterByName = function(name) {
@@ -1740,6 +2129,210 @@ var elencyConfig = function() {
     });
   };
 
+  self.pagination = function(paginationContainerIds, htmlContainerId, count, pageSize, numberOfPagesInNavigation, url) {
+    var pageNumber = 1;
+    var retrievalInProgress = false;
+
+    if (!Array.isArray(paginationContainerIds)) {
+      paginationContainerIds = [ paginationContainerIds ];
+    }
+
+    function getTotalPages() {
+      var totalPages = Math.floor(count / pageSize);
+      if (count % pageSize != 0) {
+        totalPages++;
+      }
+
+      if (count <= pageSize) {
+        totalPages = 1;
+      }
+
+      return totalPages;
+    }
+
+    function drawPagination() {
+      var html = '<nav aria-label="..."><ul class="pagination justify-content-end">';
+
+      if (pageNumber > 1) {
+        html += '<li class="page-item"><a class="page-link first" href="#">&laquo;</a></li>';
+        html += '<li class="page-item"><a class="page-link previous" href="#">&lsaquo;</a></li>';
+      }
+      else {
+        html += '<li class="page-item disabled"><span class="page-link">&laquo;</span></li>';
+        html += '<li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>';
+      }
+
+      var totalPages = getTotalPages();
+
+      if (!(numberOfPagesInNavigation % 2 == 0)) {
+        numberOfPagesInNavigation++;
+      }
+
+      var lowestPageNumber = (pageNumber - (numberOfPagesInNavigation / 2));
+      var difference = 0;
+
+      if (lowestPageNumber < 1) {
+        difference = Math.abs(lowestPageNumber);
+        lowestPageNumber = 1;
+      }
+
+      var highestPageNumber = (pageNumber + (numberOfPagesInNavigation / 2)) + difference;
+      var currentPageNumber = lowestPageNumber;
+
+      if ((highestPageNumber - currentPageNumber) < numberOfPagesInNavigation) {
+        highestPageNumber = currentPageNumber + numberOfPagesInNavigation;
+      }
+
+      if (highestPageNumber > totalPages) {
+        highestPageNumber = totalPages;
+      }
+
+      if ((highestPageNumber - currentPageNumber) < numberOfPagesInNavigation) {
+        currentPageNumber = (highestPageNumber - numberOfPagesInNavigation);
+      }
+
+      if (currentPageNumber < 1) {
+        currentPageNumber = 1;
+      }
+
+      while (currentPageNumber <= highestPageNumber) {
+        if (currentPageNumber === pageNumber) {
+          html += '<li class="page-item active"><span class="page-link active">' + currentPageNumber + '</span></li>';
+        }
+        else {
+          html += '<li class="page-item"><a class="page-link" href="#">' + currentPageNumber + '</a></li>';
+        }
+        currentPageNumber++;
+      }
+
+      if (pageNumber < totalPages) {
+        html += '<li class="page-item"><a class="page-link next" href="#">&rsaquo;</a></li>';
+        html += '<li class="page-item"><a class="page-link last" href="#">&raquo;</a></li>';
+      }
+      else {
+        html += '<li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>';
+        html += '<li class="page-item disabled"><span class="page-link">&raquo;</span></li>';
+      }
+
+      html += '</ul></nav';
+
+      $('#' + paginationContainerIds[0]).html(html);
+
+      if (paginationContainerIds.length > 1) {
+        $('#' + paginationContainerIds[1]).html(html);
+      }
+
+      setupEventHandlers();
+    }
+
+    function setupEventHandlers() {
+      $('.pagination .page-link').unbind().click(function () {
+        $this = $(this);
+
+        if (retrievalInProgress || $this.hasClass('disabled') || $this.hasClass('active')) {
+          return false;
+        }
+
+        if ($this.hasClass('first')) {
+          pageNumber = 1;
+        }
+        else if ($this.hasClass('last')) {
+          pageNumber = getTotalPages();
+        }
+        else if ($this.hasClass('previous')) {
+          pageNumber--;
+        }
+        else if ($this.hasClass('next')) {
+          pageNumber++;
+        }
+        else {
+          pageNumber = parseInt($this.text());
+        }
+
+        retrievalInProgress = true;
+        $this.html('<i class="icon-spinner icon-spin"></i>');
+
+        var requestUrl = url;
+        var seperator = (requestUrl.indexOf('audit-data?') === -1 ? '?' : '&');
+        requestUrl += seperator + 'pageNumber=' + pageNumber;
+
+        $.get({
+          type: 'GET',
+          url: requestUrl,
+          success: function(data) {
+            $('#' + htmlContainerId).html(data.html);
+            drawPagination();
+            setupEventHandlers();
+            retrievalInProgress = false;
+          },
+          error: function() {
+            drawPagination();
+            setupEventHandlers();
+            retrievalInProgress = false;
+          },
+          dataType: 'json'
+        });
+
+        return false;
+      });
+    }
+
+    drawPagination();
+    setupEventHandlers();
+  }
+
+  self.audit = function() {
+    var paginationContainerIds = [ 'pagination-container-1', 'pagination-container-2' ];
+    var htmlContainerId = 'paginated-content';
+    var retrievalInProgress = false;
+    
+    $('#getlogs').on('click', function() {
+      if (retrievalInProgress) {
+        return false;
+      }
+
+      retrievalInProgress = true;
+      var $this = $(this);
+      $this.button('loading');
+      var forceCount = false;
+      var selectedAction = $('#action').val();
+      var selectedUserId = $('#user').val();
+      var url = getLogsUrl;
+
+      var seperator = '?';
+      if (selectedAction !== '') {
+        url += seperator + 'action=' + selectedAction;
+        seperator = '&';
+      }
+      if (selectedUserId !== '') {
+        url += seperator + 'userId=' + selectedUserId;
+        seperator = '&';
+      }
+
+      var requestUrl = url + seperator + 'forceCount=true';
+
+      $.get({
+        type: 'GET',
+        url: requestUrl,
+        success: function(data) {
+
+          $('#' + htmlContainerId).html(data.html);
+          $('#audit').removeClass('audit-hidden');
+          elencyConfig.pagination(paginationContainerIds, htmlContainerId, data.count, pageSize, numberOfPagesInNavigation, url)
+          $this.button('reset');
+          retrievalInProgress = false;
+        },
+        error: function() {
+          $this.button('reset');
+          retrievalInProgress = false;
+        },
+        dataType: 'json'
+      });
+
+      return false;
+    });
+  };
+
   function setupCancel() {
     var cancel = $('#cancel');
 
@@ -1767,15 +2360,17 @@ var elencyConfig = function() {
     login: self.login,
     createUser: self.createUser,
     updateUser: self.updateUser,
+    createRole: self.createRole,
+    updateRole: self.updateRole,
     changePassword: self.changePassword,
     createTeam: self.createTeam,
     updateTeam: self.updateTeam,
     createKey: self.createKey,
-    selectAllChildCheckBoxes: self.selectAllChildCheckBoxes,
     updateKey: self.updateKey,
     createApp: self.createApp,
     updateApp: self.updateApp,
     createAppEnvironment: self.createAppEnvironment,
+    updateAppEnvironment: self.updateAppEnvironment,
     createConfiguration: self.createConfiguration,
     configuration: self.configuration,
     getParameterByName: self.getParameterByName,
@@ -1787,6 +2382,13 @@ var elencyConfig = function() {
     settings: self.settings,
     revisions: self.revisions,
     compare: self.compare,
-    users: self.users
+    users: self.users,
+    appFavourite: self.appFavourite,
+    teamFavourite: self.teamFavourite,
+    rolePermissionSetup: self.rolePermissionSetup,
+    teamPermissionSetup: self.teamPermissionSetup,
+    appPermissionSetup: self.appPermissionSetup,
+    pagination: self.pagination,
+    audit: self.audit
   };
 }();

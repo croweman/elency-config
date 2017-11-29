@@ -13,15 +13,8 @@ const validConfigurationBody = {
   appVersion: '1.1.1',
   environment: 'prod',
   configurationId: '9b386d19-fa7a-40ba-b794-f961e56ffe07',
-  configuration: [{
-    key: 'KeyOne',
-    value: ['KeyOneValue'],
-    encrypted: false
-  }, {
-    key: 'KeyTwo',
-    value: ['59ec069e61fc208b0eb88f73ef2044ef', '5fd094ba85e916cb'],
-    encrypted: true
-  }],
+  configuration: [ '00f42afad19c178194b55ccbde31b6aabd076853091b1f5ec1d32b0b1f10663373bf67554ed6dbce1af719ffc023badfe7df6a81329621546bf42539341e61e7350839b4642787b4de0bf041a6e151e91b77ebce8d1d3cc841dfc266382c5855c1b4a06ab5c49ed9e938af4fdb1f8d0a48e1013e4cc3eac1260041c090655692f9e28a23bb5a542bd6eb794ad08359ced7988eb6ec272b98300468e6cc079a90',
+    '5fd084ba85e916cz' ],
   configurationHash: 'Re10aakOhCrz488W6ws5/A==',
 };
 
@@ -29,19 +22,8 @@ const validConfigurationBody2 = {
   appId: 'proj',
   appVersion: '1.1.1',
   environment: 'prod',
-  configuration: [{
-    key: 'KeyOne',
-    value: ['KeyOneValue'],
-    encrypted: false
-  }, {
-    key: 'KeyTwo',
-    value: ['5d86028fa1c3c19a6426a6c4c8a21ad7ebaea77c8267d04e6feebef535a1b023', '49b427d40cf0245c'],
-    encrypted: true
-  }, {
-    key: 'KeyThree',
-    value: ['KeyThreeValue'],
-    encrypted: false
-  }],
+  configuration: [ 'b1ea4b95f64e0f73b9fee6daa4168dd3edced7b517359a83fe935a96d8cf7a1d9ac4593fa6890a7e2b4a275bd03e944d17b2e441532ad56e93f9b292def9dd07421d5d5dcdf14d8f662cd65d681f7e0000b006f535aad57180b45503efb659108b953aad8055cbd6c6b69b56590facb65f80f4cb8f0c0c083c603ee7ac18eb033015d4176b9557fffb91925f2a939a836c6d3d15b17640dd6e1f6fa53ea5325ba828822ce84cb6a50e140a13d14e3105acbd216351772a7e82b4380bd9a8ef4dd7722b33b7a113b6be328b73f36abd9e446995fb3fc38961c293d9d9a18e99f8757506167d99cb389beb8f44f05d050b12129fb799f4f9c4b695283f8cef5458',
+    '5gd084bb85e716ca' ],
   configurationHash: 'tExQ/a1n0/isuPxqeAT/nw==',
 };
 

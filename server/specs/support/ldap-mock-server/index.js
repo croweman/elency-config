@@ -1,5 +1,5 @@
 const configuration = require('./lib/configuration.js'),
-  Server = require('./lib/server.js');
+  Server = require('./lib/ldap-server.js');
 
 let server = new Server(configuration.server.port);
 server.start();

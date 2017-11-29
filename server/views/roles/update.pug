@@ -1,0 +1,115 @@
+doctype html
+html(lang='en')
+
+  include ../mixins/input-group.pug
+  include ../includes/head.pug
+
+  body
+
+    include ../includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Role Update
+
+    .container
+
+      div.row
+        div.col-md-5
+          strong Modified:
+          span.info-value= selectedRole.updated
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + selectedRole.updatedBy.userId
+          span.info-value
+            a(href=url)=selectedRole.updatedBy.userName
+
+      div.breaker
+
+      form
+
+        input#roleid.input(style='display:none', value=roleId)
+
+        +inputGroup('rolename', 'Role name')(autocomplete='off', data-minlength='3', data-errormessage='Role name must be at least 3 characters', value=selectedRole.roleName)
+
+        div.panel.panel-default.permissions.col-md-12
+          div.permissions-heading
+            | Team Permissions
+          div#team-permissions
+            - index=0
+            each team in teams
+              - index++
+              if team.write === true
+                - id = 'team-permission-' + index
+                div.team.team-permission.col-md-12(id=id, data-teamid=team.teamId)
+                  - displayText = team.teamName + ' (' + team.teamId + ')'
+                  .col-md-6
+                    =displayText
+                  .col-md-4
+                    select
+                      option(value='w') Write
+                  - onclick = 'javascript:$(\'#' + id + '\').remove();elencyConfig.teamPermissionSetup();'
+                  button.close(type='button', title='Remove', onclick=onclick) &times;
+
+          #add-team.form-group.col-md-12.team
+            label.form-control-label(for='team') Add a team:
+            input#team.typeahead.form-control.col-md-8(type='text', autocomplete='off', placeholder="Select a team", value='', data-errormessage="Select a valid team")
+            #team-info.form-control-feedback
+
+        div.panel.panel-default.permissions.col-md-12
+          div.permissions-heading
+            | App Configuration Permissions
+          div#app-permissions
+            - index=0
+              each app in apps
+                - index++
+                if app.hasPermissions === true
+                  - id = 'app-permission-' + index
+                  div.team.app-permission.col-md-12(id=id, data-appid=app.appId)
+                    - onclick = 'javascript:$(\'#' + id + '\').remove();elencyConfig.appPermissionSetup();'
+                    button.app-delete.close(type='button', title='Remove', onclick=onclick) &times;
+                    - displayText = app.appName + ' (' + app.appId + ')'
+                    .col-md-11
+                      =displayText
+                      each environment in app.environments
+                        .col-md-12.app-permission.app-environment(data-appid=app.appId, data-environment=environment.name)
+                          .col-md-1 &nbsp;
+                          .col-md-5.strong
+                            =environment.name
+                          .col-md-4
+                            select
+                              option(value='') None
+                              if environment.read === true && environment.write === false && environment.publish === false
+                                 option(value='r', selected='true') Read
+                              else
+                                option(value='r') Read
+                              if environment.write === true && environment.read === true && environment.publish === false
+                                 option(value='rw', selected='true') Write
+                              else
+                                option(value='rw') Write
+                              if environment.write === true && environment.read === true && environment.publish === true
+                                 option(value='rwp', selected='true') Publish
+                              else
+                                option(value='rwp') Publish
+
+          #add-app.form-group.col-md-12.team
+            label.form-control-label(for='app') Add an app:
+            input#app.typeahead.form-control.col-md-8(type='text', autocomplete='off', placeholder="Select an app", value='', data-errormessage="Select a valid app")
+            #app-info.form-control-feedback
+
+        div.text-right
+          button#updateRole.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating role") Update role
+
+        include ../includes/error-box.pug
+
+      include ../includes/footer.pug
+
+    include ../includes/scripts.pug
+
+    script(type='text/javascript').
+      var availableTeams = !{JSON.stringify(available.teams)};
+      var availableApps = !{JSON.stringify(available.apps)};
+      var appEnvironments = !{JSON.stringify(available.appEnvironments)};
+      $(function() {
+          elencyConfig.updateRole();
+      });

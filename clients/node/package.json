@@ -1,27 +1,42 @@
 {
-  "name": "elency-config-node-client",
-  "version": "1.0.0",
+  "name": "elency-config",
+  "version": "0.0.1-beta",
   "description": "elency-config - node client",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/croweman/elency-config.git"
   },
+  "contributors": [
+    {
+      "name": "Lee Crowe",
+      "email": "leecrowe81@googlemail.co.uk"
+    }
+  ],
   "scripts": {
     "test": "istanbul test ./node_modules/mocha/bin/_mocha -- specs -R spec --recursive --timeout 5000"
   },
-  "author": "Lee Crowe",
-  "license": "ISC",
+  "keywords": [
+    "elency-config",
+    "elency",
+    "config",
+    "CAAS"
+  ],
+  "author": "Lee Crowe a.k.a croweman",
+  "license": "MIT",
   "dependencies": {
-    "debug": "^3.1.0",
-    "nock": "^9.0.27",
-    "request": "^2.83.0",
-    "uuid": "^3.0.1"
+    "debug": "~3.1.0",
+    "request": "~2.83.0",
+    "uuid": "~3.0.1"
   },
   "devDependencies": {
     "chai": "~3.5.0",
     "istanbul": "~0.4.5",
     "mocha": "~3.0.2",
+    "nock": "~9.0.28",
     "should": "~11.1.0"
+  },
+  "engines": {
+    "node": ">=8.9.0"
   }
 }

@@ -3,7 +3,7 @@ const rsa = require('../encryptors/rsa'),
   aes256ctr = require('../encryptors/aes-256-ctr'),
   hasher = require('../hashers/hmac-md5'),
   path = require('path'),
-  crypto = require('crypto');
+  { generateIV } = require('../keys');
 
 module.exports = (elencyConfig) => {
   async function encryptConfiguration(configuration, exceptions) {
@@ -12,7 +12,7 @@ module.exports = (elencyConfig) => {
     const decryptionKey = await decryptKey(configuration.key);
 
     let config = JSON.stringify(configuration.configuration);
-    const hash = await hasher.hash(config);
+    const hash = await hasher.hash(`${configuration.configurationId}:${configuration.appVersion}:${config}`);
 
     for (let i = 0; i < configuration.configuration.length; i++) {
       let item = configuration.configuration[i];
@@ -25,7 +25,7 @@ module.exports = (elencyConfig) => {
         continue;
       }
 
-      const iv = crypto.randomBytes(16).toString('hex').slice(0, 16);
+      const iv = generateIV();
       item.value = await aes256cbc.encrypt(item.value, decryptionKey.value, iv);
     }
 
@@ -40,6 +40,13 @@ module.exports = (elencyConfig) => {
   async function decryptConfiguration(configuration) {
     let val = await aes256ctr.decrypt(configuration.configuration, elencyConfig.configEncryptionKey);
     configuration.configuration = JSON.parse(val);
+    return configuration;
+  }
+
+  async function encryptConfigurationWithKey(configuration) {
+    const decryptionKey = await decryptKey(configuration.key);
+    const iv = generateIV();
+    configuration.configuration = await aes256cbc.encrypt(JSON.stringify(configuration.configuration), decryptionKey.value, iv);
     return configuration;
   }
 
@@ -74,6 +81,7 @@ module.exports = (elencyConfig) => {
   return {
     encryptConfiguration,
     decryptConfiguration,
+    encryptConfigurationWithKey,
     encryptKey,
     decryptKey,
     encrypt,

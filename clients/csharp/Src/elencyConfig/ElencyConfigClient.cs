@@ -222,11 +222,20 @@ namespace ElencyConfig
                 {
                     using (var response = (HttpWebResponse)request.GetResponse())
                     {
-
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
                             Stream responseStream = response.GetResponseStream();
                             var body = new StreamReader(responseStream).ReadToEnd();
+
+                            var searchFor = "\"configuration\":";
+                            var startIndex = body.IndexOf(searchFor);
+                            var endIndex = body.IndexOf("],", startIndex + 1);
+                            var originalEncryptedConfigurationBody = body.Substring(startIndex, (endIndex - startIndex) + 1);
+                            var encryptedConfigurationBody = originalEncryptedConfigurationBody.Substring(searchFor.Length).Trim();
+                            var encryptedConfigurationBodyAsArray = JsonConvert.DeserializeObject<string[]>(encryptedConfigurationBody);
+                            var decryptedConfigurationBody = AES_256_CBC.Decrypt(encryptedConfigurationBodyAsArray, _config.ConfigEncryptionKey);
+                            body = body.Replace(originalEncryptedConfigurationBody, searchFor + decryptedConfigurationBody);
+
                             var configurationResponse = JsonConvert.DeserializeObject<ConfigurationResponse>(body);
                             var currentConfiguration = new Dictionary<string, string>();
 

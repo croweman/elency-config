@@ -91,6 +91,7 @@ module.exports = (config, repositories, encryption) => {
       }
 
       let configRetrieval = new models.configRetrieval({
+        configurationId: configuration.configurationId,
         appId,
         environment,
         ip: getRequestIp(req)
@@ -110,6 +111,10 @@ module.exports = (config, repositories, encryption) => {
       delete configuration.publishedBy;
       delete configuration.updated;
       delete configuration.updatedBy;
+      delete configuration.comment;
+      delete configuration.hasSecureItems;
+
+      await encryption.encryptConfigurationWithKey(configuration);
       delete configuration.key;
 
       return res.status(200).send(configuration).end();

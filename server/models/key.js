@@ -10,7 +10,6 @@ class Key {
     this.value = obj.value || '';
     this.updated = obj.updated || new Date();
     this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
-
     this.keyId = this.keyId.trim();
     this.keyName = this.keyName.trim();
     this.description = this.description.trim();

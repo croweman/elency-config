@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ! -d "./support/lib" ]; then
+    mkdir ./support/lib
+fi
+
+if [ ! -d "./support/models" ]; then
+    mkdir ./support/models
+fi
+
+cp -r ../../server/lib/* ./support/lib
+cp -r ../../server/models/* ./support/models
+
+
+#docker build -t croweman/elency-config-demo:0.0.7-beta .
+#docker push croweman/elency-config-demo:0.0.7-beta
+docker-compose build --force-rm
+
+rm -rf ./support/lib
+rm -rf ./support/models
+
+

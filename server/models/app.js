@@ -9,6 +9,8 @@ class App {
     this.description = obj.description;
     this.teamId = obj.teamId || '';
     this.teamName = obj.teamName || '';
+    this.updated = obj.updated || new Date();
+    this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
 
     this.appId = this.appId.trim();
     this.appName = this.appName.trim();

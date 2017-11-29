@@ -10,7 +10,9 @@ html(lang='en')
 
     #top.jumbotron
       .container
-        h2.display-6 App
+        h2.display-6
+          = 'App - ' + app.appName
+          div#star.bounce(data-teamid=app.teamId, data-appid=app.appId, data-appname=app.appName, class=favourite) ★
 
     .container
 
@@ -29,6 +31,14 @@ html(lang='en')
         div.col-md-5
           strong App Name:
           span.info-value= app.appName
+        div.col-md-5
+          strong Modified:
+          span.info-value= app.updated
+        div.col-md-5
+          strong Modified By:
+          - var url = '/user/all?userId=' + app.updatedBy.userId
+          span.info-value
+            a(href=url)=app.updatedBy.userName
 
       div.breaker
 
@@ -46,6 +56,8 @@ html(lang='en')
           tr
             th Environment
             th Key
+            if canWrite === true
+              th Edit
         tbody
           each appEnvironment in appEnvironments
             tr
@@ -55,6 +67,10 @@ html(lang='en')
               td
                 - var url = '/key/all/?keyId=' + appEnvironment.keyId;
                 a(href=url)= appEnvironment.keyName
+              if canWrite === true
+                td
+                  - var url = '/team/' + app.teamId + '/app/' + app.appId + '/environment/' + appEnvironment.environment + '/update';
+                  a.btn.btn-primary(role="button", aria-pressed="true", href=url) Edit
 
       include ../includes/footer.pug
 
@@ -63,5 +79,6 @@ html(lang='en')
     script(type='text/javascript').
       $(function() {
         elencyConfig.search('environments', [0]);
+        elencyConfig.appFavourite();
       });
 

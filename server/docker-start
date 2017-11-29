@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ -f "./configuration_files/config.json" ]; then
+    cp ./configuration_files/config.json ./config/config.json
+    rm ./configuration_files/config.json
+fi
+
+if [ -f "./configuration_files/keys.json" ]; then
+    cp ./configuration_files/keys.json ./config/keys.json
+    rm ./configuration_files/keys.json
+fi
+
+if [ -f "./configuration_files/elency-config.private.pem" ]; then
+    cp ./configuration_files/elency-config.private.pem ./sec/elency-config.private.pem
+    rm ./configuration_files/elency-config.private.pem
+fi
+
+if [ -f "./configuration_files/elency-config.public.pem" ]; then
+    cp ./configuration_files/elency-config.public.pem ./sec/elency-config.public.pem
+    rm ./configuration_files/elency-config.public.pem
+fi
+
+node ./index.js
+

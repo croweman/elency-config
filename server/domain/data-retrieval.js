@@ -63,12 +63,23 @@ module.exports = (repos) => {
     return configuration;
   }
 
+  async function getRole(roleId) {
+    const role = await repositories.role.find(roleId);
+
+    if (!role || role.isNull()) {
+      throw 'role not found';
+    }
+
+    return role;
+  }
+
   return {
     getAppEnvironment,
     getApp,
     getTeam,
     getUser,
     getKey,
-    getConfiguration
+    getConfiguration,
+    getRole
   };
 };

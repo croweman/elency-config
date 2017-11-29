@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 
 const models = require('../../../models');
 const authorization = require('../../../domain/authorization');
+const constants = require('../../../lib/constants');
 
 let settings = undefined;
 
@@ -40,7 +41,7 @@ describe('domain - authorization', () => {
       });
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.changeSettings(user)
           .then((result) => {
@@ -79,7 +80,7 @@ describe('domain - authorization', () => {
       });
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.createAUser(user)
           .then((result) => {
@@ -118,7 +119,7 @@ describe('domain - authorization', () => {
       });
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.updateAUser(user)
           .then((result) => {
@@ -169,7 +170,7 @@ describe('domain - authorization', () => {
         });
 
         it('if user role is "administrator"', (done) => {
-          const user = new models.user({ userName: 'test', roles: ['administrator'] });
+          const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
           authorizationInstance.changeAPassword(user, { userId: '124' })
             .then((result) => {
@@ -215,7 +216,7 @@ describe('domain - authorization', () => {
         });
 
         it('if user role is "administrator"', (done) => {
-          const user = new models.user({ userName: 'test', roles: ['administrator'] });
+          const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
           authorizationInstance.changeAPassword(user, { userId: '124' })
             .then((result) => {
@@ -262,7 +263,7 @@ describe('domain - authorization', () => {
     describe('returns true', () => {
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.createATeam(user)
           .then((result) => {
@@ -271,8 +272,8 @@ describe('domain - authorization', () => {
           });
       });
 
-      it('if user role is "team-writer"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['team-writer'] });
+      it(`if user role is "${constants.roleIds.teamWriter}"`, (done) => {
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.teamWriter] });
 
         authorizationInstance.createATeam(user)
           .then((result) => {
@@ -285,7 +286,7 @@ describe('domain - authorization', () => {
     describe('returns false', () => {
 
       it('if user is "admin"', (done) => {
-        const user = new models.user({ userName: 'admin', roles: ['administrator'] });
+        const user = new models.user({ userName: 'admin', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.createATeam(user)
           .then((result) => {
@@ -311,7 +312,7 @@ describe('domain - authorization', () => {
     describe('returns true', () => {
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.updateATeam(user)
           .then((result) => {
@@ -320,8 +321,8 @@ describe('domain - authorization', () => {
           });
       });
 
-      it('if user role is "team-writer"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['team-writer'] });
+      it(`if user role is "${constants.roleIds.teamWriter}"`, (done) => {
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.teamWriter] });
 
         authorizationInstance.updateATeam(user)
           .then((result) => {
@@ -334,7 +335,7 @@ describe('domain - authorization', () => {
     describe('returns false', () => {
 
       it('if user is "admin"', (done) => {
-        const user = new models.user({ userName: 'admin', roles: ['administrator'] });
+        const user = new models.user({ userName: 'admin', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.updateATeam(user)
           .then((result) => {
@@ -365,7 +366,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: [
             new models.teamPermission({
               id: teamId,
@@ -390,7 +391,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -406,7 +407,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -429,7 +430,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: [
             new models.teamPermission({
               id: teamId,
@@ -454,7 +455,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -470,7 +471,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -493,7 +494,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: [
             new models.appConfigurationPermission({
               id: appId,
@@ -518,7 +519,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: []
         });
 
@@ -534,7 +535,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: []
         });
 
@@ -557,7 +558,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: [
             new models.teamPermission({
               id: teamId,
@@ -582,7 +583,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -598,7 +599,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -621,7 +622,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: [
             new models.teamPermission({
               id: teamId,
@@ -646,7 +647,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -662,7 +663,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'test',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           teamPermissions: []
         });
 
@@ -737,7 +738,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: [
             new models.appConfigurationPermission({
               id: appId,
@@ -842,7 +843,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: [
             new models.appConfigurationPermission({
               id: appId,
@@ -947,7 +948,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: [
             new models.appConfigurationPermission({
               id: appId,
@@ -1053,7 +1054,7 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: [
             new models.appConfigurationPermission({
               id: appId,
@@ -1102,7 +1103,7 @@ describe('domain - authorization', () => {
 
     describe('returns true', () => {
 
-      it('if user has a delete permission for the app and environment', (done) => {
+      it('if user has a write permission for the app and environment', (done) => {
 
         const appId = '123';
         const environment = 'prod';
@@ -1114,7 +1115,7 @@ describe('domain - authorization', () => {
             new models.appConfigurationPermission({
               id: appId,
               environment: environment,
-              delete: true
+              write: true
             })
           ]
         });
@@ -1129,7 +1130,7 @@ describe('domain - authorization', () => {
 
     describe('returns false', () => {
 
-      it('if user has a delete permission for the app and but different environment', (done) => {
+      it('if user has a write permission for the app and but different environment', (done) => {
 
         const appId = '123';
         const environment = 'prod';
@@ -1141,7 +1142,7 @@ describe('domain - authorization', () => {
             new models.appConfigurationPermission({
               id: appId,
               environment: environment,
-              delete: true
+              write: true
             })
           ]
         });
@@ -1160,12 +1161,12 @@ describe('domain - authorization', () => {
 
         const user = new models.user({
           userName: 'admin',
-          roles: ['administrator'],
+          roles: [constants.roleIds.administrator],
           appConfigurationPermissions: [
             new models.appConfigurationPermission({
               id: appId,
               environment: environment,
-              delete: true
+              write: true
             })
           ]
         });
@@ -1177,7 +1178,7 @@ describe('domain - authorization', () => {
           });
       });
 
-      it('if user has a write and read and publish but no delete permission for the app and environment', (done) => {
+      it('if user has a read but no write permission for the app and environment', (done) => {
 
         const appId = '123';
         const environment = 'prod';
@@ -1190,9 +1191,8 @@ describe('domain - authorization', () => {
               id: appId,
               environment: environment,
               read: true,
-              write: true,
-              publish: true,
-              delete: false
+              write: false,
+              publish: true
             })
           ]
         });
@@ -1211,7 +1211,7 @@ describe('domain - authorization', () => {
     describe('returns true', () => {
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.createAKey(user)
           .then((result) => {
@@ -1220,8 +1220,8 @@ describe('domain - authorization', () => {
           });
       });
 
-      it('if user role is "key-writer"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['key-writer'] });
+      it(`if user role is "${constants.roleIds.keyWriter}"`, (done) => {
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.keyWriter] });
 
         authorizationInstance.createAKey(user)
           .then((result) => {
@@ -1234,7 +1234,7 @@ describe('domain - authorization', () => {
     describe('returns false', () => {
 
       it('if user is "admin"', (done) => {
-        const user = new models.user({ userName: 'admin', roles: ['administrator'] });
+        const user = new models.user({ userName: 'admin', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.createAKey(user)
           .then((result) => {
@@ -1260,7 +1260,7 @@ describe('domain - authorization', () => {
     describe('returns true', () => {
 
       it('if user role is "administrator"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['administrator'] });
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.updateAKey(user)
           .then((result) => {
@@ -1269,8 +1269,8 @@ describe('domain - authorization', () => {
           });
       });
 
-      it('if user role is "key-writer"', (done) => {
-        const user = new models.user({ userName: 'test', roles: ['key-writer'] });
+      it(`if user role is "${constants.roleIds.keyWriter}"`, (done) => {
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.keyWriter] });
 
         authorizationInstance.updateAKey(user)
           .then((result) => {
@@ -1283,7 +1283,7 @@ describe('domain - authorization', () => {
     describe('returns false', () => {
 
       it('if user is "admin"', (done) => {
-        const user = new models.user({ userName: 'admin', roles: ['administrator'] });
+        const user = new models.user({ userName: 'admin', roles: [constants.roleIds.administrator] });
 
         authorizationInstance.updateAKey(user)
           .then((result) => {
@@ -1301,6 +1301,85 @@ describe('domain - authorization', () => {
             done();
           });
       });
+    });
+  });
+
+  describe('createARole', () => {
+
+    describe('returns true', () => {
+
+      it('if user is "admin"', (done) => {
+        const user = new models.user({ userName: 'admin' });
+
+        authorizationInstance.createARole(user)
+          .then((result) => {
+            expect(result).to.eql(true);
+            done();
+          });
+      });
+
+      it('if user role is "administrator"', (done) => {
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
+
+        authorizationInstance.createARole(user)
+          .then((result) => {
+            expect(result).to.eql(true);
+            done();
+          });
+      });
+    });
+
+    describe('returns false', () => {
+
+      it('if user role is "user"', (done) => {
+        const user = new models.user({ userName: 'test', roles: ['user'] });
+
+        authorizationInstance.createARole(user)
+          .then((result) => {
+            expect(result).to.eql(false);
+            done();
+          });
+      });
+    });
+  });
+
+  describe('updateARole', () => {
+
+    describe('returns true', () => {
+
+      it('if user is "admin"', (done) => {
+        const user = new models.user({ userName: 'admin' });
+
+        authorizationInstance.updateARole(user)
+          .then((result) => {
+            expect(result).to.eql(true);
+            done();
+          });
+      });
+
+      it('if user role is "administrator"', (done) => {
+        const user = new models.user({ userName: 'test', roles: [constants.roleIds.administrator] });
+
+        authorizationInstance.updateARole(user)
+          .then((result) => {
+            expect(result).to.eql(true);
+            done();
+          });
+      });
+    });
+
+    describe('returns false', () => {
+
+      it('if user role is "user"', (done) => {
+        const user = new models.user({ userName: 'test', roles: ['user'] });
+
+        authorizationInstance.updateARole(user)
+          .then((result) => {
+            expect(result).to.eql(false);
+            done();
+          });
+      });
+
     });
   });
 });
