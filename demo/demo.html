@@ -1,0 +1,523 @@
+<html>
+<head>
+    <script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+</head>
+<body style="padding:0;margin:0">
+<script type="text/javascript">
+    var loaded = false;
+</script>
+<iframe id="testingIFrame" src="http://localhost:3000" height="4000px" width="100%" frameborder="0" onload="javascript: iFrameLoaded();"></iframe>
+<script type="text/javascript">
+    var innerDoc;
+    var loaded = false;
+
+    function iFrameLoaded() {
+
+        window.scrollTo(0,0);
+        window.parent.scrollTo(0,0);
+        var frame = document.getElementById('testingIFrame');
+        console.log('loaded: ' + frame.contentWindow.location.href);
+        loaded = true;
+
+//        if (frame) {
+//            // here you can make the height, I delete it first, then I make it again
+//            frame.height = "";
+//            iFrameID.height = frame.contentWindow.document.body.scrollHeight + "px";
+//        }
+    }
+    function sleep(milliseconds) {
+        if (!milliseconds) {
+            milliseconds = 500;
+        };
+        return new Promise(function(resolve) {
+            setTimeout(function() { resolve(); }, milliseconds);
+        });
+    }
+
+    function getElementBySelector(selector) {
+        var input;
+
+        console.log(selector);
+
+        if (selector.id !== undefined) {
+            input = innerDoc.getElementById(selector.id);
+        }
+        else if (selector.tagName !== undefined && selector.index !== undefined) {
+            input = innerDoc.getElementsByTagName(selector.tagName)[selector.index];
+        }
+        else if (selector.find !== undefined && selector.index !== undefined) {
+            input = $(innerDoc).find(selector.find)[selector.index];
+        }
+
+        console.log(input);
+
+        return input;
+    }
+
+    async function typeValue(input, value, cancelInvalidate) {
+        for (var i = 0; i < value.length; i++) {
+            await sleep(15);
+            input.value += value[i];
+
+            if (!cancelInvalidate) {
+                $(input).blur();
+                $(input).focus();
+            }
+        }
+    }
+
+    async function enterInput(selector, value, cancelInvalidate) {
+        var input = getElementBySelector(selector);
+        input.value = '';
+        await sleep();
+        input.focus();
+        await sleep(100);
+        await typeValue(input, value, cancelInvalidate);
+    }
+
+    function focusElement(selector) {
+        var input = getElementBySelector(selector);
+        input.focus();
+    }
+
+    async function clickButton(selector, loadedValue) {
+        var button = getElementBySelector(selector);
+        await sleep(300);
+        button.focus();
+        await sleep(300);
+        if (loadedValue !== undefined) {
+            loaded = loadedValue;
+        }
+        else {
+            loaded = false;
+        }
+        button.click();
+    }
+
+    function waitForElementLoad(selector, options) {
+        if (typeof selector === 'string') {
+            selector = {
+                id: selector
+            };
+        }
+
+        options = options || {};
+
+        if (options.sleep === undefined) {
+            options.sleep = 750;
+        }
+
+        if (options.cancelScrollToTop === undefined || options.cancelScrollToTop !== true) {
+            window.scrollTo(0, 0);
+        }
+
+        return new Promise(function(resolve) {
+            var interval = setInterval(function() {
+                console.log('waiting for ' + JSON.stringify(selector));
+                try {
+                    if (!loaded) {
+                        throw 'not loaded';
+                    }
+                    var iframe = document.getElementById('testingIFrame');
+                    innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    var element = getElementBySelector(selector);
+                    if (innerDoc.readyState === "complete" && (element !== undefined && element !== null)) {
+                        clearInterval(interval);
+
+                        setTimeout(function() {
+                            resolve();
+                        }, options.sleep);
+                    }
+                } catch (err) {
+                }
+            }, 10);
+        });
+    }
+
+    async function createAdminUser() {
+        await waitForElementLoad('password');
+        await enterInput({ id: 'password' }, 'aA1!aaaa');
+        await enterInput({ id: 'confirm-password' }, 'aA1!aaaa');
+        await clickButton({ id: 'createUser'});
+    }
+
+    async function login(username, password) {
+        await waitForElementLoad('username');
+        await enterInput({ id: 'username' }, username);
+        await enterInput({ id: 'password' }, password);
+        await clickButton({ id: 'login'});
+    }
+
+    async function createSettings() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 5 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ id: 'useLdap' });
+        await enterInput({ id: 'uri' }, 'ldap://localhost:3001');
+        await enterInput({ id: 'manager-dn' }, 'cn=Bob Smith,dc=test,dc=com');
+        await enterInput({ id: 'manager-password' }, 'f178hJ4$a!');
+        await clickButton({ id: 'check-ldap' });
+        await enterInput({ id: 'search-base' }, 'DC=test,DC=com');
+        await enterInput({ id: 'search-filter' }, '(sAMAccountName={0})');
+        await clickButton({ id: 'saveSettings' });
+
+    }
+
+    async function createRole() {
+
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 3 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: '.create-button', index: 0 });
+        await waitForElementLoad('rolename');
+        await enterInput({ id: 'rolename' }, 'Awesome Role');
+        await clickButton({ id: 'createRole' });
+    }
+
+    async function createUser() {
+
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 2 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: '#create-button', index: 0 });
+        await sleep(1000);
+        await enterInput({ id: 'username' }, 'joe');
+        await clickButton({ id: 'search-users' });
+        await sleep(500);
+        await clickButton({ id: '26271726-1c91-48e5-ac40-70875d509cc5' });
+        await clickButton({ id: 'adduserbutton' });
+        await waitForElementLoad('role');
+        await sleep(500);
+        await enterInput({ find: '.typeahead.tt-input', index: 0 }, 'administrator', true);
+        await clickButton({ find: '.tt-suggestion', index: 0 });
+        await enterInput({ find: '.typeahead.tt-input', index: 0 }, 'key-writer', true);
+        await clickButton({ find: '.tt-suggestion', index: 0 });
+        await enterInput({ find: '.typeahead.tt-input', index: 0 }, 'team-writer', true);
+        await clickButton({ find: '.tt-suggestion', index: 0 });
+        await enterInput({ find: '.typeahead.tt-input', index: 0 }, 'Awesome Role', true);
+        await clickButton({ find: '.tt-suggestion', index: 0 });
+        await clickButton({ id: 'createUser' });
+
+        //https://github.com/twitter/typeahead.js/issues/1573
+    }
+
+    async function createKey() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 2 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: '.create-button', index: 0 });
+        await waitForElementLoad('keyname');
+        await enterInput({ id: 'keyname' }, 'Test Environment');
+        await enterInput({ id: 'description' }, 'The Test Environment Key');
+        await enterInput({ id: 'keyvalue' }, 'OWY4YWQ2YzVhNzQyNGM3NWFhYTVjZDM5');
+        await clickButton({ id: 'createKey' });
+    }
+
+    async function createTeam() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 1 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: '.create-button', index: 0 });
+        await waitForElementLoad('teamid');
+        await enterInput({ id: 'teamid' }, 'awesome-team');
+        await enterInput({ id: 'teamname' }, 'Awesome Team');
+        await enterInput({ id: 'description' }, 'The Awesome Team');
+        await clickButton({ id: 'createTeam' });
+    }
+
+    async function addTeamToRole() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 4 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: 'tr td a', index: 1 });
+        await waitForElementLoad('team');
+        await sleep(500);
+        await enterInput({ find: '.typeahead.tt-input', index: 0 }, 'Awesome Team', true);
+        await clickButton({ find: '.tt-suggestion', index: 0 });
+        await sleep(500);
+        await clickButton({ id: 'updateRole' });
+    }
+
+    async function createApp() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 1 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: 'tr td a', index: 0 });
+        await waitForElementLoad('star');
+        await clickButton({ id: 'star' });
+        await clickButton({ find: '.create-button', index: 0 });
+        await waitForElementLoad('appid');
+        await enterInput({ id: 'appid' }, 'awesome-app');
+        await enterInput({ id: 'appname' }, 'Awesome App');
+        await enterInput({ id: 'description' }, 'The Awesome App');
+        await clickButton({ id: 'createApp' });
+    }
+
+    async function createEnvironment() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: 'tr td a', index: 0 });
+        await waitForElementLoad('star');
+        await clickButton({ id: 'star' });
+        await clickButton({ find: '.create-button', index: 0 });
+        await waitForElementLoad('environment');
+        await enterInput({ id: 'environment' }, 'Test');
+        innerDoc.getElementById("keyId").selectedIndex = "1";
+        await clickButton({ id: 'createAppEnvironment' });
+    }
+
+    async function addAppPermission() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 4 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: 'tr td a', index: 1 });
+        await waitForElementLoad('app');
+        await sleep(500);
+        await enterInput({ find: '.typeahead.tt-input', index: 1 }, 'Awesome App', true);
+        await clickButton({ find: '.tt-suggestion', index: 0 });
+        await sleep(500);
+        var select = getElementBySelector({ find: 'select', index: 1 });
+        select.selectedIndex = 3;
+        await sleep(500);
+        await clickButton({ id: 'updateRole' });
+    }
+
+    async function logout() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 6 });
+        await clickButton({ find: '.dropdown-item', index: 0 });
+
+    }
+
+    async function scrollToTop(delay) {
+        return new Promise(function(resolve) {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                resolve();
+            }, delay);
+        })
+    }
+
+    async function viewEnvironmentAndRetrieveVersion1Configuration() {
+        await waitForElementLoad({ find: '.create-button', index: 0 });
+        await clickButton({ tagName: 'a', index: 11 });
+
+        await waitForElementLoad({ find: '.configuration-retrieval-button', index: 0 })
+        await clickButton({ find: '.configuration-retrieval-button', index: 0 });
+
+        await waitForElementLoad({ id: 'version' });
+        await enterInput({ id: 'version' }, '1.0.0');
+        await clickButton({ id: 'search' });
+        await sleep(1000);
+
+        await clickButton({ find: 'a', index: 11 });
+        await waitForElementLoad({ find: '.configuration-retrieval-button', index: 0 });
+        await clickButton({ find: 'a', index: 15 });
+
+        await waitForElementLoad({ find: '.create-button', index: 0 });
+        await clickButton({ find: 'a', index: 13 });
+
+        await waitForElementLoad({ id: 'publish' });
+        await clickButton({ id: 'publish' });
+        await clickButton({ id: 'publishconfigurationentriesbutton' });
+        //await scrollToTop(1000);
+        document.getElementById('testingIFrame').height='600px';
+        await sleep(1000);
+        document.getElementById('testingIFrame').height='4000px';
+
+        await waitForElementLoad({ find: '.create-button', index: 0 });
+        await clickButton({ tagName: 'a', index: 11 });
+
+        await waitForElementLoad({ find: '.configuration-retrieval-button', index: 0 })
+        await clickButton({ find: '.configuration-retrieval-button', index: 0 });
+
+        await waitForElementLoad({ id: 'version' });
+        await enterInput({ id: 'version' }, '1.0.0');
+        await clickButton({ id: 'search' });
+        await sleep(1000);
+    }
+
+    async function cloneAndCreateVersion11Configuration() {
+        await clickButton({ find: 'a', index: 11 });
+        await waitForElementLoad({ find: '.configuration-retrieval-button', index: 0 });
+        await clickButton({ find: 'a', index: 15 });
+        await waitForElementLoad({ find: '.create-button', index: 0 });
+        await clickButton({ find: 'a', index: 13 });
+        await waitForElementLoad({ id: 'copy' });
+        await clickButton({ id: 'copy' });
+
+        await waitForElementLoad('version');
+        await enterInput({ id: 'version' }, '1.1.0');
+        await enterInput({ id: 'comment' }, 'various configuration changes');
+
+        await enterInput({ id: 'item0value' }, 'WARN');
+        await enterInput({ id: 'item1value' }, 'http://customer-v2.test.com');
+
+        await clickButton({ id: 'addConfigurationItem2' }, true);
+        focusElement({ id: 'createConfiguration' });
+        var options = { cancelScrollToTop: true, sleep: 0 };
+        await waitForElementLoad('item10001keyname', options);
+        await enterInput({ id: 'item10001keyname' }, 'JSON_BLOB');
+        await enterInput({ id: 'item10001value' }, '{\n  "cheese": "please"\n}');
+        await clickButton({ id: 'createConfiguration' });
+        //await scrollToTop(1000);
+        document.getElementById('testingIFrame').height='600px';
+        await sleep(1000);
+        document.getElementById('testingIFrame').height='4000px';
+
+        await waitForElementLoad({ find: '.create-button', index: 0 });
+        await clickButton({ find: 'a', index: 13 });
+
+        await waitForElementLoad({ id: 'publish' });
+        await clickButton({ id: 'publish' });
+        await clickButton({ id: 'publishconfigurationentriesbutton' });
+        //await scrollToTop(1000);
+        document.getElementById('testingIFrame').height='600px';
+        await sleep(1000);
+        document.getElementById('testingIFrame').height='4000px';
+
+        await waitForElementLoad({ find: '.create-button', index: 0 });
+        await clickButton({ tagName: 'a', index: 11 });
+
+        await waitForElementLoad({ find: '.configuration-retrieval-button', index: 0 })
+        await clickButton({ find: '.configuration-retrieval-button', index: 0 });
+
+        await waitForElementLoad({ id: 'version' });
+        await enterInput({ id: 'version' }, '1.0.0');
+        await clickButton({ id: 'search' });
+        await sleep(1500);
+
+        await enterInput({ id: 'version' }, '2.0.0');
+        await clickButton({ id: 'search' });
+        await sleep(1500);
+
+        await clickButton({ find: 'a', index: 12 });
+        document.getElementById('testingIFrame').height='600px';
+        await sleep(1000);
+        document.getElementById('testingIFrame').height='4000px';
+
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: 'a', index: 13 });
+        await waitForElementLoad({ id: 'decrypt' });
+        window.scrollTo(0, 270);
+        await sleep(1500);
+        window.scrollTo(0, 0);
+        await clickButton({ id: 'decrypt' });
+        await enterInput({ id: 'keyvalue' }, 'OWY4YWQ2YzVhNzQyNGM3NWFhYTVjZDM5');
+        await clickButton({ id: 'decryptconfigurationentriesbutton' });
+        window.scrollTo(0, 270);
+        await sleep(1500);
+    }
+
+    async function addInitialDraftConfiguration() {
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 0 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 9 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: 'tr td a', index: 0 });
+        await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ find: '.create-button', index: 0 });
+        await waitForElementLoad('version');
+        await enterInput({ id: 'version' }, '0.1.0');
+        await enterInput({ id: 'comment' }, 'Initial alpha version');
+        await clickButton({ id: 'addConfigurationItem' }, true);
+        var options = { cancelScrollToTop: true, sleep: 0 };
+        await waitForElementLoad('item10001keyname', options);
+        await enterInput({ id: 'item10001keyname' }, 'LOG_LEVEL');
+        await enterInput({ id: 'item10001value' }, 'DEBUG');
+        await clickButton({ id: 'addConfigurationItem' }, true);
+        focusElement({ id: 'createConfiguration' });
+        await waitForElementLoad('item10002keyname', options);
+        await enterInput({ id: 'item10002keyname' }, 'REST_API_URL');
+        await enterInput({ id: 'item10002value' }, 'http://customer-v1.test.com');
+        await clickButton({ id: 'addConfigurationItem2' }, true);
+        focusElement({ id: 'createConfiguration' });
+        await waitForElementLoad('item10003keyname', options);
+        await enterInput({ id: 'item10003keyname' }, 'MONGO_URL');
+        await enterInput({ id: 'item10003value' }, 'mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb1.test.com:27017/awesome?replicaSet=awesome&authSource=admin');
+        await clickButton({ id: 'addConfigurationItem2' }, true);
+        focusElement({ id: 'createConfiguration' });
+        await waitForElementLoad('item10004keyname', options);
+        await enterInput({ id: 'item10004keyname' }, 'MONGO_USER');
+        await enterInput({ id: 'item10004value' }, 'awesome-user');
+        await clickButton({ id: 'item10004secure' }, true);
+        await clickButton({ id: 'addConfigurationItem2' }, true);
+        focusElement({ id: 'createConfiguration' });
+        await waitForElementLoad('item10005keyname', options);
+        await enterInput({ id: 'item10005keyname' }, 'MONGO_PASSWORD');
+        await enterInput({ id: 'item10005value' }, 'f5%9kklMco!2@');
+        await clickButton({ id: 'item10005secure' }, true);
+        await clickButton({ id: 'createConfiguration' });
+        document.getElementById('testingIFrame').height='600px';
+        await sleep(1000);
+        document.getElementById('testingIFrame').height='4000px';
+    }
+
+    async function compare() {
+        window.scrollTo(0, 0);
+        await waitForElementLoad('navbarsExampleDefault');
+        await sleep(250);
+        await clickButton({ tagName: 'a', index: 13 });
+        await waitForElementLoad('compare');
+        await clickButton({ id: 'compare' });
+        await waitForElementLoad({ id: 'configuration-one' });
+        await sleep(500);
+        await enterInput({ find: '.typeahead.tt-input', index: 0 }, '0.1.0', true);
+        await clickButton({ find: '#configuration-one-form-group .tt-suggestion', index: 1 });
+        await sleep(500);
+        await enterInput({ find: '.typeahead.tt-input', index: 1 }, '1.1.0', true);
+        await clickButton({ find: '#configuration-two-form-group .tt-suggestion', index: 0 });
+
+        await clickButton({ id: 'compare' });
+        await sleep(500);
+        await clickButton({ id: 'encryptedentriesbutton' });
+        await sleep(500);
+        await enterInput({ id: 'keyvalue' }, 'OWY4YWQ2YzVhNzQyNGM3NWFhYTVjZDM5');
+        await clickButton({ id: 'decryptconfigurationentriesbutton' });
+        window.scrollTo(0, 385);
+        await sleep(3500);
+        window.scrollTo(0, 0);
+    }
+
+    async function audit() {
+        //await waitForElementLoad('navbarsExampleDefault');
+        await clickButton({ tagName: 'a', index: 5 });
+        await waitForElementLoad('getlogs');
+        await clickButton({ id: 'getlogs' }, true);
+        await sleep(1000);
+        await clickButton({ find: 'a', index: 9 }, true);
+//        await clickButton({ find: 'a', index: 13 }, true);
+//        await clickButton({ find: 'a', index: 14 }, true);
+//        await clickButton({ find: 'a', index: 15 }, true);
+    }
+
+    async function go() {
+        await createAdminUser();
+        await login('admin', 'aA1!aaaa');
+        await createSettings();
+        await createRole();
+        await createUser();
+        await logout();
+        await login('joe.bloggs', 'aA1!aaaa');
+        await createKey();
+        await createTeam();
+        await addTeamToRole();
+        await createApp();
+        await createEnvironment();
+        await addAppPermission();
+
+        await addInitialDraftConfiguration();
+        await viewEnvironmentAndRetrieveVersion1Configuration();
+        await cloneAndCreateVersion11Configuration();
+
+        //document.getElementById('testingIFrame').src = 'http://localhost:3000/team/awesome-team/app/awesome-app/environment/Test/version/1.1.0/configuration/c3b1975e-5621-411f-9308-b5fb0353588f';
+        //await sleep(1000);
+
+        await compare();
+        await audit();
+    }
+
+    go();
+</script>
+</body>
+</html>
