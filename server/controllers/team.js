@@ -841,7 +841,7 @@ module.exports = (config, repositories, encryption) => {
         viewData.lastRetrieved = '';
         const retrieval = await repositories.configRetrieval.last(configurationId);
 
-        if (retrieval && retrieval.retrieved) {
+        if (retrieval && retrieval.retrieved && !retrieval.isNull()) {
           viewData.lastRetrieved = moment(retrieval.retrieved).format('DD/MM/YYYY HH:mm:ss');
         }
       }
@@ -1073,11 +1073,11 @@ module.exports = (config, repositories, encryption) => {
 
       if (updating) {
         await repositories.configuration.update(configuration);
-        await domainInstance.audit.addEntry(req.user, constants.actions.updateConfiguration, { teamId: configuration.teamId, teamName: configuration.teamName, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, keyId: configuration.key.keyId });
+        await domainInstance.audit.addEntry(req.user, constants.actions.updateConfiguration, { teamId: configuration.teamId, teamName: configuration.teamName, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, configurationId: configuration.configurationId, keyId: configuration.key.keyId });
       }
       else {
         await repositories.configuration.add(configuration);
-        await domainInstance.audit.addEntry(req.user, constants.actions.createConfiguration, { teamId: configuration.teamId, teamName: configuration.teamName, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, keyId: configuration.key.keyId });
+        await domainInstance.audit.addEntry(req.user, constants.actions.createConfiguration, { teamId: configuration.teamId, teamName: configuration.teamName, appId: configuration.appId, appName: configuration.appName, environment: configuration.environment, configurationId: configuration.configurationId, keyId: configuration.key.keyId });
       }
 
       if (appEnvironment.allVersions.indexOf(version) === -1) {

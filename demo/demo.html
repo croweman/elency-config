@@ -455,13 +455,13 @@
 
     async function compare() {
         window.scrollTo(0, 0);
-        await waitForElementLoad('navbarsExampleDefault');
+        //await waitForElementLoad('navbarsExampleDefault');
         await sleep(250);
         await clickButton({ tagName: 'a', index: 13 });
         await waitForElementLoad('compare');
         await clickButton({ id: 'compare' });
         await waitForElementLoad({ id: 'configuration-one' });
-        await sleep(500);
+        await sleep(1500);
         await enterInput({ find: '.typeahead.tt-input', index: 0 }, '0.1.0', true);
         await clickButton({ find: '#configuration-one-form-group .tt-suggestion', index: 1 });
         await sleep(500);
@@ -486,9 +486,6 @@
         await clickButton({ id: 'getlogs' }, true);
         await sleep(1000);
         await clickButton({ find: 'a', index: 9 }, true);
-//        await clickButton({ find: 'a', index: 13 }, true);
-//        await clickButton({ find: 'a', index: 14 }, true);
-//        await clickButton({ find: 'a', index: 15 }, true);
     }
 
     async function go() {
