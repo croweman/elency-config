@@ -37,6 +37,14 @@ Basic client usage examples can be found in the following places:
 
 ## Demo<a name="demo"></a>
 
+### Video demo
+
+A video can be found below demonstrating basic usage of the admin ui.
+
+[![elency-config server](https://img.youtube.com/vi/MO5aSvd_GjY/0.jpg)](https://www.youtube.com/watch?v=MO5aSvd_GjY)
+
+### Real demo
+
 * The demo has a dependency on `Docker Compose`.
 
 The demo spins up in a docker containerised environment a mongo instance populated with sample data, an `elency-config-server` (with ui) and a `node client` that consumes configuration from the `Centre` app under team `Atlanta Falcons` with real time refreshing every `1000ms`.
