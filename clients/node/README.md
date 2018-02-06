@@ -30,12 +30,12 @@ npm install `elency-config` --save
 
 or
 
-1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.1-beta.tar.gz">elency-config-node-client</a>.
+1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.2-beta.tar.gz">elency-config-node-client</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
 ```
-tar xzf ./elency-config-node-client-0.0.1-beta.tar.gz
+tar xzf ./elency-config-node-client-0.0.2-beta.tar.gz
 ```
 
 ---
@@ -112,6 +112,11 @@ Once your `retrieve` function has been called the client will have the following
  - `get`: A function that accepts a `key` argument and returns the value of the key or `undefined` if the key cannot be found.
  - `getAllKeys`: A function that returns all of the `keys` within the configuration.
  - `refresh`: A function that can be called to refresh the configuration.
+ - `getBoolean`: (`key` string, `fallback` <optional>) gets the value of a key as a boolean and falls back to fallback value if provided.
+ - `getDate`: (`key` string, `fallback` <optional>) gets the value of a key as a date and falls back to fallback value if provided.
+ - `getInt`: (`key` string, `fallback` <optional>) gets the value of a key as a int and falls back to fallback value if provided.
+ - `getFloat`: (`key` string, `fallback` <optional>) gets the value of a key as a float and falls back to fallback value if provided.
+ - `getObject`: (`key` string, `fallback` <optional>) gets the value of a key as an object and falls back to fallback value if provided.
 
 ---
 

@@ -4,7 +4,8 @@ const fs = require('fs'),
   aes256cbc = require('./encryptors/aes-256-cbc'),
   versionNumber = require('./validation/version-number'),
   path = require('path'),
-  debug = require('debug')('elency-config');
+  debug = require('debug')('elency-config'),
+  valueRetrieval = require('./value-retrieval');
 
 module.exports = (configuration) => {
 
@@ -305,32 +306,69 @@ module.exports = (configuration) => {
     initialized = false;
   }
 
+  function appVersion() {
+    checkInitialisation();
+    return currentAppVersion;
+  }
+
+  function environment() {
+    checkInitialisation();
+    return currentEnvironment;
+  }
+
+  function configurationId() {
+    checkInitialisation();
+    return currentConfigurationId;
+  }
+
+  function get(key) {
+    checkInitialisation();
+    return currentConfiguration[key];
+  }
+
+  function getAllKeys() {
+    checkInitialisation();
+    return currentKeys;
+  }
+  
+  function getBoolean(key, fallback) {
+    return valueRetrieval.getBoolean(get(key), fallback);
+  }
+
+  function getDate(key, fallback) {
+    return valueRetrieval.getDate(get(key), fallback);
+  }
+
+  function getInt(key, fallback) {
+    return valueRetrieval.getInt(get(key), fallback);
+  }
+
+  function getFloat(key, fallback) {
+    return valueRetrieval.getFloat(get(key), fallback);
+  }
+
+  function getObject(key, fallback) {
+    return valueRetrieval.getObject(get(key), fallback);
+  }
+
+  async function refresh() {
+    checkInitialisation();
+    await getConfiguration();
+  }
+
   return {
     init,
     dispose,
-    appVersion: () => {
-      checkInitialisation();
-      return currentAppVersion;
-    },
-    environment: () => {
-      checkInitialisation();
-      return currentEnvironment;
-    },
-    configurationId: () => {
-      checkInitialisation();
-      return currentConfigurationId;
-    },
-    get: (key) => {
-      checkInitialisation();
-      return currentConfiguration[key];
-    },
-    getAllKeys: () => {
-      checkInitialisation();
-      return currentKeys;
-    },
-    refresh: async () => {
-      checkInitialisation();
-      await getConfiguration();
-    }
-  }
+    appVersion,
+    environment,
+    configurationId,
+    get,
+    getBoolean,
+    getDate,
+    getInt,
+    getFloat,
+    getObject,
+    getAllKeys,
+    refresh
+  };
 };

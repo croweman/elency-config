@@ -2392,3 +2392,449 @@ var elencyConfig = function() {
     audit: self.audit
   };
 }();
+
+/* eslint-disable */
+
+var tracking = tracking || {};
+tracking.bkId = '36830';
+tracking.isAvailable = true;
+tracking.previouslyRun = false;
+
+var enabledProductsP2 = [
+  "petinsurance",
+  "car",
+  "carinsurance",
+  "van",
+  "vaninsurance",
+  "travelinsurance",
+  "homev2",
+  "homeinsurance",
+  "life",
+  "lifeinsurance"
+];
+
+tracking.callBlueKai = function (kvp) {
+  if (!blueKaiEnable()) {
+    return;
+  }
+  for (key in kvp) {
+    if (kvp.hasOwnProperty(key)) {
+      bk_addPageCtx(kvp[key]);
+    }
+  }
+  BKAI.doTag(tracking.bkId);
+};
+
+tracking.param = function (obj, prefix) {
+  var str = [], p;
+  if (obj !== null){
+    for(p in obj) {
+      if (obj.hasOwnProperty(p)) {
+        var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
+        str.push((v !== null && typeof v === "object") ?
+          tracking.param(v, k) :
+        encodeURIComponent(k) + "=" + encodeURIComponent(v));
+      }
+    }
+  }
+  return str.join("&");
+}
+
+tracking.pageLoaded = function (page, section) {
+
+  try {
+    if (!blueKaiEnableP2()) {
+      return;
+    }
+    if ( ((typeof page === 'undefined') && (tracking.previouslyRun)) || (typeof dmpFieldMap === 'undefined')  ) {
+      return;
+    }
+    tracking.previouslyRun = true;
+    var groups = {};
+    var buttons = [];
+    dmpFieldMap.enabled.forEach(function (field) {
+      var groupName = field.group;
+      var elem;
+      if (field.hasOwnProperty('id')) {
+        elem = document.getElementById(field.id)
+      } else {
+        elem = document.querySelector(field.selector);
+      }
+      if (!groups.hasOwnProperty(groupName)) {
+        groups[groupName] = [];
+      }
+      groups[groupName].push(field);
+      if (elem === null) {
+        return;
+      }
+      if ((elem.type === 'button') || (elem.tagName === 'BUTTON') || (elem.type === 'submit') || (elem.tagName === 'A')) {
+        buttons.push({elem: elem, group: field.name});
+      }
+    });
+    buttons.forEach(function (button) {
+
+      button.clone = button.elem.cloneNode(true);
+      button.clone.id = button.elem.id + '_vt';
+      button.clone.name = "";
+      button.elem.parentNode.insertBefore(button.clone, button.elem.nextSibling);
+      //button.elem.parentNode.appendChild(button.clone);
+      button.elem.style.display = 'none';
+
+      var listener = function (evt) {
+
+        evt.stopPropagation();
+        evt.preventDefault()
+
+        if ( button.group && groups[button.group] ) {
+          var kvp = {};
+          groups[button.group].forEach(function (fld) {
+            try {
+              var elem;
+              if (fld.hasOwnProperty('id')) {
+                elem = document.getElementById(fld.id)
+              } else {
+                elem = document.querySelector(fld.selector);
+              }
+              if (elem === null) {
+                return;
+              }
+              if ((elem.type === 'checkbox' || elem.type === 'radio') && (typeof elem.checked !== 'undefined')) {
+                kvp[fld.alias || fld.name] = elem.checked;
+              } else {
+                kvp[fld.alias || fld.name] = elem.value;
+              }
+            } catch(e) {
+              if (tracking.metaInfo.trackingUrl) {
+                logVTError();
+              }
+            }
+          });
+          var fnName = button.group.replace(/[^a-zA-Z]/ig, '_');
+
+          callBlueKai(kvp);
+          setTimeout(function () {
+            button.elem.click();
+          },100);
+          return true;
+        } else {
+          logVTError();
+          button.elem.click();
+        }
+      };
+      button.clone.addEventListener('click', listener, true)
+    });
+  } catch(e) {
+    logVTError(e);
+    if ( button && button.elem ) {
+      button.elem.click();
+    }
+  }
+};
+
+if (!window.btoa || !window.atoa) {
+  (function () {
+
+    var object = typeof exports != 'undefined' ? exports : self; // #8: web workers
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+    function InvalidCharacterError(message) {
+      this.message = message;
+    }
+
+    InvalidCharacterError.prototype = new Error;
+    InvalidCharacterError.prototype.name = 'InvalidCharacterError';
+
+    // encoder
+    // [https://gist.github.com/999166] by [https://github.com/nignag]
+    object.btoa || (
+      object.btoa = function (input) {
+        var str = String(input);
+        for (
+          // initialize result and counter
+          var block, charCode, idx = 0, map = chars, output = '';
+          // if the next str index does not exist:
+          //   change the mapping table to "="
+          //   check if d has no fractional digits
+          str.charAt(idx | 0) || (map = '=', idx % 1);
+          // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+          output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+        ) {
+          charCode = str.charCodeAt(idx += 3/4);
+          if (charCode > 0xFF) {
+            throw new InvalidCharacterError("'btoa' failed: The string to be encoded contains characters outside of the Latin1 range.");
+          }
+          block = block << 8 | charCode;
+        }
+        return output;
+      });
+
+    object.atob || (
+      object.atob = function (input) {
+        var str = String(input).replace(/[=]+$/, ''); // #31: ExtendScript bad parse of /=
+        if (str.length % 4 == 1) {
+          throw new InvalidCharacterError("'atob' failed: The string to be decoded is not correctly encoded.");
+        }
+        for (
+          // initialize result and counters
+          var bc = 0, bs, buffer, idx = 0, output = '';
+          // get next character
+          buffer = str.charAt(idx++);
+          // character found in table? initialize bit storage and add its ascii value;
+          ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+            // and if not first of each 4 characters,
+            // convert the first 8 bits to one ascii character
+          bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+        ) {
+          // try to find character in table (0-63, not found => -1)
+          buffer = chars.indexOf(buffer);
+        }
+        return output;
+      });
+  }());
+}
+
+function b64(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+    return String.fromCharCode('0x' + p1);
+  }));
+}
+
+// Function to get cookie by name
+function getCook(cookiename) {
+  var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
+  return unescape(!!cookiestring ? cookiestring
+    .toString()
+    .replace(/^[^=]+./,"")
+    : "");
+}
+
+tracking.getIdFromJWTCookie = function(cookieName, idName) {
+  var cookie = getCook(cookieName);
+  if (!cookie) throw 'ERROR: No ' + cookieName + ' Cookie present';
+
+  var decodedPayload = atob(cookie.split('.')[1]);
+  return JSON.parse(decodedPayload)[idName];
+}
+
+tracking.getCTMSessionId = function () {
+  try {
+    return tracking.getIdFromJWTCookie('CTM.SESSION', 'sessionId');
+  } catch (e) {
+    return null;
+  }
+}
+
+tracking.getCTMVisitorId = function () {
+  try {
+    return tracking.getIdFromJWTCookie('CTM.VISITOR', 'visitorId');
+  } catch (e) {
+    return null;
+  }
+}
+
+function blueKaiEnableP2() {
+  if ( tracking && tracking.metaInfo && tracking.metaInfo.application ) {
+    if (enabledProductsP2.indexOf(tracking.metaInfo.application.toLowerCase()) > -1) return true;
+    return false;
+  }
+  return false;
+}
+
+function blueKaiEnable() {
+  return typeof bk_addPageCtx === "function";
+}
+
+function callBlueKai() {
+  if (!blueKaiEnable()) {
+    return;
+  }
+  BKTAG.doTag(tracking.bkId, 4);
+}
+
+function logVTError(e) {
+  if (tracking && tracking.metaInfo && tracking.metaInfo.trackingUrl) {
+    var report = document.createElement('img');
+    report.style.display = 'none';
+    if ( tracking.metaInfo.application ) {
+      report.src=tracking.metaInfo.trackingUrl+'/vterror/'+ tracking.metaInfo.application + '/' + (e ? JSON.stringify(e) : '');
+    } else {
+      report.src=tracking.metaInfo.trackingUrl+'/vterror/'+(e ? JSON.stringify(e) : '');
+    }
+    document.getElementsByTagName('body')[0].appendChild(report);
+  }
+}
+
+tracking.Initialise = function (baseUrl) {
+  return new tracking.GenericVisitor(baseUrl + "wb");
+};
+
+tracking.Interaction = function (action, metaInfo) {
+  var newInteraction = {
+    data: {
+      userAction: action,
+      subject: metaInfo.page
+    }
+  };
+
+  if (metaInfo.application) {
+    newInteraction.endpoint = "/interact";
+    newInteraction.data.application = metaInfo.application;
+  }
+
+  if (metaInfo.partner) {
+    newInteraction.endpoint = "/partner/interact";
+    newInteraction.data.partner = metaInfo.partner;
+  }
+
+  return newInteraction;
+};
+
+tracking.GenericVisitor = function (baseUrl) {
+  var self = this;
+
+  // Make sure when an end user recreates the tracking object by calling references
+  // to this function custom additional propeties and functions are not lost, e.g.
+  // bkId, metaInfo
+  if (Object.keys) {
+    Object.keys(tracking).forEach(function (key) {
+      self[key] = tracking[key];
+    });
+  }
+
+  var doRequest = function(resource, data, callback) {
+    var src = baseUrl + resource + (data ? "?" + tracking.param(data) : "");
+    var img = document.createElement("img");
+    img.src = src;
+    img.style.display = "none";
+    img.addEventListener("load", (function(img, callback) {
+      return function(){
+        if (callback) callback();
+        document.body.removeChild(img);
+      }
+    })(img, callback));
+
+    document.body.appendChild(img);
+  };
+
+  var getParameterByName = function(name) {
+    var url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    var results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  };
+
+  self.create = function (onSuccessCallback) {
+
+    if(tracking.metaInfo.application && blueKaiEnable()){
+      bk_addPageCtx('visit_started', tracking.metaInfo.application);
+      callBlueKai();
+    }
+
+    return doRequest('/create', undefined, onSuccessCallback);
+  };
+
+  self.performedA = function (interaction, product) {
+    if(interaction.data.userAction === "Page Rendered" && blueKaiEnable()){
+      bk_addPageCtx('page_type', interaction.data.subject);
+      bk_addPageCtx('journey_name', interaction.data.application);
+      callBlueKai();
+    }
+    if (product) {
+      return doRequest('/' + product + interaction.endpoint, interaction.data);
+    } else {
+      return doRequest(interaction.endpoint, interaction.data);
+    }
+  };
+
+  self.productClickedThrough = function (product, brandCode, productData, channel, encodedEmail) {
+    var clickThroughData = {
+      b: brandCode,
+      d: productData
+    };
+
+    if (encodedEmail) {
+      clickThroughData.e = encodedEmail;
+    }
+
+    if(blueKaiEnable()){
+      bk_addPageCtx('event_type', 'go to vendor site');
+      bk_addPageCtx('journey_name', tracking.metaInfo.application);
+      callBlueKai();
+    }
+
+    channel = channel || getParameterByName('AFFCLIE');
+    if (channel) {
+      clickThroughData.channel = channel;
+    }
+    return doRequest('/'+ product + '/clickThrough', clickThroughData);
+  };
+
+  self.productViewedMoreDetails = function (product, brandCode, productData, channel, encodedEmail) {
+    if(blueKaiEnable()){
+      bk_addPageCtx('page_type', 'view quote');
+      bk_addPageCtx('journey_name', tracking.metaInfo.application);
+      callBlueKai();
+    }
+    var viewedMoreDetails = {
+      b: brandCode,
+      d: productData
+    };
+    if (encodedEmail) {
+      viewedMoreDetails.e = encodedEmail;
+    }
+    channel = channel || getParameterByName('AFFCLIE');
+    if (channel) {
+      viewedMoreDetails.channel = channel;
+    }
+    return doRequest('/' + product + '/moredetails', viewedMoreDetails);
+  };
+
+  self.emailDisclosed = function (product, email) {
+    if(blueKaiEnable()){
+      bk_addEmailHash(email);
+      callBlueKai();
+    }
+    return doRequest('/' + product + '/ed/' + b64(email));
+  };
+
+  self.startQuote = function(product, channel) {
+    return quoteInteraction('startquote', product, channel);
+  };
+
+  self.endQuote = function(product, channel) {
+    return quoteInteraction('endquote', product, channel);
+  };
+
+  self.pricesDisplayed = function(product, channel) {
+    return quoteInteraction('pricesdisplayed', product, channel);
+  };
+
+  var quoteInteraction = function(route, product, channel) {
+    var path = '/' + product + '/' + route;
+    channel = channel || getParameterByName('AFFCLIE');
+    if (channel) {
+      path += '?channel=' + encodeURIComponent(channel);
+    }
+    return doRequest(path);
+  };
+};
+
+function ready(){
+  if (tracking.metaInfo === undefined) {
+    console.log("Application meta data required!... not logging visit.");
+  } else {
+    //tracking.pageLoaded();
+    var interaction = new tracking.Interaction("Page Rendered", tracking.metaInfo);
+    var visitor = tracking.Initialise(tracking.metaInfo.trackingUrl);
+    visitor.create(function () { visitor.performedA(interaction); });
+  }
+}
+
+if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading"){
+  ready();
+} else {
+  document.addEventListener('DOMContentLoaded', ready);
+}
