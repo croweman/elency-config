@@ -1,6 +1,6 @@
-# elency-config-csharp-client
+# ElencyConfig
 
-This is a `c#` client for the `elency-config-server`.
+This is a `c#` client for the `elency-config server`.
 
 ## Table of contents
 
@@ -16,7 +16,7 @@ This is a `c#` client for the `elency-config-server`.
 
 ## Prerequisites<a name="prerequisites"></a>
 
-`ElencyConfigClient` is built with `c#` and is dependent on .NET Framework v4.5.2.
+`ElencyConfig` is built with `c#` and is dependent on .NET Framework v4.5.2.
 
 ---
 
