@@ -30,12 +30,12 @@ npm install `elency-config` --save
 
 or
 
-1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.2-beta.tar.gz">elency-config-node-client</a>.
+1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.3-beta.tar.gz">elency-config-node-client</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
 ```
-tar xzf ./elency-config-node-client-0.0.2-beta.tar.gz
+tar xzf ./elency-config-node-client-0.0.3-beta.tar.gz
 ```
 
 ---
@@ -45,6 +45,8 @@ tar xzf ./elency-config-node-client-0.0.2-beta.tar.gz
 Firstly the client needs initialising.  It is advised that this would be done as part of your application startup.  If the required configuration could not be retrieved it may be appropriate to kill your application and log a relevant error message.
 
 It is also advised that any `keys` or `secure data` is not stored in your code base and is retrieved and provided to your application following best practises.
+
+When creating a client it is advised that the `HMACAuthorizationKey` and `configEncryptionKey` would need to be read from environment variables injected into your application and not hard coded in your code bases.
 
 To `create` a client execute the following:
 

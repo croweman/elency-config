@@ -32,6 +32,8 @@ Firstly the client needs creating.  It is advised that this would be done as par
 
 It is also advised that any `keys` or `secure data` is not stored in your code base and is retrieved and provided to your application following best practises.
 
+When creating a client it is advised that the `HMACAuthorizationKey` and `configEncryptionKey` would need to be read from environment variables injected into your application and not hard coded in your code bases.
+
 To `create` a client execute the following:
 
 ```c#
