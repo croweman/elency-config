@@ -49,6 +49,11 @@ html(lang='en')
               option(value=key.keyId)= key.keyName + ' - ' + key.keyId
           #key-info.form-control-feedback
 
+        #JSONSchema-form-group.form-group
+            label.form-control-label(for='JSONSchema') = JSON Schema
+            input.form-control(id='JSONSchema', value='', placeholder='Optional, must be a valid JSON Schema')
+            .form-control-feedback(id='JSONSchema-info')
+
         div.text-right
           button#createAppEnvironment.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating app environment") Create app environment
 

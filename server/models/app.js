@@ -11,6 +11,7 @@ class App {
     this.teamName = obj.teamName || '';
     this.updated = obj.updated || new Date();
     this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
+    this.JSONSchema = obj.JSONSchema || '';
 
     this.appId = this.appId.trim();
     this.appName = this.appName.trim();

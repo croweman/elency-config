@@ -13,6 +13,7 @@ class AppEnvironment {
     this.keyName = obj.keyName || '';
     this.updated = obj.updated || new Date();
     this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
+    this.JSONSchema = obj.JSONSchema || '';
 
     this.environment = this.environment.trim();
     this.keyId = this.keyId.trim();
