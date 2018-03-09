@@ -168,11 +168,17 @@ var elencyConfig = function() {
     return obj;
   }
 
-  self.showError = function(error) {
+  self.showError = function(error, options) {
+    options = options || {};
     var errorBox = $('#error-box');
 
     if (errorBox.length > 0) {
-      $('#error-box-message').text(error);
+      if (options.html !== undefined) {
+        $('#error-box-message').html(error);
+      }
+      else {
+        $('#error-box-message').text(error);
+      }
       errorBox.css('display', 'block');
     }
   };
@@ -1036,17 +1042,33 @@ var elencyConfig = function() {
     var appName = self.monitor('appname');
     var description = self.monitor('description');
     var teamId = $('#teamid').val();
+    var JSONSchema = self.monitor('JSONSchema');
 
     self.fireActionOn('createApp', {
       ajax: {
         url: '/team/' + teamId + '/app/create',
         payload: function() {
-
           return {
             appId: appId.value(),
             appName: appName.value(),
-            description: description.value()
+            description: description.value(),
+            JSONSchema: JSONSchema.value()
           };
+        },
+        success: function(data) {
+          if (data.location) {
+            return window.location = data.location;
+          }
+
+          if (data.error) {
+            self.showError(data.error);
+            $('#error-box')[0].scrollIntoView();
+          }
+
+          if (data.id && data.id === 'JSONSchema') {
+            var inputElements = self.getInputElements('JSONSchema');
+            self.setError(data.error, inputElements);
+          }
         }
       }
     });
@@ -1056,6 +1078,7 @@ var elencyConfig = function() {
     var appName = self.monitor('appname');
     var description = self.monitor('description');
     var teamId = self.monitor('teamid');
+    var JSONSchema = self.monitor('JSONSchema');
     var appId = $('#appid').val();
 
     self.fireActionOn('updateApp', {
@@ -1065,8 +1088,24 @@ var elencyConfig = function() {
           return {
             appName: appName.value(),
             description: description.value(),
-            teamId: teamId.value()
+            teamId: teamId.value(),
+            JSONSchema: JSONSchema.value()
           };
+        },
+        success: function(data) {
+          if (data.location) {
+            return window.location = data.location;
+          }
+
+          if (data.error) {
+            self.showError(data.error);
+            $('#error-box')[0].scrollIntoView();
+          }
+
+          if (data.id && data.id === 'JSONSchema') {
+            var inputElements = self.getInputElements('JSONSchema');
+            self.setError(data.error, inputElements);
+          }
         }
       }
     });
@@ -1075,6 +1114,7 @@ var elencyConfig = function() {
   self.createAppEnvironment = function() {
     var environment = self.monitor('environment');
     var keyId = self.monitor('keyId');
+    var JSONSchema = self.monitor('JSONSchema');
     var teamId = $('#teamid').val();
     var appId = $('#appid').val();
 
@@ -1084,8 +1124,24 @@ var elencyConfig = function() {
         payload: function() {
           return {
             environment: environment.value(),
-            keyId: keyId.value()
+            keyId: keyId.value(),
+            JSONSchema: JSONSchema.value()
           };
+        },
+        success: function(data) {
+          if (data.location) {
+            return window.location = data.location;
+          }
+          
+          if (data.error) {
+            self.showError(data.error);
+            $('#error-box')[0].scrollIntoView();
+          }
+
+          if (data.id && data.id === 'JSONSchema') {
+            var inputElements = self.getInputElements('JSONSchema');
+            self.setError(data.error, inputElements);
+          }
         }
       }
     });
@@ -1097,6 +1153,7 @@ var elencyConfig = function() {
     var teamId = $('#teamid').val();
     var appId = $('#appid').val();
     var originalEnvironment = $('#originalenvironment').val();
+    var JSONSchema = self.monitor('JSONSchema');
 
     self.fireActionOn('createAppEnvironment', {
       ajax: {
@@ -1104,8 +1161,24 @@ var elencyConfig = function() {
         payload: function() {
           return {
             environment: environment.value(),
-            keyId: keyId.value()
+            keyId: keyId.value(),
+            JSONSchema: JSONSchema.value()
           };
+        },
+        success: function(data) {
+          if (data.location) {
+            return window.location = data.location;
+          }
+
+          if (data.error) {
+            self.showError(data.error);
+            $('#error-box')[0].scrollIntoView();
+          }
+
+          if (data.id && data.id === 'JSONSchema') {
+            var inputElements = self.getInputElements('JSONSchema');
+            self.setError(data.error, inputElements);
+          }
         }
       }
     });
@@ -1184,7 +1257,11 @@ var elencyConfig = function() {
 
 
     $('#decryptModal').on('show.bs.modal', function() {
-      keyValue = self.monitor('keyvalue', true);
+      keyValue = self.monitor('keyvalue');
+    });
+
+    $('#decryptModal').on('hide.bs.modal', function() {
+      self.demonitor('keyvalue');
     });
 
     if (preload === true) {
@@ -1239,6 +1316,16 @@ var elencyConfig = function() {
             comment: comment.value(),
             configurationEntries: configurationEntries
           };
+        },
+        success: function(data) {
+          if (data.location) {
+            return window.location = data.location;
+          }
+
+          if (data.error) {
+            self.showError(data.error, { html: true });
+            $('#error-box')[0].scrollIntoView();
+          }
         }
       },
       additionalValidation: function() {

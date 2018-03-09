@@ -15,6 +15,7 @@ const aes256cbc = require('../lib/encryptors/aes-256-cbc');
 const domain = require('../domain');
 const diff = require('diff');
 const constants = require('../lib/constants');
+const { validateSchema, validate } = require('../lib/schema');
 
 module.exports = (config, repositories, encryption) => {
 
@@ -181,6 +182,12 @@ module.exports = (config, repositories, encryption) => {
       const team = await dataRetrieval.getTeam(req.params.teamId);
       body.teamId = team.teamId;
       body.teamName = team.teamName;
+      body.JSONSchema = body.JSONSchema.trim();
+
+      if (!validateSchema(body.JSONSchema)) {
+        return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
+      }
+
       const app = new models.app(body);
 
       if (!app.isValid()) {
@@ -191,7 +198,7 @@ module.exports = (config, repositories, encryption) => {
       app.updatedBy = { userId: req.user.userId, userName: req.user.userName };
 
       await repositories.app.add(app);
-      await domainInstance.audit.addEntry(req.user, constants.actions.createApp, { teamId: app.teamId, teamName: app.teamName, appId: app.appId, appName: app.appName });
+      await domainInstance.audit.addEntry(req.user, constants.actions.createApp, { teamId: app.teamId, teamName: app.teamName, appId: app.appId, appName: app.appName, JSONSchema: app.JSONSchema });
       return res.status(200).send({ location: `/team/${team.teamId}` });
     }
     catch (err) {
@@ -229,11 +236,19 @@ module.exports = (config, repositories, encryption) => {
 
     try {
       let app = await dataRetrieval.getApp(req.params.appId);
+
+      body.JSONSchema = body.JSONSchema.trim();
+
+      if (!validateSchema(body.JSONSchema)) {
+        return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
+      }
+
       let originalTeamId = app.teamId;
       let originalAppName = app.appName;
       app.appName = body.appName;
       app.description = body.description;
       app.teamId = body.teamId;
+      app.JSONSchema = body.JSONSchema;
 
       if (!app.isValid()) {
         return res.sendStatus(400);
@@ -265,7 +280,7 @@ module.exports = (config, repositories, encryption) => {
         await repositories.configuration.updateAppTeam(app, originalTeamId, team);
       }
 
-      await domainInstance.audit.addEntry(req.user, constants.actions.updateApp, { teamId: app.teamId, teamName: app.teamName, appId: app.appId, appName: app.appName });
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateApp, { teamId: app.teamId, teamName: app.teamName, appId: app.appId, appName: app.appName, JSONSchema: app.JSONSchema });
       return res.status(200).send({ location: `/team/${req.params.teamId}` });
     }
     catch (err) {
@@ -315,7 +330,12 @@ module.exports = (config, repositories, encryption) => {
       let body = req.body || {};
       const app = await dataRetrieval.getApp(req.params.appId);
       const key = await dataRetrieval.getKey(body.keyId);
-      let environment = req.body.environment.trim();
+      let environment = body.environment.trim();
+      let JSONSchema = body.JSONSchema.trim();
+
+      if (!validateSchema(JSONSchema)) {
+        return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
+      }
 
       const appEnvironment = new models.appEnvironment({
         teamId: app.teamId,
@@ -325,7 +345,8 @@ module.exports = (config, repositories, encryption) => {
         keyId: key.keyId,
         keyName: key.keyName,
         versions: [],
-        environment
+        environment,
+        JSONSchema
       });
 
       if (!appEnvironment.isValid()) {
@@ -336,7 +357,7 @@ module.exports = (config, repositories, encryption) => {
       appEnvironment.updatedBy = { userId: req.user.userId, userName: req.user.userName };
 
       await repositories.appEnvironment.add(appEnvironment);
-      await domainInstance.audit.addEntry(req.user, constants.actions.createAppEnvironment, { teamId: appEnvironment.teamId, teamName: appEnvironment.teamName, appId: appEnvironment.appId, appName: appEnvironment.appName, environment: appEnvironment.environment, keyId: appEnvironment.keyId });
+      await domainInstance.audit.addEntry(req.user, constants.actions.createAppEnvironment, { teamId: appEnvironment.teamId, teamName: appEnvironment.teamName, appId: appEnvironment.appId, appName: appEnvironment.appName, environment: appEnvironment.environment, keyId: appEnvironment.keyId, JSONSchema: appEnvironment.JSONSchema });
       return res.status(200).send({ location: `/team/${app.teamId}/app/${app.appId}` });
     }
     catch (err) {
@@ -374,10 +395,16 @@ module.exports = (config, repositories, encryption) => {
       const originalEnvironment = req.params.environment;
       const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, originalEnvironment);
       const key = await dataRetrieval.getKey(body.keyId);
+      const JSONSchema = body.JSONSchema.trim();
+
+      if (!validateSchema(JSONSchema)) {
+        return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
+      }
 
       appEnvironment.environment = body.environment;
       appEnvironment.keyId = key.keyId;
       appEnvironment.keyName = key.keyName;
+      appEnvironment.JSONSchema = JSONSchema;
 
       if (!appEnvironment.isValid()) {
         return res.sendStatus(400);
@@ -394,7 +421,7 @@ module.exports = (config, repositories, encryption) => {
         await repositories.configuration.updateEnvironment(originalEnvironment, appEnvironment);
       }
 
-      await domainInstance.audit.addEntry(req.user, constants.actions.updateAppEnvironment, { teamId: appEnvironment.teamId, teamName: appEnvironment.teamName, appId: appEnvironment.appId, appName: appEnvironment.appName, environment: appEnvironment.environment, keyId: appEnvironment.keyId });
+      await domainInstance.audit.addEntry(req.user, constants.actions.updateAppEnvironment, { teamId: appEnvironment.teamId, teamName: appEnvironment.teamName, appId: appEnvironment.appId, appName: appEnvironment.appName, environment: appEnvironment.environment, keyId: appEnvironment.keyId, JSONSchema: appEnvironment.JSONSchema });
       return res.status(200).send({ location: `/team/${appEnvironment.teamId}/app/${appEnvironment.appId}` });
     }
     catch (err) {
@@ -964,6 +991,7 @@ module.exports = (config, repositories, encryption) => {
     res.set('Content-Type', 'application/json; charset=utf-8');
 
     try {
+      const app = await dataRetrieval.getApp(req.params.appId);
       const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, req.params.environment);
       let body = req.body || {};
 
@@ -1068,6 +1096,25 @@ module.exports = (config, repositories, encryption) => {
 
       let key = await dataRetrieval.getKey(appEnvironment.keyId);
       configuration.key = { keyId: key.keyId, value: key.value };
+      
+      let JSONSchema = getJSONSchema(app, appEnvironment);
+      
+      if (JSONSchema !== undefined) {
+        const validationResult = validate(JSONSchema, configuration);
+
+        if (!validationResult.valid) {
+          let errorMessage = 'The configuration you have specified does not conform to the configured JSONSchema:<br /><ul>';
+
+          validationResult.errors.forEach(error => {
+            errorMessage += `<li>${error}</li>`;
+          });
+
+          errorMessage += '</ul>';
+
+          return res.status(200).send({ error: errorMessage });
+        }
+      }
+
 
       configuration = await encryption.encryptConfiguration(configuration, exceptions);
 
@@ -1106,6 +1153,20 @@ module.exports = (config, repositories, encryption) => {
       configuration.configuration[i].value = await aes256cbc.decrypt(configuration.configuration[i].value, keyValue);
       configuration.configuration[i].encrypted = false;
     }
+  }
+  
+  function getJSONSchema(app, appEnvironment) {
+    let JSONSchema = undefined;
+
+    if (app.JSONSchema && app.JSONSchema.length > 0) {
+      JSONSchema = app.JSONSchema;
+    }
+    
+    if (appEnvironment.JSONSchema && appEnvironment.JSONSchema.length > 0) {
+      JSONSchema = appEnvironment.JSONSchema;
+    }
+    
+    return JSONSchema;
   }
 
   return router;

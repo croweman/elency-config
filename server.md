@@ -16,6 +16,7 @@ elency-config is a `http application` built on the `node.js` platform to provide
 - [Users/Roles](#users)
 - [LDAP](#ldap)
 - [Keys](#keys)
+- [Configuration Data](#configurationdata)
 - [License](#license)
 
 ---
@@ -39,12 +40,12 @@ Ideally in a `non` local/dev environment you should be setting the server up wit
 
 ### Linux based system<a name="linux"></a>
 
-1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.11-beta.tar.gz">elency-config-server</a>.
+1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.12-beta.tar.gz">elency-config-server</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
     ```
-    tar xzf ./elency-config-server-0.0.11-beta.tar.gz
+    tar xzf ./elency-config-server-0.0.12-beta.tar.gz
     ```
 
 3. Create and add the relevant config and security files to the `config` and `sec` directories.  Refer to the <a href="#configuration">Configuration</a> section.
@@ -83,7 +84,7 @@ version: '3'
 services:
   app:
     container_name: elency-config-server
-    image: croweman/elency-config-server:0.0.11-beta
+    image: croweman/elency-config-server:0.0.12-beta
     restart: "on-failure:10"
     volumes:
       - ./configuration_files:/app/configuration_files
@@ -304,6 +305,44 @@ When editing a `key`.  Its value can be decrypted by having access to the `elenc
 Keys should be `32` character `base64` encoded strings.
 
 These can be generated through the `ui` or by using <a href="./tools/key-generator.js">key-generator.js</a>.
+
+---
+
+## Configuration Data<a name="configurationdata"></a>
+
+Configuration is stored under a applications configured environment.
+
+An application environment can have many configurations associated with it.
+
+Configuration data is stored in key value pairs and can be encrypted.
+
+The validity of configuration data can be `optionally` enforced through `JSON Schemas` which can be configured at `application` or `application environment` level.
+
+IF a `JSON Schema` is configured at both `application` and `application environment` level then the `application environment` JSON Schema takes precidence.
+
+An example `JSON Schema` may look like this:
+
+```json
+{
+  "properties": {
+    "LOG_LEVEL": {
+      "type": "string",
+      "enum": ["info", "debug", "warn", "error", "fatal"]
+    },
+    "MONGODB_URL": {
+      "type": "string",
+      "minLength": 1,
+      "secure": true
+    }
+  },
+  "required": [
+    "LOG_LEVEL",
+    "MONGODB_URL"
+  ]
+}
+```
+
+`"secure": true` indicates that the property must be marked as `Encrypted` in the admin UI.
 
 ---
 

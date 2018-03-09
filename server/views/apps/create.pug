@@ -33,6 +33,11 @@ html(lang='en')
         +inputGroup('appname', 'App name')(autocomplete='off', data-minlength='1', data-errormessage='App name must be at least 1 character')
         +inputGroup('description', 'Description')(autocomplete='off')
 
+        #JSONSchema-form-group.form-group
+            label.form-control-label(for='JSONSchema') JSON Schema
+            textarea.form-control(id='JSONSchema', cols='2', rows='5', value='', placeholder='Optional, must be a valid JSON Schema')
+            .form-control-feedback(id='JSONSchema-info')
+
         div.text-right
           button#createApp.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating app") Create app
 

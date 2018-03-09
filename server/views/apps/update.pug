@@ -52,6 +52,12 @@ html(lang='en')
         +inputGroup('appname', 'App name')(autocomplete='off', data-minlength='1', data-errormessage='App name must be at least 1 character', value=app.appName)
         +inputGroup('description', 'Description')(autocomplete='off', value=app.description)
 
+        #JSONSchema-form-group.form-group
+            label.form-control-label(for='JSONSchema') JSON Schema
+            textarea.form-control(id='JSONSchema', cols='2', rows='5', placeholder='Optional, must be a valid JSON Schema')
+              =app.JSONSchema
+            .form-control-feedback(id='JSONSchema-info')
+
         div.text-right
           button#updateApp.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating app") Update app
 

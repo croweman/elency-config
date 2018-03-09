@@ -218,7 +218,6 @@ module.exports = (config, repositories, encryption) => {
       return res.status(200).send({ count, html });
     }
     catch (err) {
-      console.log(err)
       return res.status(200).send({ html: '' });
     }
   });

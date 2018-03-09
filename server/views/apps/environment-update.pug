@@ -65,6 +65,12 @@ html(lang='en')
                 option(value=key.keyId)= key.keyName + ' - ' + key.keyId
           #key-info.form-control-feedback
 
+        #JSONSchema-form-group.form-group
+            label.form-control-label(for='JSONSchema') JSON Schema
+            textarea.form-control(id='JSONSchema', cols='2', rows='5', placeholder='Optional, must be a valid JSON Schema')
+              =appEnvironment.JSONSchema
+            .form-control-feedback(id='JSONSchema-info')
+
         div.text-right
           button#createAppEnvironment.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating app environment") Update app environment
 
