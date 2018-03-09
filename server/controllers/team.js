@@ -15,7 +15,7 @@ const aes256cbc = require('../lib/encryptors/aes-256-cbc');
 const domain = require('../domain');
 const diff = require('diff');
 const constants = require('../lib/constants');
-const { validateSchema, validate } = require('../lib/schema');
+const { validateSchema, validate, getSchemaRequiredProperties } = require('../lib/schema');
 
 module.exports = (config, repositories, encryption) => {
 
@@ -923,6 +923,7 @@ module.exports = (config, repositories, encryption) => {
 
   async function getCreateConfiguration(req, res, next) {
     try {
+      const app = await dataRetrieval.getApp(req.params.appId);
       const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, req.params.environment);
       let version = req.query && req.query.version ? req.query.version : '';
       let configurationEntries = [];
@@ -931,7 +932,6 @@ module.exports = (config, repositories, encryption) => {
       let createFrom = '';
       let updating = false;
       let comment = '';
-      let currentCount = 0;
 
       if (req.query && req.query.createFrom) {
         createFrom = req.query.createFrom;
@@ -963,6 +963,20 @@ module.exports = (config, repositories, encryption) => {
         initialEntries = configurationEntries.length;
         createFrom = configuration.configurationId;
         configuration.updated = moment(configuration.updated).format('DD/MM/YYYY HH:mm:ss')
+      }
+      else {
+        const JSONSchema = getJSONSchema(app, appEnvironment);
+        if (JSONSchema !== undefined) {
+          const requiredProperties = getSchemaRequiredProperties(JSONSchema);
+          requiredProperties.forEach(requiredProperty => {
+            configurationEntries.push({
+              key: requiredProperty.name,
+              value: requiredProperty.type,
+              encrypted: requiredProperty.secure,
+              createMode: true
+            })
+          });
+        }
       }
 
       const viewData = {

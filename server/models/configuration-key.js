@@ -5,7 +5,6 @@ class ConfigurationKey {
     this.key = obj.key || '';
     this.value = obj.value;
     this.encrypted = obj.encrypted !== undefined && (obj.encrypted === true || obj.encrypted === 'true');
-
     this.key = this.key.trim();
   }
 

@@ -63,13 +63,17 @@ Useful logins are `admin` and `joe.bloggs`
 
 Passwords are `aA1!aaaa`
 
-The demo is configured to use `LDAP` security which can be turned on and off via `Settings`.  Available users and passwords can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/specs/support/ldap-mock-server/lib/configuration.js">here</a>.
+The demo is configured to use `LDAP` security which can be turned on and off via `Settings`.
+
+Available users and passwords can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/specs/support/ldap-mock-server/lib/configuration.js">here</a>.
 
 `Prod - Atlanta Falcons` key value for decrypting secure keys on `Prod` configurations for the `Atlanta Falcons - Centre` app.
 
 ```
 M2Y0M2E0NTMyZDBjNDNjNDk5YWJjOGEy
 ```
+
+A `JSON Schema` has been setup for the `Atlanta Falcons - Wide receiver` app to demonstrate enforcing a schema.
 
 The docker-compose real-time console logging will show you any updates that occur for the `Centre` app under team `Atlanta Falcons`.  You can also execute the following to tail the logs
 

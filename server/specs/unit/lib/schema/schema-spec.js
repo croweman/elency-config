@@ -462,6 +462,43 @@ describe('schema', () => {
           expect(validationResult.errors.length).to.eql(1);
           expect(validationResult.errors[0]).to.eql('.OBJ.foo: should NOT be shorter than 2 characters');
         });
+
+        it('when a configuration contains an incorrect object property value', () => {
+          const JSONSchema = {
+            "properties": {
+              "OBJ": {
+                "type": "object",
+                "properties": {
+                  "foo": {
+                    "type": "string",
+                    "minLength": 2
+                  }
+                },
+                "required": [
+                  "foo"
+                ]
+              }
+            },
+            "required": [
+              "OBJ"
+            ]
+          };
+
+          const configuration = {
+            "configuration": [
+              {
+                "key": "OBJ",
+                "value": "",
+                "encrypted": false
+              }
+            ]
+          };
+
+          const validationResult = schema.validate(JSON.stringify(JSONSchema), configuration);
+          expect(validationResult.valid).to.eql(false);
+          expect(validationResult.errors.length).to.eql(1);
+          expect(validationResult.errors[0]).to.eql('.OBJ: should be object');
+        });
       });
 
       describe('array', () => {
@@ -628,9 +665,44 @@ describe('schema', () => {
           const validationResult = schema.validate(JSON.stringify(JSONSchema), configuration);
           expect(validationResult.valid).to.eql(false);
           expect(validationResult.errors.length).to.eql(1);
-          expect(validationResult.errors[0]).to.eql('.property: should be equal to one of the allowed values');
+          expect(validationResult.errors[0]).to.eql('.property: should be equal to one of the allowed values: ["red","amber","green"]');
         });
       });
+    });
+  });
+
+  describe('getSchemaRequiredProperties', () => {
+    it('returns all top level required properties defined on a schema', () => {
+      const JSONSchema = {
+        "properties": {
+          "LOG_LEVEL": {
+            "type": "string",
+            "minLength": 1
+          },
+          "MONGODB_URL": {
+            "type": "string",
+            "minLength": 1,
+            "secure": true
+          },
+          "NON_REQUIRED_PROPERTY": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "LOG_LEVEL",
+          "MONGODB_URL"
+        ]
+      };
+
+      const properties = schema.getSchemaRequiredProperties(JSONSchema);
+      expect(properties.length).to.eql(2);
+      expect(properties[0].name).to.eql('LOG_LEVEL');
+      expect(properties[0].secure).to.eql(false);
+      expect(properties[0].type).to.eql('string');
+      expect(properties[1].name).to.eql('MONGODB_URL');
+      expect(properties[1].secure).to.eql(true);
+      expect(properties[1].type).to.eql('string');
     });
   });
 });

@@ -133,7 +133,7 @@ html(lang='en')
                   div.form-group.col-md-6.float-right(id=id + 'value-form-group')
                     label.form-control-label(for=id + 'value') Value
                     div
-                      if (entry.encrypted === true)
+                      if (entry.encrypted === true && entry.createMode === undefined)
                         div.encrypted-value
                           pre ENCRYPTED VALUE
                         textarea.key-value.hide(id=id + 'value', cols='2', rows='3', data-encrypted='true', data-originalkey=entry.key)

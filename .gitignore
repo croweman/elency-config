@@ -80,10 +80,13 @@ elency-config-server/**
 elency-config-client/**
 
 demo/docker/support/repositories/**
+demo/docker/support/data-inserted
 demo/docker/ldap-mock-server/lib/**
 demo/docker/ldap-mock-server/index.js
 demo/docker/ldap-mock-server/package.json
 demo/docker/ldap-mock-server/package-lock.json
 
 server/public/demo.html
+
+
 

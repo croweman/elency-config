@@ -169,16 +169,17 @@ const mongoData = {
       }
     },
     {
-      "appId": "wide-receiver",
-      "appName": "Wide receiver",
-      "description": "",
-      "teamId": "atlanta-falcons",
-      "teamName": "Atlanta Falcons",
+      "appId" : "wide-receiver",
+      "appName" : "Wide receiver",
+      "description" : "",
+      "teamId" : "atlanta-falcons",
+      "teamName" : "Atlanta Falcons",
       "updated": new Date("2018-01-03T11:23:10.870Z"),
       "updatedBy": {
         "userId": "26271726-1c91-48e5-ac40-70875d509cc5",
         "userName": "joe.bloggs"
-      }
+      },
+      "JSONSchema" : "{\n  \"properties\": {\n    \"LOG_LEVEL\": {\n      \"type\": \"string\",\n      \"enum\": [\"info\", \"debug\", \"warn\", \"error\", \"fatal\"]\n    },\n    \"MONGODB_URL\": {\n      \"type\": \"string\",\n      \"minLength\": 1,\n      \"secure\": true\n    }\n  },\n  \"required\": [\n    \"LOG_LEVEL\",\n    \"MONGODB_URL\"\n  ]\n}"
     },
     {
       "appId": "centre",
@@ -2894,6 +2895,22 @@ const mongoData = {
         "keyId": "aa781123-7e07-4a30-9bb4-5e5ff86f472e"
       },
       "changed": new Date("2018-01-03T11:50:05.179Z"),
+      "changedBy": {
+        "userId": "26271726-1c91-48e5-ac40-70875d509cc5",
+        "userName": "joe.bloggs"
+      }
+    },
+    {
+      "auditId" : "7346854c-d924-49d4-ad04-1ce3f4c21bea",
+      "action" : "UpdateApp",
+      "data" : {
+        "teamId" : "atlanta-falcons",
+        "teamName" : "Atlanta Falcons",
+        "appId" : "wide-receiver",
+        "appName" : "Wide receiver",
+        "JSONSchema" : "{\n  \"properties\": {\n    \"LOG_LEVEL\": {\n      \"type\": \"string\",\n      \"enum\": [\"info\", \"debug\", \"warn\", \"error\", \"fatal\"]\n    },\n    \"MONGODB_URL\": {\n      \"type\": \"string\",\n      \"minLength\": 1,\n      \"secure\": true\n    }\n  },\n  \"required\": [\n    \"LOG_LEVEL\",\n    \"MONGODB_URL\"\n  ]\n}"
+      },
+      "changed" : new Date("2018-03-09T12:01:42.785Z"),
       "changedBy": {
         "userId": "26271726-1c91-48e5-ac40-70875d509cc5",
         "userName": "joe.bloggs"
