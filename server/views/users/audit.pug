@@ -16,19 +16,26 @@ html(lang='en')
 
       div.row
 
-        #action-form-group.form-group.col-md-6
+        #action-form-group.form-group.col-md-4
           label.form-control-label(for='action-type') Action
           select#action.form-control
             option(value='') All
             each actionType in actionTypes
               option(value=actionType)=actionType
 
-        #user-form-group.form-group.col-md-6
+        #user-form-group.form-group.col-md-4
           label.form-control-label(for='user') User
           select#user.form-control
             option(value='') All
             each user in users
               option(value=user.userId)=user.userName
+
+        #appId-form-group.form-group.col-md-4
+          label.form-control-label(for='user') App
+          select#appId.form-control
+            option(value='') All
+            each app in apps
+              option(value=app.appId)=app.appName + ' (' + app.appId + ')'
 
       button#getlogs.btn.btn-primary.no-left-margin(type='button', data-loading-text="<i class='icon-spinner icon-spin'></i> Getting Logs") Get Logs
 

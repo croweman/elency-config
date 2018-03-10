@@ -156,9 +156,11 @@ module.exports = (config, repositories, encryption) => {
   router.get('/audit', isAuthorizedTo(createAUser), async (req, res, next) => {
 
     let users = [];
+    let apps = []
 
     try {
       users = await repositories.user.findAll({ includeAdmin: true });
+      apps = await repositories.app.findAll();
     }
     catch (err) {
       return next(err);
@@ -172,7 +174,8 @@ module.exports = (config, repositories, encryption) => {
       pageSize: AuditPageSize,
       url: `/user/audit-data`,
       actionTypes,
-      users
+      users,
+      apps
     };
 
     return await res.renderView({ view: 'users/audit', viewData });
@@ -183,6 +186,7 @@ module.exports = (config, repositories, encryption) => {
     
     let action = req.query.action || '';
     let userId = req.query.userId || '';
+    let appId = req.query.appId || '';
     let pageNumber = req.query.pageNumber || 1;
     let forceCount = req.query.forceCount !== undefined;
 
@@ -196,6 +200,9 @@ module.exports = (config, repositories, encryption) => {
     }
     if (userId) {
       filters.userId = userId;
+    }
+    if (appId) {
+      filters.appId = appId;
     }
 
     try {
@@ -212,6 +219,12 @@ module.exports = (config, repositories, encryption) => {
       let html = '';
 
       auditHistory.forEach((audit) => {
+        if (audit.data.JSONSchema && audit.data.JSONSchema.trim().length > 0) {
+          try {
+            audit.data.JSONSchema = JSON.parse(audit.data.JSONSchema);
+          }
+          catch (err) {}
+        }
         html += '<tr><td>' + audit.action + '</td><td><pre>' + JSON.stringify(audit.data, null, 2) + '</pre></td><td>' + moment(audit.changed).format('DD/MM/YYYY HH:mm:ss') + '</td><td><a href="/user/all?userId=' + audit.changedBy.userId + '">' + audit.changedBy.userName + '</a></td></tr>';
       });
 

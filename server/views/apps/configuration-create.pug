@@ -108,6 +108,8 @@ html(lang='en')
         button#import.btn.btn-primary.breaker(type="button", data-toggle='modal', data-target='#importModal') Import
         if (hasSecureItem === true)
           button#decrypt.btn.btn-primary.breaker(type='button', data-toggle='modal', data-target='#decryptModal') Decrypt
+        if (JSONSchema !== undefined)
+          button#JSONSchemaDefinition.btn.btn-primary.breaker(type="button", data-toggle='modal', data-target='#JSONSchemaModal') JSON Schema
 
         #configuration-items
           if (configurationEntries.length > 0)
@@ -159,6 +161,7 @@ html(lang='en')
             button#createConfiguration.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Updating configuration") Update configuration
           else
             button#createConfiguration.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating configuration") Create configuration
+
       // Modal
       #decryptModal.modal.fade(role='dialog')
         .modal-dialog
@@ -178,6 +181,19 @@ html(lang='en')
                 strong Oh no!
                 span An error occurred while trying to decrypt configuration entries.  The key may be invalid!
 
+      if (JSONSchema !== undefined)
+          #JSONSchemaModal.modal.fade(role='dialog')
+            .modal-dialog
+              // Modal content
+              .modal-content
+                .modal-header
+                  button.close(type='button', data-dismiss='modal') ×
+                  h4.modal-title JSON Schema
+                .modal-body
+                  pre
+                    =JSONSchema
+                .modal-footer
+                  button#JSONSchemaModalCloseButton.btn.btn-primary(type='button', data-dismiss='modal') Close
 
       include ../includes/error-box.pug
 

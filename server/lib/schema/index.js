@@ -13,15 +13,8 @@ const validateSchema = (JSONSchema) => {
 };
 
 const validate = (JSONSchema, configuration) => {
-  const validationResult = {
-    valid: false,
-    errors: []
-  };
-  let schema = JSONSchema;
-
-  if (typeof schema === 'string') {
-    schema = JSON.parse(schema);
-  }
+  const validationResult = { valid: false, errors: [] };
+  const schema = getSchema(JSONSchema);
   const transformedConfiguration = transformConfiguration(schema, configuration);
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(schema);
@@ -62,12 +55,7 @@ const validate = (JSONSchema, configuration) => {
 };
 
 const getSchemaRequiredProperties = (JSONSchema) => {
-  let schema = JSONSchema;
-
-  if (typeof schema === 'string') {
-    schema = JSON.parse(schema);
-  }
-
+  const schema = getSchema(JSONSchema);
   const requiredProperties = [];
   const { properties, required } = schema;
 
@@ -96,6 +84,16 @@ const getSchemaRequiredProperties = (JSONSchema) => {
   });
   
   return requiredProperties;
+};
+
+const getSchema = (JSONSchema) => {
+  let schema = JSONSchema;
+
+  if (typeof schema === 'string') {
+    schema = JSON.parse(schema);
+  }
+
+  return schema;
 };
 
 const transformConfiguration = (schema, configuration) => {

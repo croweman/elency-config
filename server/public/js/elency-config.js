@@ -2384,6 +2384,7 @@ var elencyConfig = function() {
       var forceCount = false;
       var selectedAction = $('#action').val();
       var selectedUserId = $('#user').val();
+      var selectedAppId = $('#appId').val();
       var url = getLogsUrl;
 
       var seperator = '?';
@@ -2393,6 +2394,10 @@ var elencyConfig = function() {
       }
       if (selectedUserId !== '') {
         url += seperator + 'userId=' + selectedUserId;
+        seperator = '&';
+      }
+      if (selectedAppId !== '') {
+        url += seperator + 'appId=' + selectedAppId;
         seperator = '&';
       }
 

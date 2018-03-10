@@ -188,6 +188,13 @@ module.exports = (config, repositories, encryption) => {
         return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
       }
 
+      if (body.JSONSchema.length > 0) {
+        try {
+          body.JSONSchema = JSON.stringify(JSON.parse(body.JSONSchema), null, 4);
+        }
+        catch (err) {}
+      }
+
       const app = new models.app(body);
 
       if (!app.isValid()) {
@@ -249,6 +256,13 @@ module.exports = (config, repositories, encryption) => {
       app.description = body.description;
       app.teamId = body.teamId;
       app.JSONSchema = body.JSONSchema;
+
+      if (body.JSONSchema.length > 0) {
+        try {
+          app.JSONSchema = JSON.stringify(JSON.parse(body.JSONSchema), null, 4);
+        }
+        catch (err) {}
+      }
 
       if (!app.isValid()) {
         return res.sendStatus(400);
@@ -337,6 +351,13 @@ module.exports = (config, repositories, encryption) => {
         return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
       }
 
+      if (body.JSONSchema.length > 0) {
+        try {
+          body.JSONSchema = JSON.stringify(JSON.parse(body.JSONSchema), null, 4);
+        }
+        catch (err) {}
+      }
+
       const appEnvironment = new models.appEnvironment({
         teamId: app.teamId,
         teamName: app.teamName,
@@ -404,7 +425,13 @@ module.exports = (config, repositories, encryption) => {
       appEnvironment.environment = body.environment;
       appEnvironment.keyId = key.keyId;
       appEnvironment.keyName = key.keyName;
-      appEnvironment.JSONSchema = JSONSchema;
+
+      if (JSONSchema.length > 0) {
+        try {
+          appEnvironment.JSONSchema = JSON.stringify(JSON.parse(JSONSchema), null, 4);
+        }
+        catch (err) {}
+      }
 
       if (!appEnvironment.isValid()) {
         return res.sendStatus(400);
@@ -943,6 +970,7 @@ module.exports = (config, repositories, encryption) => {
       }
 
       let configuration = {};
+      const JSONSchema = getJSONSchema(app, appEnvironment);
 
       if (createFrom.length > 0) {
         configuration =  await dataRetrieval.getConfiguration(createFrom);
@@ -965,7 +993,6 @@ module.exports = (config, repositories, encryption) => {
         configuration.updated = moment(configuration.updated).format('DD/MM/YYYY HH:mm:ss')
       }
       else {
-        const JSONSchema = getJSONSchema(app, appEnvironment);
         if (JSONSchema !== undefined) {
           const requiredProperties = getSchemaRequiredProperties(JSONSchema);
           requiredProperties.forEach(requiredProperty => {
@@ -989,7 +1016,8 @@ module.exports = (config, repositories, encryption) => {
         updating,
         configuration,
         comment,
-        currentCount: configurationEntries.length
+        currentCount: configurationEntries.length,
+        JSONSchema
       };
 
       viewData.hasSecureItem = (viewData.configurationEntries.find((item) => { return item.encrypted === true }) !== undefined);

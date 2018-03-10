@@ -34,6 +34,10 @@ function getQuery(filters) {
     query["changedBy.userId"] = filters.userId;
   }
 
+  if (filters.appId) {
+    query["data.appId"] = filters.appId;
+  }
+
   return query;
 }
 
