@@ -88,5 +88,10 @@ demo/docker/ldap-mock-server/package-lock.json
 
 server/public/demo.html
 
+clients/bash/app_configuration.json
+clients/bash/elency_config**
+
+tutorials/**
+
 
 

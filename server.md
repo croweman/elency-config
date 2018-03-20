@@ -76,7 +76,7 @@ Docker images exist for the server but as it is dependent on configuration data.
 
 Retrieval of configuration data to be injected into containers should be carried out following your company guidelines.  Please refer to the <a href="#security">security</a> section about storage of secure information.
 
-Firstly within a directory you will need a `docker-compose.yml` which contains some of the following:
+Firstly within a directory you will need a `docker-compose.yml` which contains some of the following yml:
 
 ```yml
 version: '3'
@@ -97,11 +97,11 @@ services:
       PUBLIC_PEM_VALUE:
 ```
 
-Configuration could be injected into the container in either of the following ways.
+Configuration can be injected into the container in either of the following 2 ways.
 
 #### File injection
 
-In a directory create a local `configuration_files` could be created with the 4 configuration files copied into it at the root.
+In a directory create a local `configuration_files` directory and copy the 4 configuration files into it at the root.
 
 To bring up the container execute.
 

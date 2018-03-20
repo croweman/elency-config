@@ -27,7 +27,7 @@ rsaEncrypt(keysContent, path.join(__dirname, SEC_FOLDER_PATH + 'elency-config.pu
 
     const content = JSON.stringify(elencyConfig);
 
-    aes256ctrEncrypt.encrypt(content, keys.configEncryptionKey)
+    aes256ctrEncrypt(content, keys.configEncryptionKey)
       .then((enc) => {
         fs.writeFileSync(path.join(__dirname, CONFIG_FOLDER_PATH + 'config.json'), enc);
       });
@@ -38,7 +38,6 @@ async function rsaEncrypt(value, relativeOrAbsolutePathToPublicKey) {
   const publicKey = fs.readFileSync(absolutePath, "utf8");
   return crypto.publicEncrypt(publicKey, new Buffer(value)).toString("base64");
 }
-
 
 async function aes256ctrEncrypt(value, password){
   const cipher = crypto.createCipheriv(algorithm, password, iv);
