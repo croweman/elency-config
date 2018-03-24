@@ -10,6 +10,7 @@ elency-config allows you to seperate your configuration from your application co
 - [Clients](#clients)
 - [Examples](#examples)
 - [Demo](#demo)
+- [Tutorials](#tutorials)
 - [License](#license)
 
 ---
@@ -86,6 +87,14 @@ If you would like to bring down the containers execute
 ```
 docker-compose down
 ```
+
+---
+
+## Tutorials<a name="tutorials"></a>
+
+Some tutorials are available on youtube.com:
+
+- <a href="https://www.youtube.com/watch?v=gNH7-EZnV2M">elency-config server setup tutorial</a>
 
 ---
 
