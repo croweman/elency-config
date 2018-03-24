@@ -28,7 +28,7 @@ services:
       driver: none
   app:
     container_name: elency-config-server-demo
-    image: croweman/elency-config-server:0.0.14-beta
+    image: croweman/elency-config-server:0.0.15-beta
     restart: "on-failure:10"
     volumes:
       - configuration_files:/app/configuration_files

@@ -1142,11 +1142,21 @@ module.exports = (config, repositories, encryption) => {
       let JSONSchema = getJSONSchema(app, appEnvironment);
       
       if (JSONSchema !== undefined) {
+        let originalValues = [];
+        const decryptionKey = await encryption.decryptKey(configuration.key);
+        for (let i = 0; i < configuration.configuration.length; i++) {
+          let entry = configuration.configuration[i];
+          if (entry.encrypted === true && Array.isArray(entry.value)) {
+            originalValues.push({ index: i, value: entry.value });
+            entry.value = await aes256cbc.decrypt(entry.value, decryptionKey.value);
+          }
+        }
+
         const validationResult = validate(JSONSchema, configuration);
+        originalValues.forEach(item => configuration.configuration[item.index].value = item.value);
 
         if (!validationResult.valid) {
           let errorMessage = 'The configuration you have specified does not conform to the configured JSONSchema:<br /><ul>';
-
           validationResult.errors.forEach(error => {
             errorMessage += `<li>${error}</li>`;
           });
@@ -1156,7 +1166,6 @@ module.exports = (config, repositories, encryption) => {
           return res.status(200).send({ error: errorMessage });
         }
       }
-
 
       configuration = await encryption.encryptConfiguration(configuration, exceptions);
 
