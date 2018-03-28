@@ -9,7 +9,7 @@ const flash = require('connect-flash');
 const MongoStore = require('connect-mongo')(session);
 const controllers = require('./controllers');
 const rsa = require('./lib/encryptors/rsa');
-const aes256ctr = require('./lib/encryptors/aes-256-ctr');
+const aes256cbc = require('./lib/encryptors/aes-256-cbc');
 const repositories = require('./lib/repositories');
 const encryption = require('./lib/utils/encryption');
 const responseMiddleware = require('./lib/middleware/response');
@@ -23,7 +23,7 @@ async function create() {
 
   createConfigurationFromEnvironmentVariables();
   let config = await getConfiguration();
-  
+
   let repos = await repositories(config);
   let encryptionInstance = encryption(config);
   let controllerInstances = controllers(config, repos, encryptionInstance);
@@ -91,7 +91,7 @@ function addUIRoutes(app, config, controllerInstances, repos, encryptionInstance
 
   app.set('views', './views');
   app.set('view engine', 'pug');
-  
+
   const maxAge = (config.sessionLifeTimeInMinutes !== undefined ? 60 * 1000 * config.sessionLifeTimeInMinutes : 60 * 60 * 24 * 14 * 1000);
   const sessionOptions = {
     // session lives by default for 14 days
@@ -167,7 +167,7 @@ function findById(repos, userId, fn) {
       if (user.isNull()) {
         return fn(new Error(`User ${userId} does not exist`));
       }
-      
+
       processPermissions(repos, user)
         .then(() => {
           fn(null, user);
@@ -205,7 +205,7 @@ function errorHandler(exposeUIRoutes) {
 }
 
 function createConfigurationFromEnvironmentVariables() {
-  
+
   function fixPemKey(value) {
     let fixedValue = value.replace(/#NEWLINE#/g, '\n');
     if (!fixedValue.endsWith('\n')) {
@@ -268,13 +268,13 @@ async function getConfiguration() {
   if (keys.configEncryptionKey.length !== 32) {
     throw 'configEncryptionKey length must be 32';
   }
-  
+
   if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(keys.configEncryptionKey)) {
     throw new Error('configEncryptionKey must be a Base64 encoded string');
   }
 
   fileContent = fs.readFileSync('./config/config.json').toString('utf8');
-  fileContent = await aes256ctr.decrypt(fileContent, keys.configEncryptionKey);
+  fileContent = await aes256cbc.decrypt([ fileContent, '3564373164373033' ], keys.configEncryptionKey);
 
   let config;
 
@@ -297,7 +297,7 @@ async function getConfiguration() {
   if (config.sessionLifeTimeInMinutes && isNaN(parseInt(config.sessionLifeTimeInMinutes))) {
     throw 'sessionLifeTimeInMinutes must be a valid integer';
   }
-  
+
   config.configEncryptionKey = keys.configEncryptionKey;
   return new Configuration(config);
 }

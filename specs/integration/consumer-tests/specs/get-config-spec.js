@@ -254,6 +254,7 @@ describe('node client and node server acceptance tests', () => {
 
   before(async () => {
     await createTestData();
+    await sleep(1000);
   });
 
   describe('Initialising a node client with valid data', () => {

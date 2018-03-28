@@ -3,7 +3,7 @@ const path = require('path');
 const exec = require('child_process').execSync;
 
 const rsa = require('../../server/lib/encryptors/rsa');
-const aes256ctr = require('../../server/lib/encryptors/aes-256-ctr');
+const aes256cbc = require('../../server/lib/encryptors/aes-256-cbc');
 
 const createData = process.env.CREATE_CONFIG_DATA === 'true';
 
@@ -31,8 +31,8 @@ rsa.encrypt(keysContent, path.join(__dirname, '../../server/sec/elency-config.pu
     fs.writeFileSync(path.join(__dirname, '../../server/config/keys.json'), enc);
 
     let content = JSON.stringify(elencyConfig);
-    aes256ctr.encrypt(content, keys.configEncryptionKey)
+    aes256cbc.encrypt(content, keys.configEncryptionKey, '3564373164373033')
       .then((enc) => {
-          fs.writeFileSync(path.join(__dirname, '../../server/config/config.json'), enc);
+          fs.writeFileSync(path.join(__dirname, '../../server/config/config.json'), enc[0]);
       });
   });

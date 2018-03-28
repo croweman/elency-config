@@ -40,12 +40,12 @@ Ideally in a `non` local/dev environment you should be setting the server up wit
 
 ### Linux based system<a name="linux"></a>
 
-1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.15-beta.tar.gz">elency-config-server</a>.
+1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.16-beta.tar.gz">elency-config-server</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
     ```
-    tar xzf ./elency-config-server-0.0.15-beta.tar.gz
+    tar xzf ./elency-config-server-0.0.16-beta.tar.gz
     ```
 
 3. Create and add the relevant config and security files to the `config` and `sec` directories.  Refer to the <a href="#configuration">Configuration</a> section.
@@ -84,7 +84,7 @@ version: '3'
 services:
   app:
     container_name: elency-config-server
-    image: croweman/elency-config-server:0.0.15-beta
+    image: croweman/elency-config-server:0.0.16-beta
     restart: "on-failure:10"
     volumes:
       - ./configuration_files:/app/configuration_files
@@ -189,13 +189,31 @@ The server is dependent on 4 configuration files. These files and content (encry
 
 4. run the `encrypt-configuration-files` tool
 
-    Execute the `encrypt-configuration-files` tool to encrypt the configuration files (`config.json` and `keys.json).
+    Execute either the node or bash `encrypt-configuration-files` tool to encrypt and decrypt the configuration files (`config.json` and `keys.json).
+
+    node:
 
     ```
+    // encrypt
     node ./encrypt-configuration-files.js
+
+    // decrypt
+    node ./encrypt-configuration-files.js -d
     ```
 
     The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files.js">here</a>.
+
+node:
+
+    ```
+    # encrypt
+    ./encrypt-configuration-files
+
+    # decrypt
+    DECRYPT=true ./encrypt-configuration-files -d
+    ```
+
+    The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files">here</a>.
 
 ---
 

@@ -11,7 +11,7 @@ services:
   demo:
     #build: .
     container_name: elency-config-client-demo
-    image: croweman/elency-config-demo:0.0.8-beta
+    image: croweman/elency-config-demo:0.0.11-beta
     volumes:
       - configuration_files:/app/configuration_files
     depends_on:
@@ -28,7 +28,7 @@ services:
       driver: none
   app:
     container_name: elency-config-server-demo
-    image: croweman/elency-config-server:0.0.15-beta
+    image: croweman/elency-config-server:0.0.16-beta
     restart: "on-failure:10"
     volumes:
       - configuration_files:/app/configuration_files

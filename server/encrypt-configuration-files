@@ -1,0 +1,104 @@
+#!/bin/bash
+
+set -e
+
+hexIV='3564373164373033'
+ivBytes=$(echo -n "${hexIV}" | xxd -ps | tr '\n' ' ' | tr '\r' ' ' | tr -d '[:blank:]')
+
+configFolderPath=''
+secFolderPath=''
+configJSONFilePath=''
+keysJSONFilePath=''
+privatePemFilePath=''
+publicPemFilePath=''
+configJSONContent=''
+keysJSONContent=''
+encrypt=true
+
+function init {
+    if [ -z "$CONFIG_FOLDER_PATH" ]; then
+        configFolderPath='./config/'
+    else
+        configFolderPath=$CONFIG_FOLDER_PATH
+    fi
+
+    if ! [[ "$configFolderPath" == */ ]]; then
+        configFolderPath="$configFolderPath/"
+    fi
+
+    if [ -z "$SEC_FOLDER_PATH" ]; then
+        secFolderPath='./sec/'
+    else
+        secFolderPath=$SEC_FOLDER_PATH
+    fi
+
+    if ! [[ "$secFolderPath" == */ ]]; then
+        secFolderPath="$secFolderPath/"
+    fi
+
+    if [ "$DECRYPT" == true ]; then
+        encrypt=false
+    fi
+
+    configJSONFilePath="$(cd "$(dirname "$configFolderPath")"; pwd)/$(basename "$configFolderPath")/config.json"
+    keysJSONFilePath="$(cd "$(dirname "$configFolderPath")"; pwd)/$(basename "$configFolderPath")/keys.json"
+    privatePemFilePath="$(cd "$(dirname "$secFolderPath")"; pwd)/$(basename "$secFolderPath")/elency-config.private.pem"
+    publicPemFilePath="$(cd "$(dirname "$secFolderPath")"; pwd)/$(basename "$secFolderPath")/elency-config.public.pem"
+
+    configJSONContent=$(cat $configJSONFilePath)
+    keysJSONContent=$(cat $keysJSONFilePath)
+}
+
+function encryptConfig {
+    configEncryptionKey=$(echo ${keysJSONContent} | jq -r .configEncryptionKey)
+    keyBytes=$(echo -n "${configEncryptionKey}" | xxd -ps | tr '\n' ' ' | tr '\r' ' ' | tr -d '[:blank:]')
+    encryptedFilePath="$keysJSONFilePath.encrypted"
+    base64FilePath="$keysJSONFilePath.base64"
+    cmd="openssl rsautl -oaep -pubin -inkey $publicPemFilePath -encrypt -in $keysJSONFilePath -out $encryptedFilePath"
+    eval $cmd
+    cmd="cat $encryptedFilePath | base64 >> $base64FilePath"
+    eval $cmd
+
+    rm $keysJSONFilePath
+    cp $base64FilePath $keysJSONFilePath
+    rm $encryptedFilePath
+    rm $base64FilePath
+
+    cmd="cat $configJSONFilePath | openssl enc -e -aes-256-cbc -iv ${ivBytes} -K ${keyBytes} | xxd -ps | tr '\n' ' ' | tr '\r' ' ' | tr -d '[:blank:]'"
+    encrypted=$(eval ${cmd})
+    rm $configJSONFilePath
+    echo -n $encrypted >> $configJSONFilePath
+}
+
+
+function decryptConfig {
+    deBase64FilePath="$keysJSONFilePath.debase64"
+    cmd="cat $keysJSONFilePath | base64 -D >> $deBase64FilePath"
+    eval $cmd
+    decryptedFilePath="$keysJSONFilePath.decrypted"
+    cmd="openssl rsautl -oaep -inkey $privatePemFilePath -decrypt -in $deBase64FilePath -out $decryptedFilePath"
+    eval $cmd
+    rm $keysJSONFilePath
+    cp $decryptedFilePath $keysJSONFilePath
+    rm $deBase64FilePath
+    rm $decryptedFilePath
+
+    keysJSONContent=$(cat $keysJSONFilePath)
+    configEncryptionKey=$(echo ${keysJSONContent} | jq -r .configEncryptionKey)
+    keyBytes=$(echo -n "${configEncryptionKey}" | xxd -ps | tr '\n' ' ' | tr '\r' ' ' | tr -d '[:blank:]')
+    cmd="cat $configJSONFilePath | xxd -ps -r | openssl enc -d -aes-256-cbc -iv ${ivBytes} -K ${keyBytes}"
+    decrypted=$(eval ${cmd})
+    rm $configJSONFilePath
+    echo -n $decrypted >> $configJSONFilePath
+}
+
+init
+
+if [ "$encrypt" == true ]; then
+    encryptConfig
+    echo Encryption complete
+else
+    decryptConfig
+    echo Decryption complete
+fi
+

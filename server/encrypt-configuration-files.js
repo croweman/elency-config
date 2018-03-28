@@ -15,9 +15,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const algorithm = 'aes-256-ctr';
-const hexIV = '5d71d70367921ad4c35644c6cf451a3c';
-const iv = Buffer.from(hexIV, 'hex').slice(0, 16);
+const algorithm = 'aes-256-cbc';
+const iv = '3564373164373033';
 const decrypt = (process.argv.length === 3 && process.argv[2] === '-d');
 const configFolderPath = getFolderPath('CONFIG_FOLDER_PATH', './config/');
 const secFolderPath = getFolderPath('SEC_FOLDER_PATH', './sec/');
@@ -40,7 +39,7 @@ if (decrypt) {
   const prettifiedKeys = JSON.stringify(JSON.parse(decryptedKeysContent), null, 2);
   fs.writeFileSync(keysJSONFilePath, prettifiedKeys);
   const keys = JSON.parse(decryptedKeysContent);
-  const decryptedConfigJSON = aes256ctrDecrypt(configJSONContent.toString(), keys.configEncryptionKey);
+  const decryptedConfigJSON = aes256cbcDecrypt(configJSONContent.toString(), keys.configEncryptionKey);
   const prettifiedConfig = JSON.stringify(JSON.parse(decryptedConfigJSON), null, 2);
   fs.writeFileSync(configJSONFilePath, prettifiedConfig);
   console.log('Decryption complete');
@@ -52,7 +51,7 @@ else {
   const encryptedKeysContent = rsaEncrypt(keysContent, publicPemFilePath);
   fs.writeFileSync(keysJSONFilePath, encryptedKeysContent);
   const config = JSON.stringify(elencyConfig);
-  const encryptedConfig = aes256ctrEncrypt(config, keys.configEncryptionKey);
+  const encryptedConfig = aes256cbcEncrypt(config, keys.configEncryptionKey);
   fs.writeFileSync(configJSONFilePath, encryptedConfig);
   console.log('Encryption complete');
 }
@@ -69,14 +68,14 @@ function rsaDecrypt(value, relativeOrAbsolutePathToPrivateKey) {
   return crypto.privateDecrypt(privateKey, new Buffer(value, "base64")).toString("utf8");
 }
 
-function aes256ctrEncrypt(value, password){
+function aes256cbcEncrypt(value, password){
   const cipher = crypto.createCipheriv(algorithm, password, iv);
   let crypted = cipher.update(value, 'utf8', 'hex');
   crypted += cipher.final('hex');
   return crypted;
 }
 
-function aes256ctrDecrypt(value, password){
+function aes256cbcDecrypt(value, password){
   const decipher = crypto.createDecipheriv(algorithm, password, iv);
   let dec = decipher.update(value, 'hex', 'utf8');
   dec += decipher.final('utf8');
