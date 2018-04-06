@@ -48,6 +48,8 @@
     <Compile Include="ConfigurationResponse.cs" />
     <Compile Include="Encryption\AES_256_CBC.cs" />
     <Compile Include="Hashers\HMACSHA256.cs" />
+    <Compile Include="IElencyConfigClient.cs" />
+    <Compile Include="LocalConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\VersionNumber.cs" />
     <Compile Include="ValueRetrieval.cs" />

@@ -1,5 +1,6 @@
 ﻿using ElencyConfig.Validation;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -18,10 +19,12 @@ namespace ElencyConfig
         public Action<Exception> RefreshFailure { get; set; }
 
         public int? RequestTimeout { get; set; }
+
+        public LocalConfiguration LocalConfiguration { get; set; }
     
         internal void Validate()
         {
-            if (String.IsNullOrWhiteSpace(Uri))
+            if (string.IsNullOrWhiteSpace(Uri))
             {
                 throw new Exception("Uri has not been defined");
             }
@@ -69,6 +72,11 @@ namespace ElencyConfig
             if (!new Regex("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$").IsMatch(ConfigEncryptionKey))
             {
                 throw new Exception("ConfigEncryptionKey must be a Base64 encoded string");
+            }
+
+            if (LocalConfiguration != null)
+            {
+                LocalConfiguration.Validate();
             }
         }
     }

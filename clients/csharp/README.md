@@ -102,6 +102,33 @@ The options provided to the client are below.
  - `ConfigEncryptionKey` A 32 character (base64 encoded) string used to decrypt `secure` configuration variables.  This is the value of the `key` associated with an application environment.
  - `Retrieved` Defines a void fired when the configuration is retrieved.
  - `RefreshFailure` Defines a void fired when a configuration refresh fails.
+ - `LocalConfiguration` Defines a local configuration environment.  In development environments you may not want to communicate with a real `elency-config-server`.
+
+An example using `localConfiguration` is below:
+
+```c#
+var configuration = new ElencyConfiguration()
+    {
+        Uri = "http://192.168.1.15:3000",
+        AppId = AppId,
+        AppVersion = "2.0.0",
+        Environment = Environment,
+        RefreshInterval = 0,
+        HMACAuthorizationKey = HMACAuthorizationKey,
+        ConfigEncryptionKey = ConfigEncryptionKey,
+		LocalConfiguration = new LocalConfiguration
+        {
+            AppVersion = "1.1.2",
+            Environment = "production",
+            ConfigurationId = "9b386d19-fa7a-40ba-b794-f961e56ffe08",
+            ConfigurationData = new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "KeyOne", "Value1" },
+                { "KeyTwo", "Value2" }
+            }
+        }
+    };
+```
 
 ---
 
@@ -128,6 +155,7 @@ Once your `Retrieved` function has been called the client will have the followin
  - `GetDecimal`: (`key` string, `fallback` <optional>) gets the value of a key as a decimal and falls back to fallback value if provided.
  - `GetDouble`: (`key` string, `fallback` <optional>) gets the value of a key as a double and falls back to fallback value if provided.
  - `GetObject`: (`key` string, `fallback` <optional>) gets the value of a key as a specified type of object and falls back to fallback value if provided.
+
 ---
 
 ## Refresh Failure<a name="failure"></a>

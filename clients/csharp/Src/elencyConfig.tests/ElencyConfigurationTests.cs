@@ -25,6 +25,28 @@ namespace ElencyConfig.Tests
         }
 
         [Test]
+        public void ValidateDoesNotThrowAnExceptionWhenRequiredPropertiesArePopulatedAndAValidLocalConfiguraitonIsProvided()
+        {
+            var configuration = new ElencyConfiguration()
+            {
+                Uri = "http://localhost:8080",
+                AppId = "proj",
+                AppVersion = "1.1.1",
+                Environment = "prod",
+                HMACAuthorizationKey = HMACAuthorizationKey,
+                ConfigEncryptionKey = EncryptionKey,
+                LocalConfiguration = new LocalConfiguration
+                {
+                    AppVersion = "1.1.1",
+                    Environment = "prod",
+                    ConfigurationId = "1234",
+                    ConfigurationData = new System.Collections.Generic.Dictionary<string, string>()
+                }
+            };
+            configuration.Validate();
+        }
+
+        [Test]
         public void ValidateThrowsAnExceptionIfUriIsNotProvided()
         {
             var configuration = new ElencyConfiguration()

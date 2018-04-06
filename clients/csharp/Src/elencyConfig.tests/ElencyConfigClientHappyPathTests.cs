@@ -66,6 +66,49 @@ namespace ElencyConfig.Tests
         }
 
         [Test]
+        public async Task InitIsSuccessfulWhenValidDataAndLocalConfigurationIsProvided()
+        {
+            try
+            {
+                var config = new ElencyConfiguration()
+                {
+                    Uri = "http://localhost:8080",
+                    AppId = "proj",
+                    AppVersion = "1.1.1",
+                    Environment = "prod",
+                    HMACAuthorizationKey = HMACAuthorizationKey,
+                    ConfigEncryptionKey = EncryptionKey,
+                    LocalConfiguration = new LocalConfiguration
+                    {
+                        AppVersion = "1.1.2",
+                        Environment = "production",
+                        ConfigurationId = "9b386d19-fa7a-40ba-b794-f961e56ffe08",
+                        ConfigurationData = new System.Collections.Generic.Dictionary<string, string>
+                        {
+                            { "KeyOne", "Value1" },
+                            { "KeyTwo", "Value2" }
+                        }
+                    }
+                };
+
+                var client = new ElencyConfigClient();
+                await client.Init(config);
+
+                Assert.AreEqual(2, client.GetAllKeys().Count);
+                Assert.AreEqual("Value1", client.Get("KeyOne"));
+                Assert.AreEqual("Value2", client.Get("KeyTwo"));
+                Assert.AreEqual("1.1.2", client.AppVersion);
+                Assert.AreEqual("production", client.Environment);
+                Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe08", client.ConfigurationId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Assert.Fail("An error was defined");
+            }
+        }
+
+        [Test]
         public async Task GetReturnsConfigurationKeyValues()
         {
             var responseHeaders = new NameValueCollection() { { "x-access-token", "8363999c-bdc2-45a7-afe6-b0af9ad44aca" } };

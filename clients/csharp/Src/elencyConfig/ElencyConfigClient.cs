@@ -12,7 +12,7 @@ using ElencyConfig.Encryption;
 
 namespace ElencyConfig
 {
-    public class ElencyConfigClient
+    public class ElencyConfigClient : IElencyConfigClient
     {
         private bool _initialized = false;
         private ElencyConfiguration _config;
@@ -51,6 +51,12 @@ namespace ElencyConfig
             catch (Exception ex)
             {
                 throw ex;
+            }
+
+            if (_config.LocalConfiguration != null)
+            {
+                await GetLocalConfiguration();
+                return;
             }
 
             await GetConfiguration();
@@ -221,6 +227,20 @@ namespace ElencyConfig
             if (!_initialized)
             {
                 throw new Exception("The client has not been successfully initialized");
+            }
+        }
+
+        private async Task GetLocalConfiguration()
+        {
+            _currentAppVersion = _config.LocalConfiguration.AppVersion;
+            _currentEnvironment = _config.LocalConfiguration.Environment;
+            _currentConfigurationId = _config.LocalConfiguration.ConfigurationId;
+            _currentConfiguration = _config.LocalConfiguration.ConfigurationData;
+            _initialized = true;
+
+            if (_config.Retrieved != null)
+            {
+                await Task.Run(_config.Retrieved);
             }
         }
 
