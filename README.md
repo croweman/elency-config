@@ -17,13 +17,13 @@ elency-config allows you to seperate your configuration from your application co
 
 ## Server<a name="server"></a>
 
-Please refer to <a href="./server.md">server.md</a> for more information around setting up an `elency-config-server`.
+Please refer to <a href="./documentation/server.md">server.md</a> for more information around setting up an `elency-config-server`.
 
 ---
 
 ## Clients<a name="clients"></a>
 
-Please refer to <a href="./clients.md">clients.md</a> for more information around using `elency-config` clients.
+Please refer to <a href="./documentation/clients.md">clients.md</a> for more information around using `elency-config` clients.
 
 ---
 
