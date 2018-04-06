@@ -1,7 +1,7 @@
 const valueRetrieval = require('../../../lib/value-retrieval'),
   expect = require('chai').expect;
 
-describe.only('value-retrieval', () => {
+describe('value-retrieval', () => {
 
   describe('getBoolean', () => {
 

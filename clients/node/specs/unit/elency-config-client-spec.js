@@ -412,6 +412,28 @@ describe('elency-config - client', function () {
 
       });
 
+      it('when valid data is provided and using localConfiguration', function () {
+
+        elencyConfig({
+          uri: 'http://localhost:8080',
+          appId: 'proj',
+          appVersion: '1.1.1',
+          environment: 'prod',
+          refreshInterval: '1000',
+          HMACAuthorizationKey: HMACAuthorizationKey,
+          configEncryptionKey: encryptionKey,
+          retrieved: () => {},
+          retrievalFailure: () => {},
+          localConfiguration: {
+            appVersion: "1.1.1",
+            environment: "Test",
+            configurationId: "1234",
+            configurationData: {}
+          }
+        });
+
+      });
+
     });
 
   });
@@ -453,6 +475,44 @@ describe('elency-config - client', function () {
           expect(config.appVersion()).to.eql('1.1.1');
           expect(config.environment()).to.eql('prod');
           expect(config.configurationId()).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe07');
+        }
+        catch(err) {
+          console.log(err);
+          throw new Error('an error was defined');
+        }
+      });
+
+      it('when localConfiguration is defined', async function () {
+
+        let config = elencyConfig({
+          uri: 'http://localhost:8080',
+          appId: 'proj',
+          appVersion: '1.1.1',
+          environment: 'prod',
+          refreshInterval: '1000',
+          HMACAuthorizationKey: HMACAuthorizationKey,
+          configEncryptionKey: encryptionKey,
+          retrieved: () => {},
+          retrievalFailure: () => {},
+          localConfiguration: {
+            appVersion: "1.1.2",
+            environment: "production",
+            configurationId: '9b386d19-fa7a-40ba-b794-f961e56ffe08',
+            configurationData: {
+              KeyOne: 'KeyOneValue2',
+              KeyTwo: 'KeyTwoValue3'
+            }
+          }
+        });
+
+        try {
+          await config.init();
+          expect(config.getAllKeys().length).to.eql(2);
+          expect(config.get('KeyOne')).to.eql('KeyOneValue2');
+          expect(config.get('KeyTwo')).to.eql('KeyTwoValue3');
+          expect(config.appVersion()).to.eql('1.1.2');
+          expect(config.environment()).to.eql('production');
+          expect(config.configurationId()).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe08');
         }
         catch(err) {
           console.log(err);

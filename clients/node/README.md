@@ -30,12 +30,12 @@ npm install `elency-config` --save
 
 or
 
-1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.3-beta.tar.gz">elency-config-node-client</a>.
+1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.4-beta.tar.gz">elency-config-node-client</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
 ```
-tar xzf ./elency-config-node-client-0.0.3-beta.tar.gz
+tar xzf ./elency-config-node-client-0.0.4-beta.tar.gz
 ```
 
 ---
@@ -83,6 +83,20 @@ The options provided to the client are below.
  - `configEncryptionKey` A 32 character (base64 encoded) string used to decrypt `secure` configuration variables.  This is the value of the `key` associated with an application environment.
  - `retrieved` Defines a function fired when the configuration is retrieved.
  - `refreshFailure` Defines a function fired when a configuration refresh fails.
+ - `localConfiguration` Defines a local configuration environment.  In development environments you may not want to communicate with a real `elency-config-server`.
+
+An example using `localConfiguration` is below:
+
+```js
+elencyConfigInstance.localConfiguration = {
+    appVersion: "1.1.2",
+    environment: "production",
+    configurationId: '9b386d19-fa7a-40ba-b794-f961e56ffe08',
+    configurationData: {
+        LOG_LEVEL: 'INFO'
+    }
+};
+```
 
 Once the client instance has been created with valid options. You can call the `init` function which will attempt to communicate with the `elency-config-server` and pull down a configuration.
 

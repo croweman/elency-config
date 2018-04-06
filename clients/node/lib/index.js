@@ -28,6 +28,24 @@ module.exports = (configuration) => {
   let refreshing = false;
   let intervalId;
 
+  function validateLocalConfiguration(localConfiguration) {
+    if (!localConfiguration.appVersion) {
+      throw new Error('appVersion has not been defined on localConfiguration');
+    }
+
+    if (!localConfiguration.environment) {
+      throw new Error('environment has not been defined on localConfiguration');
+    }
+
+    if (!localConfiguration.configurationId) {
+      throw new Error('configurationId has not been defined on localConfiguration');
+    }
+
+    if (!localConfiguration.configurationData) {
+      throw new Error('configurationData has not been defined on localConfiguration');
+    }
+  }
+
   function validateConfiguration(configuration) {
     if (!configuration)
       throw new Error('invalid configuration');
@@ -75,6 +93,10 @@ module.exports = (configuration) => {
 
     if (configuration.refreshFailure !== undefined && typeof  configuration.refreshFailure !== 'function') {
       throw new Error('refreshFailure must be a callback function');
+    }
+    
+    if (configuration.localConfiguration) {
+      validateLocalConfiguration(configuration.localConfiguration);
     }
   }
 
@@ -232,7 +254,6 @@ module.exports = (configuration) => {
   }
 
   async function getConfiguration() {
-
     let configuration;
 
     if (currentVersionHash) {
@@ -266,6 +287,20 @@ module.exports = (configuration) => {
 
     if (configuration.refreshFailure) {
       refreshFailureCallback = configuration.refreshFailure;
+    }
+
+    if (configuration.localConfiguration) {
+      currentAppVersion = configuration.localConfiguration.appVersion;
+      currentEnvironment = configuration.localConfiguration.environment;
+      currentConfigurationId = configuration.localConfiguration.configurationId;
+      currentConfiguration = configuration.localConfiguration.configurationData;
+      currentKeys = Object.keys(currentConfiguration).map((key) => { return key; });
+      initialized = true;
+      
+      if (retrievedCallback) {
+        await retrievedCallback();
+      }
+      return;
     }
 
     let configurationPath = `/config/${elencyConfig.appId}/${elencyConfig.environment}/${elencyConfig.appVersion}`;

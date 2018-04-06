@@ -21,12 +21,5 @@ module.exports = {
     const key = (hmac === true ? config.HMACAuthorizationKey : config.configEncryptionKey);
     const signature = await hasher.hash(headerData.value, key);
     return `${config.appId}:${signature}:${headerData.nonce}:${headerData.timestamp}`;
-  },
-  generateAuthorizationHeaderSync: function(config, path, method, hmac) {
-    hmac = hmac || false;
-    const headerData = getHeaderData(config, path, method);
-    const key = (hmac === true ? config.HMACAuthorizationKey : config.configEncryptionKey);
-    const signature = hasher.hashSync(headerData.value, key);
-    return `${config.appId}:${signature}:${headerData.nonce}:${headerData.timestamp}`;
   }
-} 
+};
