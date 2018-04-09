@@ -73,7 +73,7 @@ module.exports = (configuration) => {
       throw new Error('HMACAuthorizationKey must be a Base64 encoded string');
     }
 
-    if (configuration.refreshInterval !== undefined && !parseInt(configuration.refreshInterval))
+    if ((configuration.refreshInterval !== undefined && configuration.refreshInterval !== null) && (!parseInt(configuration.refreshInterval) && configuration.refreshInterval !== 0))
       throw new Error('refreshInterval is invalid');
 
     if (!configuration.configEncryptionKey || configuration.configEncryptionKey.trim().length == 0)
