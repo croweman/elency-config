@@ -96,6 +96,7 @@ Some tutorials are available on youtube.com:
 
 - <a href="https://www.youtube.com/watch?v=gNH7-EZnV2M">elency-config server setup tutorial</a>
 - <a href="https://www.youtube.com/watch?v=MdhCpUmYyF0">elency-config server administration ui tutorial</a>
+- <a href="https://www.youtube.com/watch?v=xgOfQGkAbPI">elency-config - node.js client - configuration retrieval tutorial</a>
 
 ---
 
