@@ -1,17 +1,59 @@
 # elency-config
 
-elency-config is an open-source solution to configuration management for multi-tenant applications hosted on any platform.
-
-elency-config allows you to seperate your configuration from your application code.
+elency-config, an open-source solution to application/microservice configuration management.
 
 ## Table of contents
 
+- [But, what is it?](#whatisit)
+  - [But, why?](#butwhy)
 - [Server](#server)
 - [Clients](#clients)
 - [Examples](#examples)
 - [Demo](#demo)
 - [Tutorials](#tutorials)
 - [License](#license)
+
+---
+
+## But, what is it?<a name="whatisit"></a>
+
+elency-config is an open-source solution to application/microservice configuration management for multi-tenant applications hosted on any platform.
+
+It allows you to seperate your configuration from your application code.
+
+At a basic level it provides:
+
+- Admin Web UI
+  - Http administration UI for administrating application/microservice configuration.
+  - Optional JSON Schema enforcement on configuration
+  - Secure configuration data storage
+  - Configuration versioning
+  - Configuration version comparison
+  - User/Role/Permission management
+  - Auditing on configuration changes
+
+- Client Http REST API
+  - Retrieving configuration per application/environment.
+  - Configuration versioning
+  - Secure encrypted configuration over HTTP transport
+
+### But why?<a name="butwhy"></a>
+
+There are many other alternatives to application configuration on the open-source shelf.
+
+I fancied building one of my own just initially for something to do :p
+
+The alternative solutions to configuration management did not offer a solution that worked in the way I wanted it to work.
+
+I have worked in many teams that have accidentally or incorrectly placed secure configuration in source control repositories.
+
+I wanted a simple service to allow a developer to abstract all of there configuration away into a seperate data store securely.
+
+Have a nice UI on top it with user/role management, allowing teams to manage and version configuration per environment.
+
+A simple REST API that would allow any application to consume the required configuration.
+
+Hence elency-config. Try it out!
 
 ---
 
