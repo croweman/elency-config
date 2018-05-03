@@ -472,9 +472,9 @@ describe('elency-config - client', function () {
           expect(config.getAllKeys().length).to.eql(2);
           expect(config.get('KeyOne')).to.eql('KeyOneValue');
           expect(config.get('KeyTwo')).to.eql('KeyTwoValue');
-          expect(config.appVersion()).to.eql('1.1.1');
-          expect(config.environment()).to.eql('prod');
-          expect(config.configurationId()).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe07');
+          expect(config.appVersion).to.eql('1.1.1');
+          expect(config.environment).to.eql('prod');
+          expect(config.configurationId).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe07');
         }
         catch(err) {
           console.log(err);
@@ -510,9 +510,9 @@ describe('elency-config - client', function () {
           expect(config.getAllKeys().length).to.eql(2);
           expect(config.get('KeyOne')).to.eql('KeyOneValue2');
           expect(config.get('KeyTwo')).to.eql('KeyTwoValue3');
-          expect(config.appVersion()).to.eql('1.1.2');
-          expect(config.environment()).to.eql('production');
-          expect(config.configurationId()).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe08');
+          expect(config.appVersion).to.eql('1.1.2');
+          expect(config.environment).to.eql('production');
+          expect(config.configurationId).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe08');
         }
         catch(err) {
           console.log(err);

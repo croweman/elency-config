@@ -394,9 +394,15 @@ module.exports = (configuration) => {
   return {
     init,
     dispose,
-    appVersion,
-    environment,
-    configurationId,
+    get appVersion() {
+      return appVersion();
+    },
+    get environment() {
+      return environment();
+    },
+    get configurationId() {
+      return configurationId();
+    },
     get,
     getBoolean,
     getDate,

@@ -12,9 +12,9 @@ async function start() {
     console.log();
     console.log('__________________________________________');
     console.log(`Configuration retrieved: ${new Date().toString()}`);
-    console.log('Version: ' + elencyConfigInstance.appVersion());
-    console.log('Environment: ' + elencyConfigInstance.environment());
-    console.log('Configuration Id: ' + elencyConfigInstance.configurationId());
+    console.log('Version: ' + elencyConfigInstance.appVersion);
+    console.log('Environment: ' + elencyConfigInstance.environment);
+    console.log('Configuration Id: ' + elencyConfigInstance.configurationId);
     console.log('Keys and values:');
     console.log();
     

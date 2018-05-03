@@ -11,7 +11,7 @@ services:
   demo:
     #build: .
     container_name: elency-config-client-demo
-    image: croweman/elency-config-demo:0.0.11-beta
+    image: croweman/elency-config-demo:0.0.12-beta
     volumes:
       - configuration_files:/app/configuration_files
     depends_on:

@@ -30,12 +30,12 @@ npm install `elency-config` --save
 
 or
 
-1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.5-beta.tar.gz">elency-config-node-client</a>.
+1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.6-beta.tar.gz">elency-config-node-client</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
 ```
-tar xzf ./elency-config-node-client-0.0.5-beta.tar.gz
+tar xzf ./elency-config-node-client-0.0.6-beta.tar.gz
 ```
 
 ---
@@ -118,13 +118,13 @@ When configuration has been successfully retrieved, and assuming you have define
 
 In your `retrieve` function you may want to perform asynchonous setup tasks etc.
 
-Once your `retrieve` function has been called the client will have the following functions available:
+Once your `retrieve` function has been called the client will have the following functions and propertiesavailable:
 
-### functions
+### functions and properties
  - `dispose`: A function that stops refreshing if enabled.
- - `appVersion`: A function that returns the `version` of the retrieved configuration.
- - `environment`: A function that returns the `environment` of the retrieved configuration.
- - `configurationId`: A function that returns the `configurationId` of the retrieved configuration.
+ - `appVersion`: A property that returns the `version` of the retrieved configuration.
+ - `environment`: A property that returns the `environment` of the retrieved configuration.
+ - `configurationId`: A property that returns the `configurationId` of the retrieved configuration.
  - `get`: A function that accepts a `key` argument and returns the value of the key or `undefined` if the key cannot be found.
  - `getAllKeys`: A function that returns all of the `keys` within the configuration.
  - `refresh`: A function that can be called to refresh the configuration.

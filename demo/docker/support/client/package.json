@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "elency-config": "0.0.1-beta",
+    "elency-config": "0.0.6-beta",
     "mongodb": "~2.2.33",
     "uuid": "~3.0.1"
   },

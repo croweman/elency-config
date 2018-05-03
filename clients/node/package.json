@@ -1,6 +1,6 @@
 {
   "name": "elency-config",
-  "version": "0.0.5-beta",
+  "version": "0.0.6-beta",
   "description": "elency-config - node client",
   "main": "./lib/index.js",
   "repository": {

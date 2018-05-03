@@ -288,8 +288,8 @@ describe('node client and node server acceptance tests', () => {
       expect(keys.length).to.eql(2);
       expect(elencyConfigNode.get('KeyOne')).to.eql('KeyOneValue');
       expect(elencyConfigNode.get('KeyTwo')).to.eql('KeyTwoValue');
-      expect(elencyConfigNode.appVersion()).to.eql('1.1.1');
-      expect(elencyConfigNode.environment()).to.eql('production');
+      expect(elencyConfigNode.appVersion).to.eql('1.1.1');
+      expect(elencyConfigNode.environment).to.eql('production');
     });
 
     it('successfully receives updated configuration from the elency-config server based on a refresh interval', async () => {
@@ -325,8 +325,8 @@ describe('node client and node server acceptance tests', () => {
       expect(elencyConfigNode.get('KeyOne')).to.eql('KeyOneValue');
       expect(elencyConfigNode.get('KeyTwo')).to.eql('KeyTwoValueUpdated');
       expect(elencyConfigNode.get('KeyThree')).to.eql('KeyThreeValue');
-      expect(elencyConfigNode.appVersion()).to.eql('1.1.1');
-      expect(elencyConfigNode.environment()).to.eql('production');
+      expect(elencyConfigNode.appVersion).to.eql('1.1.1');
+      expect(elencyConfigNode.environment).to.eql('production');
     });
 
   });
@@ -402,8 +402,8 @@ describe('node client and node server acceptance tests', () => {
       expect(elencyConfigNode.get('KeyOne')).to.eql('KeyOneValue');
       expect(elencyConfigNode.get('KeyTwo')).to.eql('KeyTwoValueUpdated');
       expect(elencyConfigNode.get('KeyThree')).to.eql('KeyThreeValue');
-      expect(elencyConfigNode.appVersion()).to.eql('1.1.1');
-      expect(elencyConfigNode.environment()).to.eql('production');
+      expect(elencyConfigNode.appVersion).to.eql('1.1.1');
+      expect(elencyConfigNode.environment).to.eql('production');
     });
 
   });

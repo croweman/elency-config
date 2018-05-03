@@ -138,13 +138,13 @@ When configuration has been successfully retrieved, and assuming you have define
 
 In your `Retrieved` function you may want to perform setup tasks etc.
 
-Once your `Retrieved` function has been called the client will have the following methods available:
+Once your `Retrieved` function has been called the client will have the following methods and properties available:
 
-### functions
+### methods and properties
  - `Reset`: A method that stops refreshing if enabled.
- - `AppVersion`: A method that returns the `version` of the retrieved configuration.
- - `Environment`: A method that returns the `environment` of the retrieved configuration.
- - `ConfigurationId`: A method that returns the `configurationId` of the retrieved configuration.
+ - `AppVersion`: A property that returns the `version` of the retrieved configuration.
+ - `Environment`: A property that returns the `environment` of the retrieved configuration.
+ - `ConfigurationId`: A property that returns the `configurationId` of the retrieved configuration.
  - `Get`: A method that accepts a `key` argument and returns the value of the key or `null` if the key cannot be found.
  - `GetAllKeys`: A method that returns all of the `keys` within the configuration.
  - `Refresh`: A method that can be called to refresh the configuration.
