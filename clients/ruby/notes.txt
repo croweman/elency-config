@@ -1,0 +1,32 @@
+http://guides.rubygems.org/make-your-own-gem/#your-first-gem
+
+https://github.com/macournoyer/thin/tree/master/lib/thin
+
+Digest::SHA256.base64digest(phrase)
+
+
+key = 'key'
+data = 'The quick brown fox jumps over the lazy dog'
+digest = OpenSSL::Digest.new('sha1')
+
+OpenSSL::HMAC.digest(digest, key, data)
+#=> "\xDE|\x9B\x85\xB8\xB7\x8A\xA6\xBC\x8Az6\xF7\n\x90p\x1C\x9D\xB4\xD9"
+
+OpenSSL::HMAC.hexdigest(digest, key, data)
+#=> "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9"
+
+
+running:
+
+irb
+
+require 'ElencyConfig'
+a = ElencyConfig.createClient
+a.hi
+
+
+https://www.engineyard.com/blog/its-raining-gems
+
+Example local configuration needs hash
+
+https://docs.ruby-lang.org/en/2.0.0/Hash.html
