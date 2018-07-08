@@ -2,7 +2,7 @@ require 'minitest/autorun'
 require 'ElencyConfig/Client'
 
 class ElencyConfigClientTest < Minitest::Test
-  def test_init_raises_an_error_if_provide_with_undefined_Configuration
+  def test_init_raises_an_error_if_provided_with_undefined_Configuration
     begin
         client = Client.new()
         client.init(nil)
