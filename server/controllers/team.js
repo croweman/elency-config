@@ -328,7 +328,14 @@ module.exports = (config, repositories, encryption) => {
 
     try {
       const app = await dataRetrieval.getApp(req.params.appId);
-      const viewData = { app };
+      let teamsAndApps = await domainInstance.appEnvironment.getTeamsAndApps();
+
+      const viewData = { 
+        app,
+        teams: teamsAndApps.teams,
+        apps: teamsAndApps.apps
+      };
+
       viewData.keys = await repositories.key.findAll();
       return await res.renderView({ view: 'apps/environment-create', viewData });
     }
@@ -346,6 +353,10 @@ module.exports = (config, repositories, encryption) => {
       const key = await dataRetrieval.getKey(body.keyId);
       let environment = body.environment.trim();
       let JSONSchema = body.JSONSchema.trim();
+      let allowInheritance = body.allowInheritance || false;
+      allowInheritance = (allowInheritance === "true" || allowInheritance === true);
+      let teamInheritance = body.teamInheritance ? body.teamInheritance : [];
+      let appInheritance = body.appInheritance ? body.appInheritance : [];
 
       if (!validateSchema(JSONSchema)) {
         return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
@@ -367,7 +378,10 @@ module.exports = (config, repositories, encryption) => {
         keyName: key.keyName,
         versions: [],
         environment,
-        JSONSchema
+        JSONSchema,
+        allowInheritance,
+        teamInheritance,
+        appInheritance
       });
 
       if (!appEnvironment.isValid()) {
@@ -396,11 +410,19 @@ module.exports = (config, repositories, encryption) => {
 
     try {
       const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, req.params.environment);
+      let teamsAndApps = await domainInstance.appEnvironment.getTeamsAndApps();
+      let selectedTeamsAndApps = domainInstance.appEnvironment.getSelectedTeamsAndApps(teamsAndApps, appEnvironment);
+
       const viewData = {
-        appEnvironment
+        appEnvironment,
+        teams: teamsAndApps.teams,
+        apps: teamsAndApps.apps,
+        selectedTeamsAndApps
       };
+
       viewData.keys = await repositories.key.findAll();
       viewData.appEnvironment.updated = moment(appEnvironment.updated).format('DD/MM/YYYY HH:mm:ss');
+
       return await res.renderView({ view: 'apps/environment-update', viewData });
     }
     catch (err) {
@@ -417,6 +439,10 @@ module.exports = (config, repositories, encryption) => {
       const appEnvironment = await dataRetrieval.getAppEnvironment(req.params.appId, originalEnvironment);
       const key = await dataRetrieval.getKey(body.keyId);
       const JSONSchema = body.JSONSchema.trim();
+      let allowInheritance = body.allowInheritance || false;
+      allowInheritance = (allowInheritance === "true" || allowInheritance === true);
+      let teamInheritance = body.teamInheritance ? body.teamInheritance : [];
+      let appInheritance = body.appInheritance ? body.appInheritance : [];
 
       if (!validateSchema(JSONSchema)) {
         return res.status(200).send({id: 'JSONSchema', error: 'The JSON Schema you have specified is not valid JSON'});
@@ -425,6 +451,9 @@ module.exports = (config, repositories, encryption) => {
       appEnvironment.environment = body.environment;
       appEnvironment.keyId = key.keyId;
       appEnvironment.keyName = key.keyName;
+      appEnvironment.allowInheritance = allowInheritance;
+      appEnvironment.teamInheritance = teamInheritance;
+      appEnvironment.appInheritance = appInheritance;
 
       if (JSONSchema.length > 0) {
         try {

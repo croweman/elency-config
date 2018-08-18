@@ -54,6 +54,38 @@ html(lang='en')
             textarea.form-control(id='JSONSchema', cols='2', rows='5', value='', placeholder='Optional, must be a valid JSON Schema')
             .form-control-feedback(id='JSONSchema-info')
 
+        h3.breaker Configuration inheritance
+
+        div.form-group.col-md-12
+          div 
+            | By default when inheritance is allowed and no teams/apps are specified any app in the same environment can inherit the configuration!
+          br
+          div.form-check
+            label.form-check-label
+              input#allowInheritance.form-check-input(type="checkbox")
+              |  Allow inheritance
+          div#inheritance-rules-hidden
+
+            div.panel.panel-default.permissions.col-md-12
+              div.permissions-heading
+                | Teams
+              div#team-inheritance
+
+              #add-team.form-group.col-md-12.team
+                label.form-control-label(for='team') Add a team:
+                input#team.typeahead.form-control.col-md-8(type='text', autocomplete='off', placeholder="Select a team", value='', data-errormessage="Select a valid team")
+                #team-info.form-control-feedback
+
+            div.panel.panel-default.permissions.col-md-12
+              div.permissions-heading
+                | Apps
+              div#app-inheritance
+
+              #add-app.form-group.col-md-12.team
+                label.form-control-label(for='app') Add an app:
+                input#app.typeahead.form-control.col-md-8(type='text', autocomplete='off', placeholder="Select an app", value='', data-errormessage="Select a valid app")
+                #app-info.form-control-feedback
+          
         div.text-right
           button#createAppEnvironment.btn.btn-primary(type="submit", data-loading-text="<i class='icon-spinner icon-spin'></i> Creating app environment") Create app environment
 
@@ -64,6 +96,11 @@ html(lang='en')
     include ../includes/scripts.pug
 
     script(type='text/javascript').
+      var availableTeams = !{JSON.stringify(teams)};
+      var availableApps = !{JSON.stringify(apps)};
+      var teamInheritanceIndex = 0;
+      var appInheritanceIndex = 0;
+
       $(function() {
           elencyConfig.createAppEnvironment();
       });

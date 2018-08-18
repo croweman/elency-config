@@ -9,6 +9,7 @@ elency-config is a `http application` built on the `node.js` platform to provide
   - [Linux based system](#linux)
   - [Docker](#docker)
 - [Configuration](#configuration)
+- [MongoDb](#mongodb)
 - [How does it work?](#how-does-it-work)
 - [Security](#security)
 - [Ping endpoint](#ping)
@@ -214,6 +215,16 @@ node:
     ```
 
     The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files">here</a>.
+
+---
+
+## MongoDB<a name="mongodb"></a>
+
+The data storage mechanism used is mongoDB.  elency-config is dependent on a number of collections and indexes.
+
+If the connection string you are using is locked down to a specific account and this account does not have permissions to create indexes then these will have to be manually created!
+
+Index definitions can be found <a href="./indexes.yaml">here</a>.
 
 ---
 

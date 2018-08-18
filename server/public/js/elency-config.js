@@ -360,6 +360,30 @@ var elencyConfig = function() {
     return appConfigurationPermissions;
   };
 
+  self.getSelectedTeamInheritance = function() {
+    var teamInheritance = [];
+    var matches = $('#team-inheritance .team-inheritance-item');
+
+    for (var i = 0; i < matches.length; i++) {
+      var current = $(matches[i]);
+      teamInheritance.push(current.data().teamid);
+    };
+
+    return teamInheritance;
+  };
+
+  self.getSelectedAppInheritance = function() {
+    var appInheritance = [];
+    var matches = $('#app-inheritance .app-inheritance-item');
+
+    for (var i = 0; i < matches.length; i++) {
+      var current = $(matches[i]);
+      appInheritance.push(current.data().appid);
+    };
+
+    return appInheritance;
+  };
+
   self.settings = function() {
     var useLdap = $('#useLdap');
     var uri;
@@ -566,6 +590,46 @@ var elencyConfig = function() {
     $('#app').typeahead('val', '');
   };
 
+  self.addTeamInheritanceItem = function(teamId, displayText) {
+    teamInheritanceIndex++;
+
+    var existingItems = $('#team-inheritance .team-inheritance-item');
+
+    for (var i = 0; i < existingItems.length; i++) {
+      if ($(existingItems[i]).data().teamid === teamId) {
+        $('#team').typeahead('val', '');
+        return;
+      }
+    }
+
+    var id = 'team-inheritance-' + teamInheritanceIndex;
+    var selector = '#' + id;
+    var html = '<div id="' + id + '" class="team team-inheritance-item col-md-12" data-teamid="' + teamId + '"><button class="app-delete close" type="button" title="Remove" onclick="javascript:$(\'' + selector + '\').remove();elencyConfig.teamInheritanceSetup();">×</button><div class="col-md-11">' +  displayText + '</div></div>';
+    $('#team-inheritance').append(html);
+    self.teamInheritanceSetup();
+    $('#team').typeahead('val', '');
+  };
+
+  self.addAppInheritanceItem = function(appId, displayText) {
+    appInheritanceIndex++;
+
+    var existingInheritance = $('#app-inheritance .app-inheritance');
+
+    for (var i = 0; i < existingInheritance.length; i++) {
+      if ($(existingInheritance[i]).data().appid === appId) {
+        $('#app').typeahead('val', '');
+        return;
+      }
+    }
+
+    var id = 'app-inheritance-' + appInheritanceIndex;
+    var selector = '#' + id;
+    var html = '<div id="' + id + '" class="team app-inheritance-item col-md-12" data-appid="' + appId + '"><button class="app-delete close" type="button" title="Remove" onclick="javascript:$(\'' + selector + '\').remove();elencyConfig.appInheritanceSetup();">×</button><div class="col-md-11">' +  displayText + '</div></div>';
+    $('#app-inheritance').append(html);
+    self.appInheritanceSetup();
+    $('#app').typeahead('val', '');
+  };
+
   self.getIdFromLookupValue = function(value) {
     var id = value.substr(0, value.length - 1);
     return id.substr(id.lastIndexOf('(') + 1);
@@ -692,7 +756,9 @@ var elencyConfig = function() {
       limit: 10
     });
 
-    $('#role').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#role').unbind(selector);
+    $('#role').bind(selector, function(obj, datum) {
       self.addRolePermission(self.getIdFromLookupValueRole(datum), datum);
     });
   };
@@ -708,11 +774,13 @@ var elencyConfig = function() {
 
     $('#team').typeahead(options, {
       name: 'teams',
-      source: self.lookupMatcher(availableTeams, '#team-permissions .team-permission', 'teamid'),
+      source: self.lookupMatcher(availableTeams, '#team-inheritance .team-inheritance-item', 'teamid'),
       limit: 10
     });
 
-    $('#team').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#team').unbind(selector);
+    $('#team').bind(selector, function(obj, datum) {
       self.addTeamPermission(self.getIdFromLookupValue(datum), datum);
     });
   };
@@ -732,8 +800,55 @@ var elencyConfig = function() {
       limit: 10
     });
 
-    $('#app').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#app').unbind(selector);
+    $('#app').bind(selector, function(obj, datum) {
       self.addAppPermission(self.getIdFromLookupValue(datum), datum);
+    });
+
+  };
+
+  self.teamInheritanceSetup = function() {
+    var options = {
+      hint: true,
+      highlight: true,
+      minLength: 0
+    };
+
+    $('#team').typeahead('destroy','NoCached');
+
+    $('#team').typeahead(options, {
+      name: 'teams',
+      source: self.lookupMatcher(availableTeams, '#team-inheritance .team-inheritance-item', 'teamid'),
+      limit: 10
+    });
+
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#team').unbind(selector);
+    $('#team').bind(selector, function(obj, datum) {
+      self.addTeamInheritanceItem(self.getIdFromLookupValue(datum), datum);
+    });
+  };
+
+  self.appInheritanceSetup = function() {
+    var options = {
+      hint: true,
+      highlight: true,
+      minLength: 0
+    };
+
+    $('#app').typeahead('destroy','NoCached')
+
+    $('#app').typeahead(options, {
+      name: 'apps',
+      source: self.lookupMatcher(availableApps, '#app-inheritance .app-inheritance-item', 'appid'),
+      limit: 10
+    });
+
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#app').unbind(selector);
+    $('#app').bind(selector, function(obj, datum) {
+      self.addAppInheritanceItem(self.getIdFromLookupValue(datum), datum);
     });
 
   };
@@ -1117,6 +1232,15 @@ var elencyConfig = function() {
     var JSONSchema = self.monitor('JSONSchema');
     var teamId = $('#teamid').val();
     var appId = $('#appid').val();
+    
+    $('#allowInheritance').on('change', function() {
+      if ($(this).is(":checked")) {
+        $('#inheritance-rules-hidden').css('display', 'block');
+      } 
+      else {
+        $('#inheritance-rules-hidden').css('display', 'none');
+      }
+    });
 
     self.fireActionOn('createAppEnvironment', {
       ajax: {
@@ -1125,7 +1249,10 @@ var elencyConfig = function() {
           return {
             environment: environment.value(),
             keyId: keyId.value(),
-            JSONSchema: JSONSchema.value()
+            JSONSchema: JSONSchema.value(),
+            allowInheritance: $('#allowInheritance').is(':checked'),
+            teamInheritance: self.getSelectedTeamInheritance(),
+            appInheritance: self.getSelectedAppInheritance()
           };
         },
         success: function(data) {
@@ -1145,6 +1272,9 @@ var elencyConfig = function() {
         }
       }
     });
+
+    self.teamInheritanceSetup();
+    self.appInheritanceSetup();
   };
 
   self.updateAppEnvironment = function() {
@@ -1155,6 +1285,15 @@ var elencyConfig = function() {
     var originalEnvironment = $('#originalenvironment').val();
     var JSONSchema = self.monitor('JSONSchema');
 
+    $('#allowInheritance').on('change', function() {
+      if ($(this).is(":checked")) {
+        $('#inheritance-rules-hidden').css('display', 'block');
+      } 
+      else {
+        $('#inheritance-rules-hidden').css('display', 'none');
+      }
+    });
+
     self.fireActionOn('createAppEnvironment', {
       ajax: {
         url: '/team/' + teamId + '/app/' + appId + '/environment/'  + originalEnvironment + '/update',
@@ -1162,7 +1301,10 @@ var elencyConfig = function() {
           return {
             environment: environment.value(),
             keyId: keyId.value(),
-            JSONSchema: JSONSchema.value()
+            JSONSchema: JSONSchema.value(),
+            allowInheritance: $('#allowInheritance').is(':checked'),
+            teamInheritance: self.getSelectedTeamInheritance(),
+            appInheritance: self.getSelectedAppInheritance()
           };
         },
         success: function(data) {
@@ -1182,6 +1324,9 @@ var elencyConfig = function() {
         }
       }
     });
+
+    self.teamInheritanceSetup();
+    self.appInheritanceSetup();
   };
 
   self.deleteItem = function(id) {
@@ -2368,6 +2513,22 @@ var elencyConfig = function() {
     setupEventHandlers();
   }
 
+  self.environment = function() {
+    var button = $('#showInheritance');
+    var el = $('#inheritance');
+
+    button.on('click', function() {
+      if (el.hasClass('hide')) {
+        el.removeClass('hide');
+        button.text('Hide');
+      } 
+      else {
+        el.addClass('hide');
+        button.text('Show');
+      }
+    });
+  };
+
   self.audit = function() {
     var paginationContainerIds = [ 'pagination-container-1', 'pagination-container-2' ];
     var htmlContainerId = 'paginated-content';
@@ -2480,7 +2641,10 @@ var elencyConfig = function() {
     rolePermissionSetup: self.rolePermissionSetup,
     teamPermissionSetup: self.teamPermissionSetup,
     appPermissionSetup: self.appPermissionSetup,
+    teamInheritanceSetup: self.teamInheritanceSetup,
+    appInheritanceSetup: self.appInheritanceSetup,
     pagination: self.pagination,
-    audit: self.audit
+    audit: self.audit,
+    environment: self.environment
   };
 }();

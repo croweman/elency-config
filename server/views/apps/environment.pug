@@ -61,6 +61,37 @@ html(lang='en')
           - compareUrl = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId + '/environment/' + appEnvironment.environment + '/configuration/compare'
           a#compare.btn.btn-primary.breaker.no-left-margin(role='button', aria-pressed="true", href=compareUrl) Compare
 
+      if appEnvironment.allowInheritance && appEnvironment.allowInheritance === true
+        h3.breaker Configuration inheritance
+          button#showInheritance.btn.btn-primary.breaker(type="button") Show
+
+        div.form-group.col-md-6
+          div.form-check
+            div#inheritance.hide
+              div.strong.heading
+                | Teams
+              if appEnvironment.teamInheritance.length > 0
+                | The following teams can inherit this configuration:
+                ul
+                  each team in appEnvironment.teamInheritance
+                    - url = '/team/' + appEnvironment.teamId
+                    li
+                      a(href=url)= appEnvironment.teamName
+              else
+                | All teams can inherit this configuration.
+
+              div.strong.heading
+                | Apps
+              if appEnvironment.appInheritance.length > 0
+                | The following apps can inherit this configuration:
+                ul
+                  each app in appEnvironment.appInheritance
+                    - url = '/team/' + appEnvironment.teamId + '/app/' + appEnvironment.appId
+                    li
+                      a(href=url)= appEnvironment.appName
+              else
+                | All apps can inherit this configuration.
+
       h3.breaker Configuration versions
 
       +search(placeholder='Find a version...')
@@ -87,6 +118,7 @@ html(lang='en')
 
     script(type='text/javascript').
       $(function() {
+        elencyConfig.environment();
         elencyConfig.search('versions', [0]);
       });
 

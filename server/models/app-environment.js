@@ -14,6 +14,9 @@ class AppEnvironment {
     this.updated = obj.updated || new Date();
     this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
     this.JSONSchema = obj.JSONSchema || '';
+    this.allowInheritance = obj.allowInheritance || false;
+    this.teamInheritance = obj.teamInheritance || [];
+    this.appInheritance = obj.appInheritance || [];
 
     this.environment = this.environment.trim();
     this.keyId = this.keyId.trim();

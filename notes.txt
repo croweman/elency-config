@@ -1,0 +1,13 @@
+app environment
+
+- allow/dissalow inheritance
+- specify teams
+- or apps
+
+when removing inheritance error if there are already apps inheriting, or any configurations already inheriting should continue?
+when editing can you remove inheritance on app configuration if in use?
+
+app allow to pick anything that allows inheiritance
+what to do if no longer allows inheritance?
+
+specify latest or specific?
