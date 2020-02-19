@@ -1,17 +1,13 @@
 #!/bin/bash
 
-npm list --depth 0 --global v8-profiler
-
-if [ $? -neq 0 ]
-then
-  npm install v8-profiler -g
+package='v8-profiler'
+if [ `npm list -g | grep -c $package` -eq 0 ]; then
+    npm install $package -g --no-shrinkwrap
 fi
 
-npm list --depth 0 --global pm2
-
-if [ $? -neq 0 ]
-then
-  npm install pm2 -g
+package='pm2'
+if [ `npm list -g | grep -c $package` -eq 0 ]; then
+    npm install $package -g --no-shrinkwrap
 fi
 
 pm2 startup systemd

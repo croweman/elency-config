@@ -190,7 +190,7 @@ The server is dependent on 4 configuration files. These files and content (encry
 
 4. run the `encrypt-configuration-files` tool
 
-    Execute either the node or bash `encrypt-configuration-files` tool to encrypt and decrypt the configuration files (`config.json` and `keys.json).
+    Execute either the node or bash `encrypt-configuration-files` tool to encrypt and decrypt the configuration files (`config.json` and `keys.json`).
 
     node:
 
@@ -204,7 +204,7 @@ The server is dependent on 4 configuration files. These files and content (encry
 
     The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files.js">here</a>.
 
-node:
+    node:
 
     ```
     # encrypt
@@ -283,7 +283,7 @@ The endpoint will return a `200` status code and a `pong` in the response.
 
 ---
 
-## Health endpoint<a name="ping"></a>
+## Health endpoint<a name="health"></a>
 
 A health endpoint is provided so that you can determine whether the application is up and exposing routes but also `healthy` e.g. http://address/private/health.
 
