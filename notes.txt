@@ -11,3 +11,5 @@ app allow to pick anything that allows inheiritance
 what to do if no longer allows inheritance?
 
 specify latest or specific?
+
+actually have index creation script and update readme to reference it
