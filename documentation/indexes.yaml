@@ -1,141 +1,330 @@
-- collection: app
-  keys:
-    appId: 1
-  options:
-    unique: true
-- collection: app
-  keys:
-    appId: 1
-    teamId: 1
-  options:
-    background: true
-- collection: app
-  keys:
-    appName: 1
-  options:
-    unique: true
-- collection: appEnvironment
-  keys:
-    appId: 1
-    environment: 1
-  options:
-    unique: true
-- collection: appEnvironment
-  keys:
-    teamId: 1
-  options:
-    background: true
-- collection: appEnvironment
-  keys:
-    keyId: 1
-  options:
-    background: true
-- collection: audit
-  keys:
-    userId: 1
-    changed: -1
-  options:
-    background: true
-- collection: audit
-  keys:
-    action: 1
-    changed: -1
-  options:
-    background: true
-- collection: key
-  keys:
-    keyId: 1
-  options:
-    unique: true
-- collection: key
-  keys:
-    keyName: 1
-  options:
-    unique: true
-- collection: configuration
-  keys:
-    appId: 1
-    version: 1
-    environment: 1
-    published: 1
-    updated: -1
-  options:
-    background: true
-- collection: configRetrieval
-  keys:
-    configurationId: 1
-    retrieved: -1
-  options:
-    background: true
-- collection: team
-  keys:
-    teamId: 1
-  options:
-    unique: true
-- collection: team
-  keys:
-    teamName: 1
-  options:
-    unique: true
-- collection: tokens
-  keys:
-    accessToken: 1
-    expires: 1
-  options:
-    background: true
-- collection: tokens
-  keys:
-    expires: 1
-  options:
-    expireAfterSeconds: 0
-- collection: user
-  keys:
-    userId: 1
-  options:
-    unique: true
-- collection: user
-  keys:
-    userName: 1
-  options:
-    unique: true
-- collection: user
-  keys:
-    favourites.teams.teamId: 1
-  options:
-    unique: false
-    background: true
-- collection: user
-  keys:
-    favourites.apps.appId: 1
-  options:
-    unique: false
-    background: true
-- collection: user
-  keys:
-    appConfigurationPermissions.id: 1
-    appConfigurationPermissions.environment: 1
-  options:
-    unique: false
-    background: true
-- collection: role
-  keys:
-    roleId: 1
-  options:
-    unique: true
-- collection: role
-  keys:
-    roleName: 1
-  options:
-    unique: true
-- collection: role
-  keys:
-    appConfigurationPermissions.id: 1
-    appConfigurationPermissions.environment: 1
-  options:
-    unique: false
-    background: true
-- collection: settings
-  keys:
-    settingsId: 1
-  options:
-    unique: true
+db.runCommand(
+{
+	"createIndexes" : "app",
+	"indexes" : [
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"appId" : 1
+			},
+			"name" : "appId_1",
+			"ns" : "elency-config.app"
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"appId" : 1,
+				"teamId" : 1
+			},
+			"name" : "appId_1_teamId_1",
+			"ns" : "elency-config.app",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"appName" : 1
+			},
+			"name" : "appName_1",
+			"ns" : "elency-config.app"
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "appEnvironment",
+	"indexes" : [
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"appId" : 1,
+				"environment" : 1
+			},
+			"name" : "appId_1_environment_1",
+			"ns" : "elency-config.appEnvironment"
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"teamId" : 1
+			},
+			"name" : "teamId_1",
+			"ns" : "elency-config.appEnvironment",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"keyId" : 1
+			},
+			"name" : "keyId_1",
+			"ns" : "elency-config.appEnvironment",
+			"background" : true
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "audit",
+	"indexes" : [
+		{
+			"v" : 2,
+			"key" : {
+				"action" : 1,
+				"changed" : -1
+			},
+			"name" : "action_1_changed_-1",
+			"ns" : "elency-config.audit",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"userId" : 1,
+				"changed" : -1
+			},
+			"name" : "userId_1_changed_-1",
+			"ns" : "elency-config.audit",
+			"background" : true
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "configRetrieval",
+	"indexes" : [
+		{
+			"v" : 2,
+			"key" : {
+				"configurationId" : 1,
+				"retrieved" : -1
+			},
+			"name" : "configurationId_1_retrieved_-1",
+			"ns" : "elency-config.configRetrieval",
+			"background" : true
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "configuration",
+	"indexes" : [
+		{
+			"v" : 2,
+			"key" : {
+				"appId" : 1,
+				"version" : 1,
+				"environment" : 1,
+				"published" : 1,
+				"updated" : -1
+			},
+			"name" : "appId_1_version_1_environment_1_published_1_updated_-1",
+			"ns" : "elency-config.configuration",
+			"background" : true
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "key",
+	"indexes" : [
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"keyId" : 1
+			},
+			"name" : "keyId_1",
+			"ns" : "elency-config.key"
+		},
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"keyName" : 1
+			},
+			"name" : "keyName_1",
+			"ns" : "elency-config.key"
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "role",
+	"indexes" : [
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"roleName" : 1
+			},
+			"name" : "roleName_1",
+			"ns" : "elency-config.role"
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"appConfigurationPermissions.id" : 1,
+				"appConfigurationPermissions.environment" : 1
+			},
+			"name" : "appConfigurationPermissions.id_1_appConfigurationPermissions.environment_1",
+			"ns" : "elency-config.role",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"roleId" : 1
+			},
+			"name" : "roleId_1",
+			"ns" : "elency-config.role"
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "sessions",
+	"indexes" : [
+		{
+			"v" : 2,
+			"key" : {
+				"expires" : 1
+			},
+			"name" : "expires_1",
+			"ns" : "elency-config.sessions",
+			"expireAfterSeconds" : 0
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "settings",
+	"indexes" : [
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"settingsId" : 1
+			},
+			"name" : "settingsId_1",
+			"ns" : "elency-config.settings"
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "team",
+	"indexes" : [
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"teamName" : 1
+			},
+			"name" : "teamName_1",
+			"ns" : "elency-config.team"
+		},
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"teamId" : 1
+			},
+			"name" : "teamId_1",
+			"ns" : "elency-config.team"
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "tokens",
+	"indexes" : [
+		{
+			"v" : 2,
+			"key" : {
+				"accessToken" : 1,
+				"expires" : 1
+			},
+			"name" : "accessToken_1_expires_1",
+			"ns" : "elency-config.tokens",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"expires" : 1
+			},
+			"name" : "expires_1",
+			"ns" : "elency-config.tokens",
+			"expireAfterSeconds" : 0
+		}
+	]
+}
+)
+db.runCommand(
+{
+	"createIndexes" : "user",
+	"indexes" : [
+		{
+			"v" : 2,
+			"key" : {
+				"favourites.teams.teamId" : 1
+			},
+			"name" : "favourites.teams.teamId_1",
+			"ns" : "elency-config.user",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"userName" : 1
+			},
+			"name" : "userName_1",
+			"ns" : "elency-config.user"
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"appConfigurationPermissions.id" : 1,
+				"appConfigurationPermissions.environment" : 1
+			},
+			"name" : "appConfigurationPermissions.id_1_appConfigurationPermissions.environment_1",
+			"ns" : "elency-config.user",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"key" : {
+				"favourites.apps.appId" : 1
+			},
+			"name" : "favourites.apps.appId_1",
+			"ns" : "elency-config.user",
+			"background" : true
+		},
+		{
+			"v" : 2,
+			"unique" : true,
+			"key" : {
+				"userId" : 1
+			},
+			"name" : "userId_1",
+			"ns" : "elency-config.user"
+		}
+	]
+}
+)
