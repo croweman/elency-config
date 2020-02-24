@@ -25,7 +25,7 @@ npm test
 checkError $?
 
 cd ./server
-npm run startlocal & nodeprocessid=$!
+npm run startlocalwithldapsupport & nodeprocessid=$!
 
 cd ..
 

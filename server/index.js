@@ -3,7 +3,16 @@ const logger = require('./lib/logger');
 
 async function startup() {
   try {
-    const application = await app.create();
+    let application = await app.create();
+    let key, cert;
+
+    if (process.env.ELENCY_CONFIG_RUNNING_LOCALLY) {
+      const fs = require('fs');
+      const https = require('https');
+      key = fs.readFileSync('./development/key.pem');
+      cert = fs.readFileSync('./development/cert.pem');
+      application = https.createServer({ key: key, cert: cert }, application)
+    }
 
     const port = process.env.PORT || 3000;
     const server = application.listen(port, '0.0.0.0', () => {
