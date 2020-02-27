@@ -24,3 +24,6 @@ https://ksearch.wordpress.com/2017/08/22/generate-and-import-a-self-signed-ssl-c
 when building update version in ui
 
 npm audit?
+
+YOU CANT INHERIT YOURSELF
+BASE MUST BE INCLUDED IN COMPARE!!!!
