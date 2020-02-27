@@ -17,3 +17,5 @@ actually have index creation script and update readme to reference it
 
 https://medium.com/@nitinpatel_20236/how-to-create-an-https-server-on-localhost-using-express-366435d61f28
 https://ksearch.wordpress.com/2017/08/22/generate-and-import-a-self-signed-ssl-certificate-on-mac-osx-sierra/
+
+when building update version in ui
