@@ -23,7 +23,25 @@ https://ksearch.wordpress.com/2017/08/22/generate-and-import-a-self-signed-ssl-c
 
 when building update version in ui
 
+node version and in documentation
 npm audit?
+
+when viewing config (not editing) should show you inheritied stuff and have column to indicate where inherited from????????????
+
+MESSAGING - WHEN SAVING INHERITED CONFIG TO INFORM EDITOR YOU COULD IMPACT APPLICATIONS?
 
 YOU CANT INHERIT YOURSELF
 BASE MUST BE INCLUDED IN COMPARE!!!!
+What if you delete a config, should there be verification somehow if something else using it
+
+
+=============
+=== BUGS ====
+=============
+
+BUG - when 1 team assigned to role and click to add it lists the same role not filtered alhtough you can't add it twice/
+
+Upgrade to latest typeahead, will require js changes?
+
+
+
