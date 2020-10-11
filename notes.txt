@@ -35,13 +35,5 @@ BASE MUST BE INCLUDED IN COMPARE!!!!
 What if you delete a config, should there be verification somehow if something else using it
 
 
-=============
-=== BUGS ====
-=============
-
-BUG - when 1 team assigned to role and click to add it lists the same role not filtered alhtough you can't add it twice/
-
-Upgrade to latest typeahead, will require js changes?
-
 
 

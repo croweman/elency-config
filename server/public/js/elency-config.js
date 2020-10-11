@@ -657,6 +657,7 @@ var elencyConfig = function() {
       });
 
       var selectedItems = $(selector);
+
       var selections = [];
       for (var i = 0; i < selectedItems.length; i++) {
         selections.push($(selectedItems[i]).data()[idAttr])
@@ -774,7 +775,7 @@ var elencyConfig = function() {
 
     $('#team').typeahead(options, {
       name: 'teams',
-      source: self.lookupMatcher(availableTeams, '#team-inheritance .team-inheritance-item', 'teamid'),
+      source: self.lookupMatcher(availableTeams, '#team-permissions .team-permission', 'teamid'),
       limit: 10
     });
 
