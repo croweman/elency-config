@@ -20,6 +20,7 @@ rm ./elency-config-server/public/js/elency-config_*
 rm ./elency-config-server/todo.txt
 rm -rf ./elency-config-server/configuration_files
 rm -rf ./elency-config-server/configuration_files_from_secure_location
+rm -rf ./elency-config-server/development
 
 cd ./elency-config-server
 npm install --production
