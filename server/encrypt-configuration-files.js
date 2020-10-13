@@ -59,13 +59,13 @@ else {
 function rsaEncrypt(value, relativeOrAbsolutePathToPublicKey) {
   const absolutePath = path.resolve(relativeOrAbsolutePathToPublicKey);
   const publicKey = fs.readFileSync(absolutePath, "utf8");
-  return crypto.publicEncrypt(publicKey, new Buffer(value)).toString("base64");
+  return crypto.publicEncrypt(publicKey, Buffer.from(value)).toString("base64");
 }
 
 function rsaDecrypt(value, relativeOrAbsolutePathToPrivateKey) {
   const absolutePath = path.resolve(relativeOrAbsolutePathToPrivateKey);
   const privateKey = fs.readFileSync(absolutePath, "utf8");
-  return crypto.privateDecrypt(privateKey, new Buffer(value, "base64")).toString("utf8");
+  return crypto.privateDecrypt(privateKey, Buffer.from(value, "base64")).toString("utf8");
 }
 
 function aes256cbcEncrypt(value, password){

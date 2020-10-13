@@ -1,6 +1,6 @@
 {
   "name": "elency-config-node-server",
-  "version": "0.0.16-beta",
+  "version": "0.0.17-beta",
   "description": "elency-config - node server",
   "main": "index.js",
   "repository": {
@@ -15,7 +15,8 @@
   ],
   "scripts": {
     "start": "node ./index.js",
-    "startlocal": "ELENCY_CONFIG_RUN_OVER_HTTP=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
+    "startlocal": "ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
+    "startlocalwithldapsupport": "ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
     "test": "./node_modules/mocha/bin/_mocha ./specs/**/*-spec.js --timeout 5000"
   },
   "author": "Lee Crowe",
@@ -33,7 +34,7 @@
     "jquery": "~3.2.1",
     "ldapjs": "~1.0.1",
     "moment": "~2.21.0",
-    "mongodb": "~2.2.33",
+    "mongodb": "~3.5.2",
     "passport": "~0.4.0",
     "passport-local": "~1.0.0",
     "pug": "~2.0.0-rc.4",

@@ -143,7 +143,7 @@ function formatGUID(objectGUID) {
     return objectGUID;
   }
 
-  let data = new Buffer(objectGUID, 'binary');
+  let data = Buffer.from(objectGUID, 'binary');
   let template = '{3}{2}{1}{0}-{5}{4}-{7}{6}-{8}{9}-{10}{11}{12}{13}{14}{15}';
 
   for (let i = 0; i < data.length; i++) {

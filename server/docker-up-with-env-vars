@@ -9,7 +9,7 @@ cd ./configuration_files_from_secure_location
 openssl genrsa -out ./elency-config.private.pem 2048
 openssl rsa -in ./elency-config.private.pem -outform PEM -pubout -out ./elency-config.public.pem
 
-echo "{ \"mongoUrl\": \"mongodb://mongodb:27017/elency-config\", \"HMACAuthorizationKey\": \"NGM5YjYwZjhjZmQ4NGE5YWE1MmVhMTg3\", \"exposeUIRoutes\": true, \"maxJsonPostSize\": \"1mb\", \"runOverHttp\": true, \"sessionLifeTimeInMinutes\": 20160, \"validateAuthorizationTokenWindow\": true, \"authorizationTokenValidationWindowInSeconds\": 300 }" >> config.json
+echo "{ \"mongoUrl\": \"mongodb://mongodb:27017/elency-config\", \"HMACAuthorizationKey\": \"NGM5YjYwZjhjZmQ4NGE5YWE1MmVhMTg3\", \"exposeUIRoutes\": true, \"maxJsonPostSize\": \"1mb\", \"sessionLifeTimeInMinutes\": 20160, \"validateAuthorizationTokenWindow\": true, \"authorizationTokenValidationWindowInSeconds\": 300 }" >> config.json
 echo "{ \"configEncryptionKey\": \"MDdiNjYwNzFiYjk2NDgwMzliMTZkZmI1\" }" >> keys.json
 cat ./config.json
 CONFIG_FOLDER_PATH=./configuration_files_from_secure_location SEC_FOLDER_PATH=./configuration_files_from_secure_location node ../encrypt-configuration-files.js

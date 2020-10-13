@@ -692,7 +692,9 @@ var elencyConfig = function() {
       limit: 10
     });
 
-    $('#role').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#role').unbind(selector);
+    $('#role').bind(selector, function(obj, datum) {
       self.addRolePermission(self.getIdFromLookupValueRole(datum), datum);
     });
   };
@@ -712,7 +714,9 @@ var elencyConfig = function() {
       limit: 10
     });
 
-    $('#team').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#team').unbind(selector);
+    $('#team').bind(selector, function(obj, datum) {
       self.addTeamPermission(self.getIdFromLookupValue(datum), datum);
     });
   };
@@ -732,7 +736,9 @@ var elencyConfig = function() {
       limit: 10
     });
 
-    $('#app').bind('typeahead:selected  typeahead:autocompleted', function(obj, datum) {
+    var selector = 'typeahead:selected  typeahead:autocompleted';
+    $('#app').unbind(selector);
+    $('#app').bind(selector, function(obj, datum) {
       self.addAppPermission(self.getIdFromLookupValue(datum), datum);
     });
 

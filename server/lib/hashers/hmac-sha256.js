@@ -10,7 +10,7 @@ async function hash(value, password) {
 function hashSync(value, password) {
 
     return crypto
-      .createHmac('sha256', new Buffer(password, 'base64'))
+      .createHmac('sha256', Buffer.from(password, 'base64'))
       .update(value)
       .digest("base64");
 }

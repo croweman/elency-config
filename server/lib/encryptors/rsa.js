@@ -8,7 +8,7 @@ const crypto = require('crypto'),
 async function encrypt(value, relativeOrAbsolutePathToPublicKey) {
   const absolutePath = path.resolve(relativeOrAbsolutePathToPublicKey);
   const publicKey = fs.readFileSync(absolutePath, "utf8");
-  return crypto.publicEncrypt(publicKey, new Buffer(value)).toString("base64");
+  return crypto.publicEncrypt(publicKey, Buffer.from(value)).toString("base64");
 }
 
 async function decrypt(value, relativeOrAbsolutePathToPrivateKey) {
@@ -16,7 +16,7 @@ async function decrypt(value, relativeOrAbsolutePathToPrivateKey) {
   try {
     const absolutePath = path.resolve(relativeOrAbsolutePathToPrivateKey);
     const privateKey = fs.readFileSync(absolutePath, "utf8");
-    return crypto.privateDecrypt(privateKey, new Buffer(value, "base64")).toString("utf8");
+    return crypto.privateDecrypt(privateKey, Buffer.from(value, "base64")).toString("utf8");
   }
   catch(err) {
     debug(`RSA authorization header decryption error: ${err}`);
@@ -26,7 +26,7 @@ async function decrypt(value, relativeOrAbsolutePathToPrivateKey) {
 
 async function decryptFromPrivateKey(value, privateKey) {
   try {
-    return crypto.privateDecrypt(privateKey, new Buffer(value, "base64")).toString("utf8");
+    return crypto.privateDecrypt(privateKey, Buffer.from(value, "base64")).toString("utf8");
   }
   catch(err) {
     debug(`RSA authorization header decryption error: ${err}`);
