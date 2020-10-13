@@ -9,6 +9,9 @@ const ElencyConfigNode = require('../../../../clients/node');
 
 describe('node client and node server acceptance tests', () => {
 
+  // allow self signed certificates
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+
   const teamId = 'awesome-team';
   const teamName = 'awesome team';
   const appId = 'awesome-micro-service';
@@ -263,7 +266,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId,
         appVersion: '1.1.1',
         environment,
@@ -337,7 +340,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId,
         appVersion: '1.0.1',
         environment,
@@ -376,7 +379,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId,
         appVersion: '1.2.4',
         environment,
@@ -414,7 +417,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId,
         appVersion: '1.1.1',
         environment: 'test',
@@ -451,7 +454,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId: 'fishApp',
         appVersion: '1.1.1',
         environment,
@@ -488,7 +491,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId,
         appVersion: '1.1.1',
         environment,
@@ -525,7 +528,7 @@ describe('node client and node server acceptance tests', () => {
 
     before(async () => {
       elencyConfigNode = ElencyConfigNode({
-        uri: 'http://localhost:3000',
+        uri: 'https://localhost:3000',
         appId,
         appVersion: '1.1.1',
         environment,
