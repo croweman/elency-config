@@ -9,6 +9,7 @@ elency-config is a `http application` built on the `node.js` platform to provide
   - [Linux based system](#linux)
   - [Docker](#docker)
 - [Configuration](#configuration)
+- [MongoDb](#mongodb)
 - [How does it work?](#how-does-it-work)
 - [Security](#security)
 - [Ping endpoint](#ping)
@@ -40,12 +41,12 @@ Ideally in a `non` local/dev environment you should be setting the server up wit
 
 ### Linux based system<a name="linux"></a>
 
-1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.16-beta.tar.gz">elency-config-server</a>.
+1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.17-beta.tar.gz">elency-config-server</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
     ```
-    tar xzf ./elency-config-server-0.0.16-beta.tar.gz
+    tar xzf ./elency-config-server-0.0.17-beta.tar.gz
     ```
 
 3. Create and add the relevant config and security files to the `config` and `sec` directories.  Refer to the <a href="#configuration">Configuration</a> section.
@@ -84,7 +85,7 @@ version: '3'
 services:
   app:
     container_name: elency-config-server
-    image: croweman/elency-config-server:0.0.16-beta
+    image: croweman/elency-config-server:0.0.17-beta
     restart: "on-failure:10"
     volumes:
       - ./configuration_files:/app/configuration_files
@@ -189,7 +190,7 @@ The server is dependent on 4 configuration files. These files and content (encry
 
 4. run the `encrypt-configuration-files` tool
 
-    Execute either the node or bash `encrypt-configuration-files` tool to encrypt and decrypt the configuration files (`config.json` and `keys.json).
+    Execute either the node or bash `encrypt-configuration-files` tool to encrypt and decrypt the configuration files (`config.json` and `keys.json`).
 
     node:
 
@@ -214,6 +215,16 @@ node:
     ```
 
     The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files">here</a>.
+
+---
+
+## MongoDB<a name="mongodb"></a>
+
+The data storage mechanism used is mongoDB.  elency-config is dependent on a number of collections and indexes.
+
+If the connection string you are using is locked down to a specific account and this account does not have permissions to create indexes then these will have to be manually created!
+
+Index definitions can be found <a href="./indexes.yaml">here</a>.
 
 ---
 

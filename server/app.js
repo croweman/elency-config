@@ -97,7 +97,7 @@ function addUIRoutes(app, config, controllerInstances, repos, encryptionInstance
     // session lives by default for 14 days
     cookie: {
       maxAge,
-      secure: !config.runOverHttp
+      secure: true
     },
     secret: config.configEncryptionKey,
     resave: true,
