@@ -12,10 +12,10 @@ function generateId() {
 }
 
 function generateBase64Key(id) {
-  let base64Key = new Buffer(id).toString('base64');
+  let base64Key = Buffer.from(id).toString('base64');
   while (base64Key.length !== keyLength) {
     id = id.slice(0, -1);
-    base64Key = new Buffer(id).toString('base64');
+    base64Key = Buffer.from(id).toString('base64');
   }
   return base64Key;
 }

@@ -37,7 +37,7 @@ elency-config is built with <a href="https://nodejs.org/en/">nodejs</a> and has 
 
 This document assumes you will be installing `elency-config` on a `linux` based system.
 
-Ideally in a `non` local/dev environment you should be setting the server up with a `reverse proxy` in front of it over `https` and using valid `SSL certificates`.
+The server should be setup with a `reverse proxy` in front of it over `https` and using valid `SSL certificates`.
 
 ### Linux based system<a name="linux"></a>
 
@@ -150,15 +150,12 @@ The server is dependent on 4 configuration files. These files and content (encry
 
     Create a `config.json` file within the `config` folder and update its settings!
 
-    If running `locally` (over `http`, not `https`) the UI routes will not work if `runOverHttp` has a value of `false`, you will need to change this to `true`!
-
     ```json
     {
       "mongoUrl": "mongodb://localhost:27017/elency-config",
       "HMACAuthorizationKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "exposeUIRoutes": true,
       "maxJsonPostSize": "1mb",
-      "runOverHttp": false,
       "sessionLifeTimeInMinutes": 20160,
       "validateAuthorizationTokenWindow": true,
       "authorizationTokenValidationWindowInSeconds": 300
@@ -170,7 +167,6 @@ The server is dependent on 4 configuration files. These files and content (encry
      - `HMACAuthorizationKey`: This is the key used for creating authorization headers.  It should be a `32` character `base64` encoding string.
      - `exposeUIRoutes`: (default: false) Defines whether the admin interface should be exposed.
      - `maxJsonPostSize`: (default: `1mb`) Defines the max payload size that can be posted.
-     - `runOverHttp`: (default: false) Defines whether the web application is running over http (not https) and should create non secure cookies.
      - `sessionLifeTimeInMinutes`: (default: 20160 (14 days)) Defines the life time of a session cookie.
      - `validateAuthorizationTokenWindow`: (default: false) Defines whether the authorization token timestamp should be validated.
      - `authorizationTokenValidationWindowInSeconds`: (default: 300) Defines the authorization token validation window in seconds.
@@ -203,18 +199,6 @@ The server is dependent on 4 configuration files. These files and content (encry
     ```
 
     The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files.js">here</a>.
-
-node:
-
-    ```
-    # encrypt
-    ./encrypt-configuration-files
-
-    # decrypt
-    DECRYPT=true ./encrypt-configuration-files -d
-    ```
-
-    The file can be found <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/encrypt-configuration-files">here</a>.
 
 ---
 

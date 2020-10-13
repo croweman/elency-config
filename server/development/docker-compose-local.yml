@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  ldap:
+    container_name: ldap
+    build: ../specs/support/ldap-mock-server
+
+  nginx-proxy:
+    container_name: proxy
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+    networks:
+      default:
+        ipv4_address: 172.20.0.200
+
+  whoami:
+    container_name: whoami
+    image: jwilder/whoami
+    volumes:
+      - ./certs/ca.crt:/usr/local/share/ca-certificates/ca.crt
+    environment:
+      - VIRTUAL_HOST=whoami.vcap.me
+      - VIRTUAL_PORT=8000
+    extra_hosts:
+      - "elency-config.vcap.me:172.20.0.200"
+      - "whoami.vcap.me:172.20.0.200"
+
+  mongodb:
+    container_name: mongodb-elency-config-server
+    image: mongo:3.4
+    expose:
+      - 27017
+    # logging:
+    #   driver: none
+
+  app:
+    build: ..
+    container_name: elency-config-server
+    restart: "on-failure:10"
+    volumes:
+      - ../configuration_files:/app/configuration_files
+    depends_on:
+      - mongodb
+      - ldap
+    environment:
+      CONFIG_JSON_VALUE:
+      KEYS_JSON_VALUE:
+      PRIVATE_PEM_VALUE:
+      PUBLIC_PEM_VALUE:
+      VIRTUAL_HOST: elency-config.vcap.me
+      VIRTUAL_PORT: 3000
+    extra_hosts:
+      - "elency-config.vcap.me:172.20.0.200"
+      - "whoami.vcap.me:172.20.0.200"
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

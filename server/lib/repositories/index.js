@@ -51,7 +51,7 @@ async function createRepositories(elencyConfig) {
   };
 
   repositoriesInstance = repositories;
-  return repositories
+  return repositories;
 }
 
 module.exports = createRepositories;

@@ -71,11 +71,11 @@ module.exports = (elencyConfig) => {
   }
 
   function base64Encode(value) {
-    return new Buffer(value).toString('base64')
+    return Buffer.from(value).toString('base64')
   }
 
   function base64Decode(value) {
-    return new Buffer(value, 'base64').toString('ascii');
+    return Buffer.from(value, 'base64').toString('ascii');
   }
   
   return {

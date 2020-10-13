@@ -3,8 +3,8 @@ function findOne(mongoClient, collectionName, model) {
     options = options || {};
 
     return new Promise((resolve, reject) => {
-
       mongoClient
+        .db()
         .collection(collectionName)
         .findOne(query, options)
         .then((result) => {
@@ -23,8 +23,8 @@ function find(mongoClient, collectionName, model) {
     options = options || {};
 
     return new Promise((resolve, reject) => {
-
       let find = mongoClient
+        .db()
         .collection(collectionName)
         .find(query);
 
@@ -60,6 +60,7 @@ function count(mongoClient, collectionName) {
     return new Promise((resolve, reject) => {
 
       mongoClient
+        .db()
         .collection(collectionName)
         .count(query)
         .then((count) => {
@@ -75,6 +76,7 @@ function insertOne(mongoClient, collectionName) {
   return function(data) {
     return new Promise((resolve, reject) => {
       mongoClient
+        .db()
         .collection(collectionName)
         .insertOne(data)
         .then(() => {
@@ -90,6 +92,7 @@ function insertMany(mongoClient, collectionName) {
   return function(data) {
     return new Promise((resolve, reject) => {
       mongoClient
+        .db()
         .collection(collectionName)
         .insertMany(data)
         .then(() => {
@@ -105,6 +108,7 @@ function updateOne(mongoClient, collectionName) {
   return function(query, data) {
     return new Promise((resolve, reject) => {
       mongoClient
+        .db()
         .collection(collectionName)
         .updateOne(query, data)
         .then(() => {
@@ -120,6 +124,7 @@ function updateMany(mongoClient, collectionName) {
   return function(query, modifications) {
     return new Promise((resolve, reject) => {
       mongoClient
+        .db()
         .collection(collectionName)
         .updateMany(query, modifications)
         .then(() => {
@@ -134,6 +139,7 @@ function removeOne(mongoClient, collectionName) {
   return function(query) {
     return new Promise((resolve, reject) => {
       mongoClient
+        .db()
         .collection(collectionName)
         .removeOne(query)
         .then(resolve)
@@ -146,6 +152,7 @@ function removeMany(mongoClient, collectionName) {
   return function(query) {
     return new Promise((resolve, reject) => {
       mongoClient
+        .db()
         .collection(collectionName)
         .removeMany(query)
         .then(resolve)
@@ -157,6 +164,7 @@ function removeMany(mongoClient, collectionName) {
 function addIndex(mongoClient, collectionName) {
   return function(query, options) {
     mongoClient
+      .db()
       .collection(collectionName)
       .createIndex(query, options)
       .then(() => {})
