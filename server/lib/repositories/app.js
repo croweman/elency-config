@@ -39,7 +39,7 @@ function update(app) {
 }
 
 function updateTeam(team) {
-  return base.updateMany({ teamId: team.teamId }, { $set: { teamName: team.teamName }});
+  return base.updateMany({ teamId: team.teamId }, { teamName: team.teamName });
 }
 
 function remove(app) {

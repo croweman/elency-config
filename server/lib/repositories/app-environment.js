@@ -46,19 +46,19 @@ function removeAll() {
 }
 
 function updateTeam(team) {
-  return base.updateMany({ teamId: team.teamId }, { $set: { teamName: team.teamName }});
+  return base.updateMany({ teamId: team.teamId }, { teamName: team.teamName });
 }
 
 function updateApp(app) {
-  return base.updateMany({ teamId: app.teamId, appId: app.appId }, { $set: { appName: app.appName }});
+  return base.updateMany({ teamId: app.teamId, appId: app.appId }, { appName: app.appName });
 }
 
 function updateAppTeam(app, originalTeamId, team) {
-  return base.updateMany({ appId: app.appId, teamId: originalTeamId }, { $set : { teamId: team.teamId, teamName: team.teamName }});
+  return base.updateMany({ appId: app.appId, teamId: originalTeamId }, { teamId: team.teamId, teamName: team.teamName });
 }
 
 function updateKey(key) {
-  return base.updateMany({ keyId: key.keyId }, { $set: { keyName: key.keyName }});
+  return base.updateMany({ keyId: key.keyId }, { keyName: key.keyName });
 }
 
 function addIndexes() {

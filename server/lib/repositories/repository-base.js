@@ -110,7 +110,7 @@ function updateOne(mongoClient, collectionName) {
       mongoClient
         .db()
         .collection(collectionName)
-        .updateOne(query, data)
+        .updateOne(query, { $set: data })
         .then(() => {
           resolve(data);
         })
@@ -126,7 +126,7 @@ function updateMany(mongoClient, collectionName) {
       mongoClient
         .db()
         .collection(collectionName)
-        .updateMany(query, modifications)
+        .updateMany(query, { $set: { modifications } })
         .then(() => {
           resolve(modifications);
         })
