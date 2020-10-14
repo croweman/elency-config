@@ -34,14 +34,15 @@ services:
   mongodb:
     container_name: mongodb-elency-config-server
     image: mongo:3.4
-    expose:
-      - 27017
+    ports:
+      - "27017:27017"
     # logging:
     #   driver: none
 
   app:
-    build: ..
+    #build: ..
     container_name: elency-config-server
+    image: croweman/elency-config-server:0.0.18-beta
     restart: "on-failure:10"
     volumes:
       - ../configuration_files:/app/configuration_files

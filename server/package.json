@@ -1,6 +1,6 @@
 {
   "name": "elency-config-node-server",
-  "version": "0.0.17-beta",
+  "version": "0.0.18-beta",
   "description": "elency-config - node server",
   "main": "index.js",
   "repository": {
@@ -15,8 +15,8 @@
   ],
   "scripts": {
     "start": "node ./index.js",
-    "startlocal": "ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
-    "startlocalwithldapsupport": "ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
+    "startlocal": "ELENCY_CONFIG_RUN_OVER_HTTP=false ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js",
+    "startlocalwithldapsupport": "ELENCY_CONFIG_RUN_OVER_HTTP=false ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
     "test": "./node_modules/mocha/bin/_mocha ./specs/**/*-spec.js --timeout 5000"
   },
   "author": "Lee Crowe",

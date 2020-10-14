@@ -2,12 +2,14 @@
 
 # When up browse to https://elency-config.vcap.me
 
-#brew install mkcert
-#mkcert -install
-mkcert -cert-file vcap.me.crt -key-file vcap.me.key "*.vcap.me"
-cp "$(mkcert -CAROOT)/rootCA.pem" ./certs/ca.crt
-mv vcap.me.crt ./certs/vcap.me.crt
-mv vcap.me.key ./certs/vcap.me.key
+if [ ! -f "./certs/vcap.me.key" ]; then
+    #brew install mkcert
+    #mkcert -install
+    mkcert -cert-file vcap.me.crt -key-file vcap.me.key "*.vcap.me"
+    cp "$(mkcert -CAROOT)/rootCA.pem" ./certs/ca.crt
+    mv vcap.me.crt ./certs/vcap.me.crt
+    mv vcap.me.key ./certs/vcap.me.key
+fi
 
 if [ ! -d "../configuration_files_from_secure_location" ]; then
     mkdir ../configuration_files_from_secure_location
@@ -25,7 +27,7 @@ if [ ! -f "../configuration_files_from_secure_location/hasRun.json" ]; then
 
     rm ./config.json
     rm ./keys.json
-    echo "{ \"mongoUrl\": \"mongodb://mongodb:27017/elency-config\", \"HMACAuthorizationKey\": \"NGM5YjYwZjhjZmQ4NGE5YWE1MmVhMTg3\", \"exposeUIRoutes\": true, \"maxJsonPostSize\": \"1mb\", \"sessionLifeTimeInMinutes\": 20160, \"validateAuthorizationTokenWindow\": true, \"authorizationTokenValidationWindowInSeconds\": 300 }" >> config.json
+    echo "{ \"mongoUrl\": \"mongodb://mongodb:27017/elency-config\", \"HMACAuthorizationKey\": \"NGM5YjYwZjhjZmQ4NGE5YWE1MmVhMTg3\", \"exposeUIRoutes\": true, \"maxJsonPostSize\": \"1mb\", \"runOverHttp\": true, \"sessionLifeTimeInMinutes\": 20160, \"validateAuthorizationTokenWindow\": true, \"authorizationTokenValidationWindowInSeconds\": 300 }" >> config.json
     echo "{ \"configEncryptionKey\": \"MDdiNjYwNzFiYjk2NDgwMzliMTZkZmI1\" }" >> keys.json
     cat ./config.json
     cd ..
