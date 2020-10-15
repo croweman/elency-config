@@ -1,6 +1,6 @@
 {
   "name": "elency-config-node-server",
-  "version": "0.0.18-beta",
+  "version": "0.0.19-beta",
   "description": "elency-config - node server",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,7 @@
     "start": "node ./index.js",
     "startlocal": "ELENCY_CONFIG_RUN_OVER_HTTP=false ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js",
     "startlocalwithldapsupport": "ELENCY_CONFIG_RUN_OVER_HTTP=false ELENCY_CONFIG_RUNNING_LOCALLY=true LOG_LEVEL=DEBUG node ./index.js & node ./specs/support/ldap-mock-server/index.js",
-    "test": "./node_modules/mocha/bin/_mocha ./specs/**/*-spec.js --timeout 5000"
+    "test": "mocha ./specs/**/*-spec.js --timeout 5000 --exit"
   },
   "author": "Lee Crowe",
   "license": "ISC",
@@ -25,19 +25,19 @@
     "ajv": "~6.2.1",
     "body-parser": "~1.18.2",
     "connect-flash": "~0.1.1",
-    "connect-mongo": "~1.3.2",
+    "connect-mongo": "~3.2.0",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
     "diff": "~3.4.0",
     "express": "~4.16.2",
     "express-session": "~1.15.6",
-    "jquery": "~3.2.1",
+    "jquery": "~3.5.1",
     "ldapjs": "~1.0.1",
     "moment": "~2.21.0",
     "mongodb": "~3.5.2",
     "passport": "~0.4.0",
     "passport-local": "~1.0.0",
-    "pug": "~2.0.0-rc.4",
+    "pug": "~3.0.0",
     "semver": "~5.4.1",
     "uuid": "~3.2.1",
     "uuid-validate": "0.0.2"
@@ -45,9 +45,8 @@
   "devDependencies": {
     "asn1": "0.2.3",
     "chai": "~3.5.0",
-    "istanbul": "~0.4.5",
-    "mocha": "~3.0.2",
-    "nock": "9.0.2",
+    "mocha": "~8.1.3",
+    "nock": "~13.0.4",
     "should": "~11.1.0"
   }
 }

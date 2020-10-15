@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "sh ./test.sh",
-    "consumertests": "istanbul test ./node_modules/mocha/bin/_mocha -- specs -R spec --recursive --timeout 20000"
+    "consumertests": "mocha -- specs -R spec --recursive --timeout 20000 --exit"
   },
   "author": "Lee Crowe a.k.a croweman",
   "license": "MIT",
@@ -19,9 +19,8 @@
   },
   "devDependencies": {
     "chai": "~3.5.0",
-    "istanbul": "~0.4.5",
-    "mocha": "~3.0.2",
-    "nock": "9.0.2",
+    "mocha": "~8.1.3",
+    "nock": "~13.0.4",
     "should": "~11.1.0"
   }
 }
