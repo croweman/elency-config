@@ -1,5 +1,4 @@
-const fs = require('fs'),
-  request = require('request'),
+const axios = require('axios'),
   authorization = require('./authorization'),
   aes256cbc = require('./encryptors/aes-256-cbc'),
   versionNumber = require('./validation/version-number'),
@@ -105,7 +104,7 @@ module.exports = (configuration) => {
       error,
       body,
       headers: (response ? response.headers : {}),
-      statusCode: response ? response.statusCode : undefined
+      statusCode: response ? response.status : undefined
     });
   }
 
@@ -113,15 +112,16 @@ module.exports = (configuration) => {
 
     return new Promise((resolve) => {
 
-      request(requestOptions, (error, response, body) => {
-
-        if (error) {
-          debug(error);
-          return buildRequestResult(resolve, error, response, body);
-        }
-
-        return buildRequestResult(resolve, error, response, body);
-      });
+      axios(requestOptions)
+        .then(function(response) {
+          return buildRequestResult(resolve, undefined, response, response.data);
+        })
+        .catch(function(error) {
+          let data = error.response;
+          if (data)
+            data = data.data;
+          return buildRequestResult(resolve, error, error.response, data);
+        });
     });
   }
 

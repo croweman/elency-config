@@ -1,6 +1,6 @@
 {
   "name": "elency-config",
-  "version": "0.0.6-beta",
+  "version": "0.0.7-beta",
   "description": "elency-config - node client",
   "main": "./lib/index.js",
   "repository": {
@@ -14,7 +14,7 @@
     }
   ],
   "scripts": {
-    "test": "istanbul test ./node_modules/mocha/bin/_mocha -- specs -R spec --recursive --timeout 5000"
+    "test": "mocha -- specs -R spec --recursive --timeout 5000 --exit"
   },
   "keywords": [
     "elency-config",
@@ -25,15 +25,14 @@
   "author": "Lee Crowe a.k.a croweman",
   "license": "MIT",
   "dependencies": {
+    "axios": "~0.20.0",
     "debug": "~3.1.0",
-    "request": "~2.83.0",
     "uuid": "~3.0.1"
   },
   "devDependencies": {
     "chai": "~3.5.0",
-    "istanbul": "~0.4.5",
-    "mocha": "~3.0.2",
-    "nock": "~9.0.28",
+    "mocha": "~8.1.3",
+    "nock": "~13.0.4",
     "should": "~11.1.0"
   },
   "engines": {

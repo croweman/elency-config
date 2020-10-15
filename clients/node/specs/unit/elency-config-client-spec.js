@@ -1,6 +1,6 @@
 'use strict';
 
-const elencyConfig = require('../../'),
+const elencyConfig = require('../../lib'),
   expect = require('chai').expect,
   nock = require('nock'),
   hasher = require('../../lib/hashers/hmac-sha256');

@@ -1,10 +1,13 @@
 const elencyConfig = require('../../clients/node/');
 
+// for testing ignore self signed certificates
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 async function start() {
   const appId = 'awesome-micro-service';
   const environment = 'production';
-  const HMACAuthorizationKey = 'MzY4dUBKaTFhMjM0ODIxamhoRmEhYWE=';
-  const configEncryptionKey = 'NTY4dUppMWEyQDM0NThqaGhGYSFhYQ==';
+  const HMACAuthorizationKey = 'YWJlZjYwNzQwYzk4NDY4Zjg3ZTg5MWU0';
+  const configEncryptionKey = 'ZTk0YTU5YjNhMjk4NGI3NmIxNWExNzdi';//'M2VlMzRiOTFiNmM0NDY2YWI0MTAxZmZi';
 
   let elencyConfigInstance;
 
@@ -30,7 +33,7 @@ async function start() {
   }
 
   elencyConfigInstance = elencyConfig({
-    uri: 'http://192.168.1.15:3000',
+    uri: 'https://localhost:3000',
     appId,
     appVersion: '2.0.0',
     environment,
