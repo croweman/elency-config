@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Text;
@@ -65,7 +66,7 @@ namespace ElencyConfig
             if (_config.RefreshInterval > 0)
             {
                 _timerCallback = new TimerCallback(RefreshConfigurationOnInteval);
-                _timer = new Timer(_timerCallback, null, 0, _config.RefreshInterval);
+                _timer = new Timer(_timerCallback, null, _config.RefreshInterval, _config.RefreshInterval);
             }
         }
 

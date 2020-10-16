@@ -1,0 +1,8 @@
+<Project>
+    <!-- Workaround for EmbedSources support, see https://github.com/dotnet/roslyn/issues/19127 -->
+    <Target Name="PopulateEmbeddedFiles" AfterTargets="BeforeCompile" BeforeTargets="CoreCompile">
+        <ItemGroup>
+            <EmbeddedFiles Include="@(Compile)" />
+        </ItemGroup>
+    </Target>
+</Project>

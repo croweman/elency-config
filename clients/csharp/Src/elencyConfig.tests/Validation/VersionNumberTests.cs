@@ -1,7 +1,7 @@
 ﻿using ElencyConfig.Validation;
 using NUnit.Framework;
 
-namespace elencyConfig.Tests.Validation
+namespace ElencyConfig.Tests.Validation
 {
     [TestFixture]
     public class VersionNumberTests

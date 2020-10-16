@@ -1,0 +1,11 @@
+<Project>
+    <PropertyGroup>
+        <RepositoryUrl>git@github.com:croweman/elency-config.git</RepositoryUrl>
+        <Authors>Copyright (c) 2017 Lee Crowe a.k.a. croweman</Authors>
+        <NetStandardImplicitPackageVersion>2.0.1</NetStandardImplicitPackageVersion>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+        <DebugType>portable</DebugType>
+        <IncludeSymbolsInPackage>true</IncludeSymbolsInPackage>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    </PropertyGroup>
+</Project>

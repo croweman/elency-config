@@ -102,21 +102,21 @@ namespace ElencyConfig.Tests
             public void ReturnsDateTimeObjectIfValueIsAValidDateTime()
             {
                 var value = ValueRetrieval.GetDateTime("2018-02-06T12:35:45.970Z");
-                Assert.That(value.Value.ToString(), Is.EqualTo("06/02/2018 12:35:45"));
+                Assert.That(value.Value.ToString("dd/MM/yyyy hh:mm:ss"), Is.EqualTo("06/02/2018 12:35:45"));
             }
 
             [Test]
             public void ReturnsDateTimeObjectIfValueIsNullAndFallbackIsAValidDateTime()
             {
                 var value = ValueRetrieval.GetDateTime(null, DateTime.Parse("2018-02-06T12:35:45.970Z"));
-                Assert.That(value.Value.ToString(), Is.EqualTo("06/02/2018 12:35:45"));
+                Assert.That(value.Value.ToString("dd/MM/yyyy hh:mm:ss"), Is.EqualTo("06/02/2018 12:35:45"));
             }
 
             [Test]
             public void ReturnsDateTimeObjectIfValueIsasdfAndFallbackIsAValidDateTime()
             {
                 var value = ValueRetrieval.GetDateTime("adsf", DateTime.Parse("2018-02-06T12:35:45.970Z"));
-                Assert.That(value.Value.ToString(), Is.EqualTo("06/02/2018 12:35:45"));
+                Assert.That(value.Value.ToString("dd/MM/yyyy hh:mm:ss"), Is.EqualTo("06/02/2018 12:35:45"));
             }
         }
 

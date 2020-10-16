@@ -8,8 +8,8 @@ namespace Example
     {
         const string AppId = "awesome-micro-service";
         const string Environment = "production";
-        const string HMACAuthorizationKey = "MzY4dUBKaTFhMjM0ODIxamhoRmEhYWE=";
-        const string ConfigEncryptionKey = "NTY4dUppMWEyQDM0NThqaGhGYSFhYQ==";
+        const string HMACAuthorizationKey = "YWJlZjYwNzQwYzk4NDY4Zjg3ZTg5MWU0";
+        const string ConfigEncryptionKey = "ZTk0YTU5YjNhMjk4NGI3NmIxNWExNzdi";//"NTY4dUppMWEyQDM0NThqaGhGYSFhYQ==";
 
         static ElencyConfigClient Client;
 
@@ -36,7 +36,7 @@ namespace Example
         {
             var configuration = new ElencyConfiguration()
             {
-                Uri = "http://192.168.1.15:3000",
+                Uri = "https://localhost:3000",
                 AppId = AppId,
                 AppVersion = "2.0.0",
                 Environment = Environment,
@@ -56,10 +56,10 @@ namespace Example
         {
             Console.WriteLine();
             Console.WriteLine("__________________________________________");
-            Console.WriteLine(string.Format("Configuration retrieved: {0}", DateTime.Now.ToString()));
-            Console.WriteLine(string.Format("Version: {0}", Client.AppVersion));
-            Console.WriteLine(string.Format("Environment: {0}", Client.Environment));
-            Console.WriteLine(string.Format("Configuration Id: {0}", Client.ConfigurationId));
+            Console.WriteLine($"Configuration retrieved: {DateTime.Now.ToString()}");
+            Console.WriteLine($"Version: {Client.AppVersion}");
+            Console.WriteLine($"Environment: {Client.Environment}");
+            Console.WriteLine($"Configuration Id: {Client.ConfigurationId}");
             Console.WriteLine("Keys and values:");
             Console.WriteLine();
 
