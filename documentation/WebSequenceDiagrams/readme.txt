@@ -7,7 +7,7 @@ note right of Server: Validates authorization header
 Server->Client: Returns "x-access-token" header if "authorization" header is valid
 Client->Server: Configuration request with "authorization" and "x-access-token" headers\n(GET http://host/config/${appId}/${environment}/${appVersion})
 note right of Server: Validates headers and determines whether Client\nhas permission to retrieve the configuration
-Server->Client: Returns encrypted configuration if headers valid
+Server->Client: Returns encrypted configuration if headers are valid
 
 
 title Configuration Refresh

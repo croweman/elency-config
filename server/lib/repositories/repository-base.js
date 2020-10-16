@@ -62,7 +62,7 @@ function count(mongoClient, collectionName) {
       mongoClient
         .db()
         .collection(collectionName)
-        .count(query)
+        .countDocuments(query)
         .then((count) => {
           resolve(count);
         })
