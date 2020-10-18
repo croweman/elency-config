@@ -361,6 +361,7 @@ var elencyConfig = function() {
   };
 
   self.settings = function() {
+    var use2FA = $('#useTwoFactorAuthentication');
     var useLdap = $('#useLdap');
     var uri;
     var managerDn;
@@ -427,10 +428,11 @@ var elencyConfig = function() {
       ajax: {
         url: '/settings',
         payload: function() {
-
+          var twoFactorAuthenticationEnabled = $(use2FA).is(':checked');
           var ldapEnabled = $(useLdap).is(':checked');
           
           return {
+            twoFactorAuthenticationEnabled: twoFactorAuthenticationEnabled,
             ldapEnabled: ldapEnabled,
             ldapUri: ldapEnabled ? uri.value() : $('#uri').val(),
             ldapManagerDn: ldapEnabled ? managerDn.value() : $('#manager-dn').val(),

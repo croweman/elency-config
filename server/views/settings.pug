@@ -33,6 +33,16 @@ html(lang='en')
         .form-group
           .form-check
             label.form-check-label
+              if (settings.twoFactorAuthenticationEnabled !== undefined && settings.twoFactorAuthenticationEnabled === true)
+                input#useTwoFactorAuthentication.form-check-input(type='checkbox', checked='checked')
+                |  Use Two Factor Authentication
+              else
+                input#useTwoFactorAuthentication.form-check-input(type='checkbox')
+                |  Use Two Factor Authentication
+
+        .form-group
+          .form-check
+            label.form-check-label
               if (settings.ldapEnabled !== undefined && settings.ldapEnabled === true)
                 input#useLdap.form-check-input(type='checkbox', checked='checked')
                 |  Use LDAP

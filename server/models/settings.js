@@ -10,6 +10,7 @@ class Settings {
     this.ldapManagerPassword = obj.ldapManagerPassword || '';
     this.ldapSearchBase = obj.ldapSearchBase || '';
     this.ldapSearchFilter = obj.ldapSearchFilter || '';
+    this.twoFactorAuthenticationEnabled = obj.twoFactorAuthenticationEnabled || false;
     this.updated = obj.updated || new Date();
     this.updatedBy = obj.updatedBy || { userId: '', userName: '' };
   }
