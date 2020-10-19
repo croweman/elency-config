@@ -21,6 +21,7 @@ class User {
     
     this.userName = this.userName.toLowerCase().trim();
     this.password = this.password.trim();
+    this.twoFactorAuthenticationEnabled = obj.twoFactorAuthenticationEnabled || false;
   }
 
   isNull() {

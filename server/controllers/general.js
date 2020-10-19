@@ -158,7 +158,6 @@ module.exports = (config, repositories, encryption) => {
         newSettings = true;
         settings = new models.settings({
           settingsId: uuid(),
-          twoFactorAuthenticationEnabled: body.twoFactorAuthenticationEnabled !== undefined && (body.twoFactorAuthenticationEnabled === 'true' || body.twoFactorAuthenticationEnabled === true),
           ldapEnabled: body.ldapEnabled !== undefined && (body.ldapEnabled === 'true' || body.ldapEnabled === true),
           ldapUri: body.ldapUri,
           ldapManagerDn: body.ldapManagerDn,
@@ -168,7 +167,6 @@ module.exports = (config, repositories, encryption) => {
         });
       }
       else {
-        settings.twoFactorAuthenticationEnabled = body.twoFactorAuthenticationEnabled !== undefined && (body.twoFactorAuthenticationEnabled === 'true' || body.twoFactorAuthenticationEnabled === true);
         settings.ldapEnabled = body.ldapEnabled !== undefined && (body.ldapEnabled === 'true' || body.ldapEnabled === true);
         settings.ldapUri = body.ldapUri;
         settings.ldapManagerDn = body.ldapManagerDn;

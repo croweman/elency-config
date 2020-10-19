@@ -361,7 +361,6 @@ var elencyConfig = function() {
   };
 
   self.settings = function() {
-    var use2FA = $('#useTwoFactorAuthentication');
     var useLdap = $('#useLdap');
     var uri;
     var managerDn;
@@ -428,11 +427,9 @@ var elencyConfig = function() {
       ajax: {
         url: '/settings',
         payload: function() {
-          var twoFactorAuthenticationEnabled = $(use2FA).is(':checked');
           var ldapEnabled = $(useLdap).is(':checked');
           
           return {
-            twoFactorAuthenticationEnabled: twoFactorAuthenticationEnabled,
             ldapEnabled: ldapEnabled,
             ldapUri: ldapEnabled ? uri.value() : $('#uri').val(),
             ldapManagerDn: ldapEnabled ? managerDn.value() : $('#manager-dn').val(),
@@ -769,7 +766,8 @@ var elencyConfig = function() {
             roles: rolePermissions,
             teamPermissions: teamPermissions,
             appConfigurationPermissions: appConfigurationPermissions,
-            ldapEnabled: ldapEnabled
+            ldapEnabled: ldapEnabled.password,
+            twoFactorAuthenticationEnabled: $('#enableTwoFactorAuthentication').is(':checked'),
           };
 
           if (ldapEnabled === true) {
@@ -801,6 +799,7 @@ var elencyConfig = function() {
 
           return {
             enabled: $('#enabled').is(':checked'),
+            twoFactorAuthenticationEnabled: $('#enableTwoFactorAuthentication').is(':checked'),
             roles: rolePermissions,
             teamPermissions: teamPermissions,
             appConfigurationPermissions: appConfigurationPermissions

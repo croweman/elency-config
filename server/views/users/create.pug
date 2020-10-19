@@ -30,6 +30,16 @@ html(lang='en')
               input#enabled.form-check-input(type='checkbox', checked='checked')
               |  Enabled
 
+        .form-group
+          .form-check
+            label.form-check-label
+              if (twoFactorAuthenticationEnabled !== undefined && twoFactorAuthenticationEnabled === true)
+                input#enableTwoFactorAuthentication.form-check-input(type='checkbox', checked='checked')
+                |  Enable Two Factor Authentication
+              else
+                input#enableTwoFactorAuthentication.form-check-input(type='checkbox')
+                |  Enable Two Factor Authentication
+
         div.panel.panel-default.permissions.col-md-12
           div.permissions-heading
             | Roles
