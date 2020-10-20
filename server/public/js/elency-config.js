@@ -808,6 +808,35 @@ var elencyConfig = function() {
       }
     });
     self.userPermissionsSetup();
+
+    $('#reset-totp').on('click', function() {
+      var $this = $(this);
+
+      $('#error-box').css('display', 'none');
+
+        $this.button('loading');
+
+        $.ajax({
+          type: 'POST',
+          url: '/totp-destroy/user/' + $('#userid').val(),
+          data: {},
+          success: function(data, textStatus) {
+            if (data !== undefined && typeof data === 'string' && data.indexOf('elencyConfig.login();') !== -1) {
+              window.location = '/login';
+              return;
+            }
+
+            $this.button('reset');
+            $('#destruction-info').removeClass('has-danger');
+            $('#destruction-info').text('Destroyed the secret and recovery codes');
+          },
+          error: function(xhr, err) {
+            $this.button('reset');
+            $('#destruction-info').addClass('has-danger');
+            $('#destruction-info').text('An error occuring while trying to destroy the secret and recovery codes');
+          }
+        });
+      });
   };
   
   self.changePassword = function() {
@@ -1853,6 +1882,41 @@ var elencyConfig = function() {
       return false;
     });
   };
+
+  self.totpInput = function() {
+    self.monitor('code');
+    self.fireActionOn('login', { returnResult: true });
+  };
+
+  self.totpReset = function() {
+    var code = self.monitor('code');
+
+    self.fireActionOn('reset', {
+      ajax: {
+        url: '/totp-reset',
+        payload: function() {
+          return {
+            code: code.value(),
+          };
+        },
+        success: function(data) {
+          if (data.location) {
+            return window.location = data.location;
+          }
+
+          if (data.error) {
+            self.showError(data.error);
+            $('#error-box')[0].scrollIntoView();
+          }
+
+          if (data.id && data.id === 'code') {
+            var inputElements = self.getInputElements('code');
+            self.setError(data.error, inputElements);
+          }
+        }
+      }
+    });
+  };
   
   self.revisions = function() {
     var configurationId = elencyConfig.getParameterByName('configurationId');
@@ -2488,6 +2552,8 @@ var elencyConfig = function() {
     teamPermissionSetup: self.teamPermissionSetup,
     appPermissionSetup: self.appPermissionSetup,
     pagination: self.pagination,
-    audit: self.audit
+    audit: self.audit,
+    totpInput: self.totpInput,
+    totpReset: self.totpReset
   };
 }();

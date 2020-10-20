@@ -35,10 +35,10 @@ html(lang='en')
             label.form-check-label
               if (twoFactorAuthenticationEnabled !== undefined && twoFactorAuthenticationEnabled === true)
                 input#enableTwoFactorAuthentication.form-check-input(type='checkbox', checked='checked')
-                |  Enable Two Factor Authentication
+                |  Enable Time-based One-time Password Authentication
               else
                 input#enableTwoFactorAuthentication.form-check-input(type='checkbox')
-                |  Enable Two Factor Authentication
+                |  Enable Time-based One-time Password Authentication
 
         div.panel.panel-default.permissions.col-md-12
           div.permissions-heading

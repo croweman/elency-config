@@ -1,0 +1,41 @@
+doctype html
+html(lang='en')
+
+  include includes/head.pug
+
+  body
+
+    include includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Time-based One-time Password
+
+    .container
+
+      form(action='/totp-input', method='get')
+
+        div.row
+            div.col-md
+                span Scan this code with Google Authenticator or a similar alternative and click the Done button
+
+        img(src=qrUrl alt=user.secret)
+
+        if recoveryCodesExist === false
+          div.row
+            div.col-md
+              h3 Recovery codes
+              p These codes can be used if you somehow lose access to your app (for example, if you lose or replace your phone). It is important to save your recovery codes in a safe place such as in a password manager. You can use these codes to connect your account to a new TOTP app.            
+
+              ul
+              each recoveryCode in recoveryCodes
+                li= recoveryCode
+
+        div.text-left
+          br
+          button#done.btn.btn-primary(type="submit") Done
+
+      include includes/footer.pug
+
+    include includes/scripts.pug
+

@@ -46,7 +46,7 @@ async function process(req, res, next) {
         return redirectToLogin(req, res, req.originalUrl);
       }
 
-      next();
+      return ensureTotp(req, res, next);
     }
     else {
       if (!adminUserExists) {
@@ -74,6 +74,32 @@ async function process(req, res, next) {
       return await res.renderErrorNoState();
     }
   }
+}
+
+function ensureTotp(req, res, next) {
+  if (!req.user.twoFactorAuthenticationEnabled) {
+    return next();
+  }
+
+  if (req.session.method == 'totp' && req.session.twoFactorAuthenticated) {
+    return next();
+  }
+
+  if (!req.user.secret && req.session.method == 'plain') {
+    return next();
+  }
+
+  if (req.isAuthenticated()) {
+    if (req.user.secret)
+      return res.redirect('/totp-input')
+
+    if (req.path === '/totp-setup')
+      return next();
+
+    return res.redirect('/totp-setup');
+  }
+
+  return res.redirect('/login');
 }
 
 module.exports = (repos) => {
