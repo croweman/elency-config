@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyConfiguration("")]
 // [assembly: AssemblyCompany("")]
 // [assembly: AssemblyProduct("ElencyConfig.Tests")]
-// [assembly: AssemblyCopyright("Copyright (c) 2017 Lee Crowe a.k.a. croweman")]
+// [assembly: AssemblyCopyright("Copyright (c) 2020 Lee Crowe a.k.a. croweman")]
 // [assembly: AssemblyTrademark("")]
 // [assembly: AssemblyCulture("")]
 // [assembly: ComVisible(false)]

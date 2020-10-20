@@ -21,6 +21,9 @@ class User {
     
     this.userName = this.userName.toLowerCase().trim();
     this.password = this.password.trim();
+    this.twoFactorAuthenticationEnabled = obj.twoFactorAuthenticationEnabled || false;
+    this.secret = obj.secret;
+    this.recoveryCodes = obj.recoveryCodes;
   }
 
   isNull() {

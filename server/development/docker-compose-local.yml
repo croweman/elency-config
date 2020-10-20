@@ -42,7 +42,7 @@ services:
   app:
     #build: ..
     container_name: elency-config-server
-    image: croweman/elency-config-server:0.0.20-beta
+    image: croweman/elency-config-server:0.0.21-beta
     restart: "on-failure:10"
     volumes:
       - ../configuration_files:/app/configuration_files

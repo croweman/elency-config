@@ -97,7 +97,8 @@ module.exports = (config, repositories, encryption) => {
         apps: teamsAndApps.apps,
         LDAPUserName: req.query.username || '',
         LDAPUserId: req.query.userid || '',
-        availableRoles
+        availableRoles,
+        twoFactorAuthenticationEnabled: true
       };
 
       if (viewData.LDAPUserName.length > 0) {
@@ -138,6 +139,7 @@ module.exports = (config, repositories, encryption) => {
       user.updated = new Date();
       user.updatedBy = { userId: req.user.userId, userName: req.user.userName };
       user.password = user.getHashedPassword(hasher, user.password, config.configEncryptionKey);
+      user.twoFactorAuthenticationEnabled = body.twoFactorAuthenticationEnabled !== undefined && (body.twoFactorAuthenticationEnabled === 'true' || body.twoFactorAuthenticationEnabled === true)
       await repositories.user.add(user);
       await domainInstance.audit.addEntry(req.user, constants.actions.createUser, { userId: user.userId, userName: user.userName });
       return res.status(200).send({ location: '/user/all' });
@@ -293,6 +295,7 @@ module.exports = (config, repositories, encryption) => {
       user.appConfigurationPermissions = appConfigurationPermissions;
       user.updated = new Date();
       user.updatedBy = { userId: req.user.userId, userName: req.user.userName };
+      user.twoFactorAuthenticationEnabled = body.twoFactorAuthenticationEnabled !== undefined && (body.twoFactorAuthenticationEnabled === 'true' || body.twoFactorAuthenticationEnabled === true)
       await repositories.user.update(user);
       await domainInstance.audit.addEntry(req.user, constants.actions.updateUser, { userId: user.userId, userName: user.userName });
       return res.status(200).send({ location: '/user/all' });

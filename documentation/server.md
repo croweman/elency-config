@@ -41,12 +41,12 @@ The server should be setup with a `reverse proxy` in front of it over `https` an
 
 ### Linux based system<a name="linux"></a>
 
-1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.20-beta.tar.gz">elency-config-server</a>.
+1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.21-beta.tar.gz">elency-config-server</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
     ```
-    tar xzf ./elency-config-server-0.0.20-beta.tar.gz
+    tar xzf ./elency-config-server-0.0.21-beta.tar.gz
     ```
 
 3. Create and add the relevant config and security files to the `config` and `sec` directories.  Refer to the <a href="#configuration">Configuration</a> section.
@@ -85,7 +85,7 @@ version: '3'
 services:
   app:
     container_name: elency-config-server
-    image: croweman/elency-config-server:0.0.20-beta
+    image: croweman/elency-config-server:0.0.21-beta
     restart: "on-failure:10"
     volumes:
       - ./configuration_files:/app/configuration_files
@@ -367,7 +367,7 @@ An example `JSON Schema` may look like this:
 
 (The MIT License)
 
-Copyright (c) 2017 `Lee Crowe` a.k.a. `croweman`
+Copyright (c) 2020 `Lee Crowe` a.k.a. `croweman`
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

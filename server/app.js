@@ -7,6 +7,7 @@ const passport = require('passport');
 const session = require('express-session');
 const flash = require('connect-flash');
 const MongoStore = require('connect-mongo')(session);
+const base32 = require('thirty-two');
 const controllers = require('./controllers');
 const rsa = require('./lib/encryptors/rsa');
 const aes256cbc = require('./lib/encryptors/aes-256-cbc');
@@ -15,6 +16,7 @@ const encryption = require('./lib/utils/encryption');
 const responseMiddleware = require('./lib/middleware/response');
 const logger = require('./lib/logger');
 const passportLocalStrategy = require('./lib/passport-local-strategy');
+const TotpStrategy = require('passport-totp').Strategy;
 const Configuration = require('./lib/configuration');
 const md5 = require('./lib/hashers/hmac-md5');
 const { processPermissions } = require('./domain/permissions');
@@ -107,7 +109,8 @@ function addUIRoutes(app, config, controllerInstances, repos, encryptionInstance
     saveUninitialized: false,
     store: new MongoStore({
       url: config.mongoUrl
-    })
+    }),
+    unset: 'destroy'
   };
 
   app.use(session(sessionOptions));
@@ -134,6 +137,19 @@ function addUIRoutes(app, config, controllerInstances, repos, encryptionInstance
 
   const passportLocalStrategyInstance = passportLocalStrategy(repos, encryptionInstance, config);
   passport.use(passportLocalStrategyInstance);
+
+  passport.use(new TotpStrategy(
+    async function(user, done) {
+        let { secret, twoFactorAuthenticationEnabled } = user;
+        secret = await encryptionInstance.decrypt(secret);
+
+        if (!twoFactorAuthenticationEnabled || !secret) {
+            return done(new Error('2FA enabled or key not defined'));
+        } else {
+            return done(null, base32.decode(secret).toString(), 30); //30 = valid key period
+        }
+    })
+  );
 
   app.use('/', controllerInstances.general);
   app.use('/key', controllerInstances.key);

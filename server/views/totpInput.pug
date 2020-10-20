@@ -1,0 +1,37 @@
+doctype html
+html(lang='en')
+
+  include includes/head.pug
+
+  body
+
+    include includes/nav-bar.pug
+
+    #top.jumbotron
+      .container
+        h2.display-6 Enter the Generated Code
+
+    .container
+
+      form(action='/totp-input', method='post')
+
+        #code-form-group.form-group
+
+          div.col-md-4
+            label.form-control-label(for='code') Code
+            input#code.form-control(type='text', name='code', autocomplete='off', data-regex='^[\\d]{6,}$', data-errormessage='Code is not valid e.g. 123456 (^[\d]{6}$)')
+            #code-info.form-control-feedback
+            br
+            div.text-left
+              button#login.btn.btn-primary(type="submit") Login
+
+      a(href="/totp-reset") Lost your phone?
+
+      include includes/footer.pug
+
+    include includes/scripts.pug
+
+    script(type='text/javascript').
+      $(function() {
+          elencyConfig.totpInput();
+      });

@@ -44,6 +44,19 @@ html(lang='en')
                 input#enabled.form-check-input(type='checkbox')
               |  Enabled
 
+        .form-group
+          .form-check
+            label.form-check-label
+              if (selectedUser.twoFactorAuthenticationEnabled !== undefined && selectedUser.twoFactorAuthenticationEnabled === true)
+                input#enableTwoFactorAuthentication.form-check-input(type='checkbox', checked='checked')
+                |  Enable Time-based One-time Password Authentication
+              else
+                input#enableTwoFactorAuthentication.form-check-input(type='checkbox')
+                |  Enable Time-based One-time Password Authentication
+          div.text-left
+            button#reset-totp.btn.btn-primary(type="button", data-loading-text="<i class='icon-spinner icon-spin'></i> Destroying Secret And Recovery Codes", style="margin-left:20px") Destroy Secret And Recovery Codes
+            div#destruction-info(style="margin-left:20px")
+
         div.panel.panel-default.permissions.col-md-12
           div.permissions-heading
             | Roles

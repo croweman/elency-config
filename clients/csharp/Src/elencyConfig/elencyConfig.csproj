@@ -11,7 +11,7 @@
     <FileVersion>0.1.1.0</FileVersion>
     <PackageVersion>0.1.1</PackageVersion>
     <Authors>LCrowe</Authors>
-    <Copyright>Copyright (c) 2017 Lee Crowe a.k.a. croweman</Copyright>
+    <Copyright>Copyright (c) 2020 Lee Crowe a.k.a. croweman</Copyright>
     <PackageProjectUrl>https://github.com/croweman/elency-config/blob/master/clients/csharp/README.md</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/croweman/elency-config/tree/master/clients/csharp</RepositoryUrl>

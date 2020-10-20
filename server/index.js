@@ -2,7 +2,7 @@ const app = require('./app');
 const logger = require('./lib/logger');
 
 async function startup() {
-  try {
+  try {    
     let application = await app.create();
     let key, cert;
 
