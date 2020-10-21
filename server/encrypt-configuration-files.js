@@ -4,7 +4,7 @@
  Environment variables:
 
  - CONFIG_FOLDER_PATH: (optional) The folder containing the config.json and keys.json configuration files
- - SEC_FOLDER_PATH: (optional) The folder containing the elency-config.private.pem and elency-config.public.pe files
+ - SEC_FOLDER_PATH: (optional) The folder containing the elency-config.private.pem and elency-config.public.pem files
 
  Arguments:
 

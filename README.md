@@ -92,15 +92,21 @@ A video can be found below demonstrating basic usage of the admin ui.
 
 The demo spins up in a docker containerised environment a mongo instance populated with sample data, an `elency-config-server` (with ui) and a `node client` that consumes configuration from the `Centre` app under team `Atlanta Falcons` with real time refreshing every `1000ms`.
 
-The demo can be setup by firstly downloading <a href="https://raw.githubusercontent.com/croweman/elency-config/master/demo/docker/docker-compose.yml">docker-compose.yml</a>.
+The demo can be setup by firstly downloading <a href="https://raw.githubusercontent.com/croweman/elency-config/master/demo/docker/docker-compose.yml">docker-compose.yml</a> and placing it into an `elency-config` directory.
 
-Once the `docker-compose.yml` has been downloaded into a directory, execute the following command within the scope of the directory.
+You will then need to create a `certs` directory within the `elency-config` directory and create the following files within it
+
+* <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/development/certs/ca.crt">ca.crt</a>
+* <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/development/certs/vcap.me.crt">vcap.me.crt</a>
+* <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/development/certs/vcap.me.key">vcap.me.key</a>
+
+Once the above tasks have been completed change execute the following command within the scope of the `elency-config` directory.
 
 ```
 docker-compose up
 ```
 
-To view/create/change configuration etc on the `elency-config-server` browse to <a href="http://localhost:3000">http://localhost:3000<a/>.
+To view/create/change configuration etc on the `elency-config-server` browse to <a href="https://elency-config.vcap.me">https://elency-config.vcap.me<a/>.  You will need to `trust` the `insecure` certifacte!
 
 Useful logins are `admin` and `joe.bloggs`
 

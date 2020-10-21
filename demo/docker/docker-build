@@ -12,8 +12,8 @@ cp -r ../../server/lib/* ./support/lib
 cp -r ../../server/models/* ./support/models
 
 
-#docker build -t croweman/elency-config-demo:0.0.12-beta .
-#docker push croweman/elency-config-demo:0.0.12-beta
+#docker build -t croweman/elency-config-demo:0.0.13-beta .
+#docker push croweman/elency-config-demo:0.0.13-beta
 
 docker-compose build --force-rm
 

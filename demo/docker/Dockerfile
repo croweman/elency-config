@@ -1,4 +1,4 @@
-FROM node:carbon-alpine as base
+FROM node:12.18.3-alpine3.12 as base
 WORKDIR /app
 COPY support/configuration_files ./support
 COPY support/client ./
