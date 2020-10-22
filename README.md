@@ -94,13 +94,7 @@ The demo spins up in a docker containerised environment a mongo instance populat
 
 The demo can be setup by firstly downloading <a href="https://raw.githubusercontent.com/croweman/elency-config/master/demo/docker/docker-compose.yml">docker-compose.yml</a> and placing it into an `elency-config` directory.
 
-You will then need to create a `certs` directory within the `elency-config` directory and create the following files within it
-
-* <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/development/certs/ca.crt">ca.crt</a>
-* <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/development/certs/vcap.me.crt">vcap.me.crt</a>
-* <a href="https://raw.githubusercontent.com/croweman/elency-config/master/server/development/certs/vcap.me.key">vcap.me.key</a>
-
-Once the above tasks have been completed change execute the following command within the scope of the `elency-config` directory.
+Once the above has been completed execute the following command within the scope of the `elency-config` directory.
 
 ```
 docker-compose up

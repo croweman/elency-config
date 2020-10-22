@@ -4,6 +4,9 @@ cp ./support/config.json ./configuration_files/config.json
 cp ./support/keys.json ./configuration_files/keys.json
 cp ./support/elency-config.private.pem ./configuration_files/elency-config.private.pem
 cp ./support/elency-config.public.pem ./configuration_files/elency-config.public.pem
+cp ./support/ca.crt ./certs/ca.crt
+cp ./support/vcap.me.crt ./certs/vcap.me.crt
+cp ./support/vcap.me.key ./certs/vcap.me.key
 
 node ./insert-data.js
 node ./wait.js

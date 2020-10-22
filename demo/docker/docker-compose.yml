@@ -12,9 +12,10 @@ services:
   demo:
     #build: .
     container_name: elency-config-client-demo
-    image: croweman/elency-config-demo:0.0.13-beta
+    image: croweman/elency-config-demo:0.0.14-beta
     volumes:
       - configuration_files:/app/configuration_files
+      - certs:/app/certs
     depends_on:
       - mongodb
 
@@ -37,10 +38,12 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./certs:/etc/nginx/certs
+      - certs:/etc/nginx/certs
     networks:
       default:
         ipv4_address: 172.20.0.200
+    depends_on:
+      - demo
     logging:
       driver: none
 
@@ -48,13 +51,15 @@ services:
     container_name: elency-config-whoami
     image: jwilder/whoami
     volumes:
-      - ./certs/ca.crt:/usr/local/share/ca-certificates/ca.crt
+      - certs:/usr/local/share/ca-certificates
     environment:
       - VIRTUAL_HOST=whoami.vcap.me
       - VIRTUAL_PORT=8000
     extra_hosts:
       - "elency-config.vcap.me:172.20.0.200"
       - "whoami.vcap.me:172.20.0.200"
+    depends_on:
+      - demo
     logging:
       driver: none    
 
@@ -81,6 +86,7 @@ services:
 
 volumes:
   configuration_files:
+  certs:
 
 networks:
   default:
