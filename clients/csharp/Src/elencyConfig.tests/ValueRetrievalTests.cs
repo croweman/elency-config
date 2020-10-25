@@ -279,10 +279,8 @@ namespace ElencyConfig.Tests
         [TestFixture]
         public class GetObject
         {
-            [DataContract]
             public class TestObject
             {
-                [DataMember]
                 public bool On { get; set; }
             }
 

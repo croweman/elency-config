@@ -1,19 +1,15 @@
 ﻿using System.Text.RegularExpressions;
+// ReSharper disable IdentifierTypo
 
 namespace ElencyConfig.Validation
 {
     internal static class VersionNumber
     {
-        private static Regex _versionNumberRegex = new Regex(@"^(\d+)\.(\d+).(\d+)$");
+        private static readonly Regex VersionNumberRegex = new Regex(@"^(\d+)\.(\d+).(\d+)$");
 
         public static bool IsValid(string versionNumber)
         {
-            if (string.IsNullOrWhiteSpace(versionNumber))
-            {
-                return false;
-            }
-
-            return _versionNumberRegex.IsMatch(versionNumber);
+            return !string.IsNullOrWhiteSpace(versionNumber) && VersionNumberRegex.IsMatch(versionNumber);
         }
     }
 }

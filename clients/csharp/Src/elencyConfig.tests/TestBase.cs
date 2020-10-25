@@ -1,6 +1,4 @@
 ﻿using ElencyConfig.Hashers;
-using Nock.net;
-using NUnit.Framework;
 using System.IO;
 using System.Reflection;
 

@@ -1,19 +1,12 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Text;
+using Newtonsoft.Json;
+// ReSharper disable IdentifierTypo
 
 namespace ElencyConfig
 {
     internal static class ValueRetrieval
     {
-
-        public static bool? GetBoolean(string value)
-        {
-            return GetBoolean(value, null);
-        }
-
-        public static bool? GetBoolean(string value, bool? fallback)
+        public static bool? GetBoolean(string value, bool? fallback = null)
         {
             if (value == null && fallback.HasValue)
             {
@@ -30,157 +23,72 @@ namespace ElencyConfig
                 return false;
             }
 
-            if (fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            return null;
+            return fallback;
         }
 
-        public static DateTime? GetDateTime(string value)
+        public static DateTime? GetDateTime(string value, DateTime? fallback = null)
         {
-            return GetDateTime(value, null);
+            switch (value)
+            {
+                case null when fallback.HasValue:
+                    return fallback.Value;
+                case null:
+                    return null;
+                default:
+                    return DateTime.TryParse(value, out var parsedDateTime) ? parsedDateTime : fallback;
+            }
         }
 
-        public static DateTime? GetDateTime(string value, DateTime? fallback)
+        public static int? GetInteger(string value, int? fallback = null)
         {
-            if (value == null && fallback.HasValue)
+            switch (value)
             {
-                return fallback.Value;
+                case null when fallback.HasValue:
+                    return fallback.Value;
+                case null:
+                    return null;
+                default:
+                    return int.TryParse(value, out var parsedInt) ? parsedInt : fallback;
             }
-
-            if (value != null)
-            {
-                DateTime parsedDateTime;
-                if (DateTime.TryParse(value, out parsedDateTime))
-                {
-                    return parsedDateTime;
-                }
-            }
-
-            if (fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            return null;
         }
 
-        public static int? GetInteger(string value)
+        public static float? GetFloat(string value, float? fallback = null)
         {
-            return GetInteger(value, null);
+            switch (value)
+            {
+                case null when fallback.HasValue:
+                    return fallback.Value;
+                case null:
+                    return null;
+                default:
+                    return float.TryParse(value, out var parsedFloat) ? parsedFloat : fallback;
+            }
         }
 
-        public static int? GetInteger(string value, int? fallback)
+        public static decimal? GetDecimal(string value, decimal? fallback = null)
         {
-            if (value == null && fallback.HasValue)
+            switch (value)
             {
-                return fallback.Value;
+                case null when fallback.HasValue:
+                    return fallback.Value;
+                case null:
+                    return null;
+                default:
+                    return decimal.TryParse(value, out var parsedDecimal) ? parsedDecimal : fallback;
             }
-
-            if (value != null)
-            {
-                int parsedInt;
-                if (int.TryParse(value, out parsedInt))
-                {
-                    return parsedInt;
-                }
-            }
-
-            if (fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            return null;
         }
 
-        public static float? GetFloat(string value)
+        public static double? GetDouble(string value, double? fallback = null)
         {
-            return GetFloat(value, null);
-        }
-
-        public static float? GetFloat(string value, float? fallback)
-        {
-            if (value == null && fallback.HasValue)
+            switch (value)
             {
-                return fallback.Value;
+                case null when fallback.HasValue:
+                    return fallback.Value;
+                case null:
+                    return null;
+                default:
+                    return double.TryParse(value, out var parsedDouble) ? parsedDouble : fallback;
             }
-
-            if (value != null)
-            {
-                float parsedFloat;
-                if (float.TryParse(value, out parsedFloat))
-                {
-                    return parsedFloat;
-                }
-            }
-
-            if (fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            return null;
-        }
-
-        public static decimal? GetDecimal(string value)
-        {
-            return GetDecimal(value, null);
-        }
-
-        public static decimal? GetDecimal(string value, decimal? fallback)
-        {
-            if (value == null && fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            if (value != null)
-            {
-                decimal parsedDecimal;
-                if (decimal.TryParse(value, out parsedDecimal))
-                {
-                    return parsedDecimal;
-                }
-            }
-
-            if (fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            return null;
-        }
-
-        public static double? GetDouble(string value)
-        {
-            return GetDouble(value, null);
-        }
-
-        public static double? GetDouble(string value, double? fallback)
-        {
-            if (value == null && fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            if (value != null)
-            {
-                double parsedDouble;
-                if (double.TryParse(value, out parsedDouble))
-                {
-                    return parsedDouble;
-                }
-            }
-
-            if (fallback.HasValue)
-            {
-                return fallback.Value;
-            }
-
-            return null;
         }
 
         public static T GetObject<T>(string value) where T: class
@@ -191,17 +99,11 @@ namespace ElencyConfig
         public static T GetObject<T>(string value, T fallback) where T: class
         {
             if (value == null)
-            {
                 return null;
-            }
 
             try
             {
-                using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(value)))
-                {
-                    var serializer = new DataContractJsonSerializer(typeof(T));
-                    return serializer.ReadObject(memoryStream) as T;
-                }
+                return JsonConvert.DeserializeObject<T>(value);
             }
             catch (Exception ex)
             {

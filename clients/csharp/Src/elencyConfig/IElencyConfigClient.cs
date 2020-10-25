@@ -4,12 +4,17 @@ using System.Threading.Tasks;
 
 namespace ElencyConfig
 {
+    public interface IElencyConfigClient<T> : IElencyConfigClient
+        where T : class
+    {
+        T Configuration { get; }
+    }
+
     public interface IElencyConfigClient
     {
         string AppVersion { get; }
         string ConfigurationId { get; }
         string Environment { get; }
-
         string Get(string key);
         List<string> GetAllKeys();
         bool? GetBoolean(string key);

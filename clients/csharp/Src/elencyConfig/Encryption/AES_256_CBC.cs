@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 namespace ElencyConfig.Encryption
 {
@@ -9,11 +11,10 @@ namespace ElencyConfig.Encryption
 
         private static RijndaelManaged CreateRijndael()
         {
-            var cipher = new RijndaelManaged();
-            cipher.Mode = CipherMode.CBC;
-            cipher.Padding = PaddingMode.PKCS7;
-            cipher.KeySize = 256;
-            cipher.BlockSize = 128;
+            var cipher = new RijndaelManaged
+            {
+                Mode = CipherMode.CBC, Padding = PaddingMode.PKCS7, KeySize = 256, BlockSize = 128
+            };
             return cipher;
         }
 
@@ -26,9 +27,9 @@ namespace ElencyConfig.Encryption
                 var ivBytes = Encoding.UTF8.GetBytes(iv);
                 cipher.Key = passwordBytes;
                 cipher.IV = ivBytes;
-                byte[] plainText = cipher.CreateEncryptor().TransformFinalBlock(encoding.GetBytes(value), 0, value.Length);
+                var plainText = cipher.CreateEncryptor().TransformFinalBlock(encoding.GetBytes(value), 0, value.Length);
                 var hex = BitConverter.ToString(plainText);
-                return new string[] { hex.Replace("-", "").ToLower(), iv };
+                return new[] { hex.Replace("-", "").ToLower(), iv };
             }
         }
 
@@ -49,7 +50,7 @@ namespace ElencyConfig.Encryption
                     raw[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
                 }
 
-                byte[] plainText = cipher.CreateDecryptor().TransformFinalBlock(raw, 0, raw.Length);
+                var plainText = cipher.CreateDecryptor().TransformFinalBlock(raw, 0, raw.Length);
                 return encoding.GetString(plainText);
             }
         }

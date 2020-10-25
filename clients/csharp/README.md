@@ -16,7 +16,7 @@ This is a `c#` client for the `elency-config server`.
 
 ## Prerequisites<a name="prerequisites"></a>
 
-`ElencyConfig` is built with `c#` and is dependent on .NET Framework v4.5.2.
+`ElencyConfig` is built with `c#` and is dependent on .NET Standard 2.0.
 
 ---
 
@@ -44,6 +44,8 @@ const string AppId = 'awesome-app';
 const string Environment = 'prod';
 const string HMACAuthorizationKey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 const string ConfigEncryptionKey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+static ElencyConfigClient Client;
 
 static void Main(string[] args)
 {
@@ -78,7 +80,8 @@ private static async Task GetConfiguration()
     configuration.Retrieved = Retrieved;
     configuration.RefreshFailure = RefreshFailure;
 
-    await ElencyConfigClient.Init(configuration);
+    Client = new ElencyConfigClient();
+    await Client.Init(configuration);
 }
 
 private static void Retrieved()
@@ -129,6 +132,23 @@ var configuration = new ElencyConfiguration()
         }
     };
 ```
+
+If you would like to make use of a typed configuration object you can create a class with the relevant properties and use a Generic client
+
+```c#
+public class TypedConfiguration
+{
+    public string PropertyOne { get; set; }
+    public bool PropertyTwo { get; set; }
+}
+
+...
+Client = new ElencyConfigClient<TypedConfiguration>();
+await Client.Init(configuration);
+
+Console.WriteLine(Client.Configuration.PropertyOne);
+Console.WriteLine(Client.Configuration.PropertyTwo);
+``` 
 
 ---
 
