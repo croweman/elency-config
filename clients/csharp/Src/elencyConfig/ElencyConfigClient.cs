@@ -1,21 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Text;
-using System.Runtime.Serialization.Json;
-
 using ElencyConfig.Encryption;
+using Newtonsoft.Json;
 
 namespace ElencyConfig
 {
+    public class ElencyConfigClient<T> : ElencyConfigClient, IElencyConfigClient<T>
+        where T : class
+    {
+        private T _configuration;
+
+        public T Configuration
+        {
+            get
+            {
+                if (_configuration != null)
+                    return _configuration;
+
+                LoadConfiguration();
+                return _configuration;
+            }
+        }
+
+        protected override void Retrieved()
+        {
+            LoadConfiguration();
+        }
+
+        private void LoadConfiguration()
+        {
+            var obj = new ExpandoObject() as IDictionary<string, Object>;
+
+            var keys = GetAllKeys().ToList();
+
+            foreach (var key in keys)
+                obj.Add(key, Get(key));
+
+            var json = JsonConvert.SerializeObject(obj);
+
+            _configuration = JsonConvert.DeserializeObject<T>(json);
+        }
+    }
+    
     public class ElencyConfigClient : IElencyConfigClient
     {
-        private bool _initialized = false;
+        private bool _initialized;
         private ElencyConfiguration _config;
         private string _configurationPath;
         private Dictionary<string, string> _currentConfiguration;
@@ -25,7 +60,7 @@ namespace ElencyConfig
         private string _currentConfigurationId;
         private Timer _timer;
         private TimerCallback _timerCallback;
-        private bool _refreshing = false;
+        private bool _refreshing;
         private const int Timeout = 30000;
 
         public async Task Init(ElencyConfiguration config)
@@ -35,7 +70,7 @@ namespace ElencyConfig
                 throw new Exception("You must define a configuration");
             }
 
-            if (_initialized == true)
+            if (_initialized)
             {
                 throw new Exception("The client is already initialised");
             }
@@ -44,10 +79,7 @@ namespace ElencyConfig
             {
                 config.Validate();
                 _config = config;
-                _configurationPath = string.Format("/config/{0}/{1}/{2}",
-                    _config.AppId,
-                    _config.Environment,
-                    _config.AppVersion);
+                _configurationPath = $"/config/{_config.AppId}/{_config.Environment}/{_config.AppVersion}";
             }
             catch (Exception ex)
             {
@@ -65,12 +97,12 @@ namespace ElencyConfig
 
             if (_config.RefreshInterval > 0)
             {
-                _timerCallback = new TimerCallback(RefreshConfigurationOnInteval);
+                _timerCallback = RefreshConfigurationOnInterval;
                 _timer = new Timer(_timerCallback, null, _config.RefreshInterval, _config.RefreshInterval);
             }
         }
 
-        private async void RefreshConfigurationOnInteval(object stateInfo)
+        private async void RefreshConfigurationOnInterval(object stateInfo)
         {
             if (_refreshing)
             {
@@ -117,10 +149,7 @@ namespace ElencyConfig
         public string Get(string key)
         {
             CheckInitialisation();
-            if (_currentConfiguration.ContainsKey(key))
-                return _currentConfiguration[key];
-
-            return null;
+            return _currentConfiguration.ContainsKey(key) ? _currentConfiguration[key] : null;
         }
 
         public List<string> GetAllKeys()
@@ -220,7 +249,7 @@ namespace ElencyConfig
 
         public T GetObject<T>(string key, T fallback) where T : class
         {
-            return ValueRetrieval.GetObject<T>(Get(key), fallback);
+            return ValueRetrieval.GetObject(Get(key), fallback);
         }
 
         private void CheckInitialisation()
@@ -239,6 +268,8 @@ namespace ElencyConfig
             _currentConfiguration = _config.LocalConfiguration.ConfigurationData;
             _initialized = true;
 
+            Retrieved();
+
             if (_config.Retrieved != null)
             {
                 await Task.Run(_config.Retrieved);
@@ -255,10 +286,10 @@ namespace ElencyConfig
                     await RefreshConfiguration();
                     _refreshing = false;
                 }
-                catch (Exception ex)
+                catch
                 {
                     _refreshing = false;
-                    throw ex;
+                    throw;
                 }
             }
             else
@@ -270,14 +301,14 @@ namespace ElencyConfig
         private async Task RefreshConfiguration()
         {
             var authorizationHeader = Authorization.GenerateAuthorizationHeader(_config, _configurationPath, "head");
-            var uri = string.Format("{0}{1}", _config.Uri, _configurationPath);
+            var uri = $"{_config.Uri}{_configurationPath}";
             var request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "HEAD";
             request.Accept = "application/json";
             request.ContentType = "application/json";
             request.Headers.Add("Authorization", authorizationHeader);
             request.Headers.Add("x_version_hash", _currentVersionHash);
-            request.Timeout = _config.RequestTimeout.HasValue ? _config.RequestTimeout.Value : Timeout;
+            request.Timeout = _config.RequestTimeout ?? Timeout;
 
             await Task.Run(async () =>
             {
@@ -296,7 +327,7 @@ namespace ElencyConfig
                             return;
                         }
 
-                        throw new Exception(string.Format("HttpStatusCode: {0} was returned", response.StatusCode));
+                        throw new Exception($"HttpStatusCode: {response.StatusCode} was returned");
                     }
                 }
                 catch (Exception ex)
@@ -311,14 +342,14 @@ namespace ElencyConfig
             var accessToken = await GetAccessToken();
             var authorizationHeader = Authorization.GenerateAuthorizationHeader(_config, _configurationPath, "get");
 
-            var uri = string.Format("{0}{1}", _config.Uri, _configurationPath);
+            var uri = $"{_config.Uri}{_configurationPath}";
             var request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "GET";
             request.Accept = "application/json";
             request.ContentType = "application/json";
             request.Headers.Add("Authorization", authorizationHeader);
             request.Headers.Add("x-access-token", accessToken);
-            request.Timeout = _config.RequestTimeout.HasValue ? _config.RequestTimeout.Value : Timeout;
+            request.Timeout = _config.RequestTimeout ?? Timeout;
 
             await Task.Run(async () =>
             {
@@ -326,52 +357,47 @@ namespace ElencyConfig
                 {
                     using (var response = (HttpWebResponse)request.GetResponse())
                     {
-                        if (response.StatusCode == HttpStatusCode.OK)
+                        if (response.StatusCode != HttpStatusCode.OK)
+                            throw new Exception($"HttpStatusCode: {response.StatusCode} was returned");
+                        
+                        var responseStream = response.GetResponseStream();
+                        var body = new StreamReader(responseStream).ReadToEnd();
+
+                        var searchFor = "\"configuration\":";
+                        var startIndex = body.IndexOf(searchFor);
+                        var endIndex = body.IndexOf("],", startIndex + 1);
+                        var originalEncryptedConfigurationBody = body.Substring(startIndex, (endIndex - startIndex) + 1);
+                        var encryptedConfigurationBody = originalEncryptedConfigurationBody.Substring(searchFor.Length).Trim();
+                        var encryptedConfigurationBodyAsArray = JsonConvert.DeserializeObject<string[]>(encryptedConfigurationBody);
+                        var decryptedConfigurationBody = AES_256_CBC.Decrypt(encryptedConfigurationBodyAsArray, _config.ConfigEncryptionKey);
+                        body = body.Replace(originalEncryptedConfigurationBody, searchFor + decryptedConfigurationBody);
+
+                        var configurationResponse = JsonConvert.DeserializeObject<ConfigurationResponse>(body);
+                        var currentConfiguration = new Dictionary<string, string>();
+
+                        foreach (var item in configurationResponse.configuration)
                         {
-                            Stream responseStream = response.GetResponseStream();
-                            var body = new StreamReader(responseStream).ReadToEnd();
-
-                            var searchFor = "\"configuration\":";
-                            var startIndex = body.IndexOf(searchFor);
-                            var endIndex = body.IndexOf("],", startIndex + 1);
-                            var originalEncryptedConfigurationBody = body.Substring(startIndex, (endIndex - startIndex) + 1);
-                            var encryptedConfigurationBody = originalEncryptedConfigurationBody.Substring(searchFor.Length).Trim();
-                            var encryptedConfigurationBodyAsArray = DeserializeObject<string[]>(encryptedConfigurationBody);
-                            var decryptedConfigurationBody = AES_256_CBC.Decrypt(encryptedConfigurationBodyAsArray, _config.ConfigEncryptionKey);
-                            body = body.Replace(originalEncryptedConfigurationBody, searchFor + decryptedConfigurationBody);
-
-                            var configurationResponse = DeserializeObject<ConfigurationResponse>(body);
-                            var currentConfiguration = new Dictionary<string, string>();
-
-                            for (var i = 0; i < configurationResponse.configuration.Length; i++)
+                            if (!item.encrypted)
                             {
-                                var item = configurationResponse.configuration[i];
-
-                                if (!item.encrypted)
-                                {
-                                    currentConfiguration.Add(item.key, item.value[0]);
-                                    continue;
-                                }
-
-                                item.value = new string[] { AES_256_CBC.Decrypt(item.value, _config.ConfigEncryptionKey) };
                                 currentConfiguration.Add(item.key, item.value[0]);
+                                continue;
                             }
 
-                            _currentAppVersion = configurationResponse.appVersion;
-                            _currentEnvironment = configurationResponse.environment;
-                            _currentConfigurationId = configurationResponse.configurationId;
-                            _currentVersionHash = configurationResponse.configurationHash;
-                            _currentConfiguration = currentConfiguration;
-                            _initialized = true;
-
-                            if (_config.Retrieved != null)
-                            {
-                                await Task.Run(_config.Retrieved);
-                            }
-                            return;
+                            item.value = new string[] { AES_256_CBC.Decrypt(item.value, _config.ConfigEncryptionKey) };
+                            currentConfiguration.Add(item.key, item.value[0]);
                         }
 
-                        throw new Exception(string.Format("HttpStatusCode: {0} was returned", response.StatusCode));
+                        _currentAppVersion = configurationResponse.appVersion;
+                        _currentEnvironment = configurationResponse.environment;
+                        _currentConfigurationId = configurationResponse.configurationId;
+                        _currentVersionHash = configurationResponse.configurationHash;
+                        _currentConfiguration = currentConfiguration;
+                        _initialized = true;
+
+                        Retrieved();
+
+                        if (_config.Retrieved != null)
+                            await Task.Run(_config.Retrieved);
                     }
                 }
                 catch (Exception ex)
@@ -379,31 +405,20 @@ namespace ElencyConfig
                     throw new Exception("An error occurred while trying to refresh the configuration", ex);
                 }
             });
-
         }
-
-        private T DeserializeObject<T>(string value) where T : class
-        {
-            using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(value)))
-            {
-                var serializer = new DataContractJsonSerializer(typeof(T));
-                return serializer.ReadObject(memoryStream) as T;
-            }
-        }
-
 
         private async Task<string> GetAccessToken()
         {
             var authorizationHeader = Authorization.GenerateAuthorizationHeader(_config, "/config", "head", true);
-            var uri = string.Format("{0}/config", _config.Uri);
+            var uri = $"{_config.Uri}/config";
             var request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "HEAD";
             request.Accept = "application/json";
             request.ContentType = "application/json";
             request.Headers.Add("Authorization", authorizationHeader);
-            request.Timeout = _config.RequestTimeout.HasValue ? _config.RequestTimeout.Value : Timeout;
+            request.Timeout = _config.RequestTimeout ?? Timeout;
 
-            string responseText = await Task.Run(() =>
+            var responseText = await Task.Run(() =>
             {
                 try
                 {
@@ -425,6 +440,11 @@ namespace ElencyConfig
             });
 
             return responseText;
+        }
+        
+        protected virtual async void Retrieved()
+        {
+                
         }
     }
 }

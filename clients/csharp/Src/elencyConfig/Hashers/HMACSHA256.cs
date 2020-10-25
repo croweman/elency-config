@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Text;
+// ReSharper disable IdentifierTypo
 
 namespace ElencyConfig.Hashers
 {
+    // ReSharper disable once InconsistentNaming
     internal static class HMACSHA256
     {
         public static string Hash(string value, string password)

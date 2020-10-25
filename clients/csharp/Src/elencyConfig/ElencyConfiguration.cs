@@ -1,8 +1,7 @@
 ﻿using ElencyConfig.Validation;
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+// ReSharper disable IdentifierTypo
 
 namespace ElencyConfig
 {
@@ -74,10 +73,7 @@ namespace ElencyConfig
                 throw new Exception("ConfigEncryptionKey must be a Base64 encoded string");
             }
 
-            if (LocalConfiguration != null)
-            {
-                LocalConfiguration.Validate();
-            }
+            LocalConfiguration?.Validate();
         }
     }
 }
