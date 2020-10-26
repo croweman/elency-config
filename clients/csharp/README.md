@@ -133,7 +133,7 @@ var configuration = new ElencyConfiguration()
     };
 ```
 
-If you would like to make use of a typed configuration object you can create a class with the relevant properties and use a Generic client
+If you would like to make use of a typed configuration object you can create a class with the relevant properties and use a Generic client.  Newtonsoft.Json is used to map the configuration to the object so relevant attributes can be used if needed.
 
 ```c#
 public class TypedConfiguration
