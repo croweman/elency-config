@@ -84,6 +84,7 @@ The options provided to the client are below.
  - `retrieved` Defines a function fired when the configuration is retrieved.
  - `refreshFailure` Defines a function fired when a configuration refresh fails.
  - `localConfiguration` Defines a local configuration environment.  In development environments you may not want to communicate with a real `elency-config-server`.
+ - `configurationMapping` An optional array that defines mapping for typed configuration.
 
 An example using `localConfiguration` is below:
 
@@ -110,6 +111,45 @@ catch (err) {
 }
 ```
 
+An example of using `configurationMapping` for typed configuration is below:
+
+```js
+const elencyConfig = require('elency-config');
+
+const appId = 'awesome-app';
+const environment = 'prod';
+const HMACAuthorizationKey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const configEncryptionKey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+const elencyConfigInstance = elencyConfig({
+    uri: 'https://192.155.1.22:3000',
+    appId,
+    appVersion: '2.0.0',
+    environment,
+    refreshInterval: 10000,
+    HMACAuthorizationKey,
+    configEncryptionKey,
+    retrieved: () => {},
+    refreshFailure: () => {},
+    configurationMapping: [
+      { configurationPropertyName: 'KeyOne', propertyName: 'KeyOneRenamed' },
+      { configurationPropertyName: 'Bool', type: 'Boolean' },
+      { configurationPropertyName: 'Date', type: 'Date' },
+      { configurationPropertyName: 'Int', propertyName: 'int', type: 'Int' },
+      { configurationPropertyName: 'Float', type: 'Float' },
+      { configurationPropertyName: 'Object', type: 'Object' },
+      { configurationPropertyName: 'NonExistant', type: 'int' },
+      { configurationPropertyName: 'NonExistantWithFallback', type: 'int', fallback: 4 }
+    ]
+  });
+```
+
+Objects within the `configurationMapping` array can have the following properties
+ - `configurationPropertyName`: (required) Defines the name of the property found in the configuration.
+ - `propertyName`: (optional) Defines the target property name on the typed configuration object.
+ - `type`: (optional) Defines the target type of the property on typed configuration object.  (Boolean, Date, Int, Float, Object)
+ - `fallback`: (optional) Defines a fallback value to use if one was not defined in the configuration or the property did not exist.
+
 ---
 
 ## Initialisation/Retrieved<a name="retrieved"></a>
@@ -133,6 +173,7 @@ Once your `retrieve` function has been called the client will have the following
  - `getInt`: (`key` string, `fallback` <optional>) gets the value of a key as a int and falls back to fallback value if provided.
  - `getFloat`: (`key` string, `fallback` <optional>) gets the value of a key as a float and falls back to fallback value if provided.
  - `getObject`: (`key` string, `fallback` <optional>) gets the value of a key as an object and falls back to fallback value if provided.
+ - `typedConfiguration`: A function that can be called to returned typed configuration if `configurationMapping` is defined as options when creating the client.
 
 ---
 

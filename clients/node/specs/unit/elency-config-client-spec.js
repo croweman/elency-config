@@ -482,6 +482,57 @@ describe('elency-config - client', function () {
         }
       });
 
+      it('when configuration data is returned from elency-config - 200 status code and configuration mapping is used', async function () {
+
+        var requestNockOne = nock('http://localhost:8080')
+          .matchHeader('authorization', matchAuthorizationHeader('/config', 'head', true))
+          .head('/config')
+          .reply(200, '', { 'x-access-token': '8363999c-bdc2-45a7-afe6-b0af9ad44aca' });
+
+        var requestNockTwo = nock('http://localhost:8080')
+          .matchHeader('authorization', matchAuthorizationHeader('/config/proj/prod/1.1.1', 'get'))
+          .matchHeader('x-access-token', matchAccessToken('8363999c-bdc2-45a7-afe6-b0af9ad44aca'))
+          .get('/config/proj/prod/1.1.1')
+          .reply(200, validConfigurationBody);
+
+        var config = elencyConfig({
+          uri: 'http://localhost:8080',
+          appId: 'proj',
+          appVersion: '1.1.1',
+          environment: 'prod',
+          refreshInterval: '1000',
+          HMACAuthorizationKey: HMACAuthorizationKey,
+          configEncryptionKey: encryptionKey,
+          configurationMapping: [
+            { configurationPropertyName: 'KeyOne', propertyName: 'Key_One' },
+            { configurationPropertyName: 'NonExistant', fallback: false }
+          ]
+        });
+
+        try {
+          await config.init();
+          expect(requestNockOne.isDone()).to.eql(true);
+          expect(requestNockTwo.isDone()).to.eql(true);
+          expect(config.getAllKeys().length).to.eql(2);
+          expect(config.get('KeyOne')).to.eql('KeyOneValue');
+          expect(config.get('KeyTwo')).to.eql('KeyTwoValue');
+          expect(config.appVersion).to.eql('1.1.1');
+          expect(config.environment).to.eql('prod');
+          expect(config.configurationId).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe07');
+
+          let typedConfiguration = config.typedConfiguration;
+
+          expect(Object.keys(typedConfiguration).length).to.eql(3);
+          expect(typedConfiguration.Key_One).to.eql('KeyOneValue');
+          expect(typedConfiguration.KeyTwo).to.eql('KeyTwoValue');
+          expect(typedConfiguration.NonExistant).to.eql(false);
+        }
+        catch(err) {
+          console.log(err);
+          throw new Error('an error was defined');
+        }
+      });
+
       it('when localConfiguration is defined', async function () {
 
         let config = elencyConfig({
@@ -500,19 +551,53 @@ describe('elency-config - client', function () {
             configurationId: '9b386d19-fa7a-40ba-b794-f961e56ffe08',
             configurationData: {
               KeyOne: 'KeyOneValue2',
-              KeyTwo: 'KeyTwoValue3'
+              KeyTwo: 'KeyTwoValue3',
+              Bool: 'true',
+              Date: '2020-11-12T14:05:08.952Z',
+              Int: '3',
+              Float: '2.75',
+              Object: '{ "hello": "world" }'
             }
-          }
+          },
+          configurationMapping: [
+            { configurationPropertyName: 'KeyOne', propertyName: 'KeyOneRenamed' },
+            { configurationPropertyName: 'Bool', type: 'Boolean' },
+            { configurationPropertyName: 'Date', type: 'Date' },
+            { configurationPropertyName: 'Int', propertyName: 'int', type: 'Int' },
+            { configurationPropertyName: 'Float', type: 'Float' },
+            { configurationPropertyName: 'Object', type: 'Object' },
+            { configurationPropertyName: 'NonExistant', type: 'int' },
+            { configurationPropertyName: 'NonExistantWithFallback', type: 'int', fallback: 4 }
+          ]
         });
 
         try {
           await config.init();
-          expect(config.getAllKeys().length).to.eql(2);
+          expect(config.getAllKeys().length).to.eql(7);
           expect(config.get('KeyOne')).to.eql('KeyOneValue2');
           expect(config.get('KeyTwo')).to.eql('KeyTwoValue3');
+          expect(config.get('Bool')).to.eql('true');
+          expect(config.get('Date')).to.eql('2020-11-12T14:05:08.952Z');
+          expect(config.get('Int')).to.eql('3');
+          expect(config.get('Float')).to.eql('2.75');
+          expect(config.get('Object')).to.eql('{ "hello": "world" }');
+
           expect(config.appVersion).to.eql('1.1.2');
           expect(config.environment).to.eql('production');
           expect(config.configurationId).to.eql('9b386d19-fa7a-40ba-b794-f961e56ffe08');
+
+          let typedConfiguration = config.typedConfiguration;
+
+          expect(Object.keys(typedConfiguration).length).to.eql(9);
+          expect(typedConfiguration.KeyOneRenamed).to.eql('KeyOneValue2');
+          expect(typedConfiguration.KeyTwo).to.eql('KeyTwoValue3');
+          expect(typedConfiguration.Bool).to.eql(true);
+          expect(typedConfiguration.Date).to.eql(new Date('2020-11-12T14:05:08.952Z'));
+          expect(typedConfiguration.int).to.eql(3);
+          expect(typedConfiguration.Float).to.eql(2.75);
+          expect(typedConfiguration.Object).to.eql({ hello: 'world' });
+          expect(typedConfiguration.NonExistant).to.eql(undefined);
+          expect(typedConfiguration.NonExistantWithFallback).to.eql(4);
         }
         catch(err) {
           console.log(err);

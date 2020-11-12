@@ -26,6 +26,9 @@ module.exports = (configuration) => {
   let refreshFailureCallback;
   let refreshing = false;
   let intervalId;
+  let configurationMappings = [];
+  let currentTypedConfiguration;
+
 
   function validateLocalConfiguration(localConfiguration) {
     if (!localConfiguration.appVersion) {
@@ -236,6 +239,7 @@ module.exports = (configuration) => {
         currentConfiguration = configurationData;
         currentVersionHash = body.configurationHash;
         currentKeys = Object.keys(currentConfiguration).map((key) => { return key; });
+        getTypedConfiguration(currentConfiguration);
         initialized = true;
 
         if (retrievedCallback) {
@@ -279,6 +283,102 @@ module.exports = (configuration) => {
       throw new Error('The client has not been successfully initialized');
   }
 
+  function isValidString(property) {
+    return property !== undefined && property !== null && typeof property === 'string' && property.trim().length > 0;
+  }
+
+  function isValidType(type) {
+    return type === 'Boolean' ||
+      type === 'Date' ||
+      type === 'Int' ||
+      type === 'Float' ||
+      type === 'Object'
+  }
+
+  function defineConfigurationMapping(configuration) {
+    mappings = configuration.configurationMapping;
+
+    if (mappings === null || mappings === undefined || !Array.isArray(mappings)) return;
+
+    mappings.forEach(mapping => {
+
+      let { configurationPropertyName, propertyName, type } = mapping;
+
+      if (!isValidString(configurationPropertyName)) return;
+
+      let validPropertyName = isValidString(propertyName);
+      let validType = isValidType(type);
+      let hasFallback = mapping.hasOwnProperty('fallback');
+
+      let configurationMapping = { configurationPropertyName: configurationPropertyName.trim() };
+
+      if (validPropertyName)
+        configurationMapping.propertyName = propertyName.trim();
+
+      if (validType)
+        configurationMapping.type = type;
+
+      if (hasFallback)
+        configurationMapping.fallback = mapping.fallback;
+
+      configurationMappings.push(configurationMapping);
+    });
+  }
+
+  function getTypedConfiguration(currentConfiguration) {
+    let newTypedConfiguration = {};
+    let propertiesNotProcessed = Object.keys(currentConfiguration);
+
+    configurationMappings.forEach(mapping => {
+      let { configurationPropertyName, propertyName, type, fallback } = mapping;
+      let targetPropertyName = propertyName ?? configurationPropertyName;
+      let value = undefined;
+
+      if (type) {
+        switch (type) {
+          case 'Boolean':
+            value = valueRetrieval.getBoolean(currentConfiguration[configurationPropertyName], fallback);
+            break;
+          case 'Date':
+            value = valueRetrieval.getDate(currentConfiguration[configurationPropertyName], fallback);
+            break;
+          case 'Int':
+            value = valueRetrieval.getInt(currentConfiguration[configurationPropertyName], fallback);
+            break;
+          case 'Float':
+            value = valueRetrieval.getFloat(currentConfiguration[configurationPropertyName], fallback);
+            break;
+          case 'Object':
+            value = valueRetrieval.getObject(currentConfiguration[configurationPropertyName], fallback);
+            break;
+          default:
+            value = currentConfiguration[configurationPropertyName];
+            break;
+        }
+      } else {
+        value = currentConfiguration[configurationPropertyName];
+      }
+
+      if ((value === undefined || value === null) && mapping.hasOwnProperty('fallback')) {
+        value = fallback;
+      }
+
+      newTypedConfiguration[targetPropertyName] = value;
+
+      let index = propertiesNotProcessed.indexOf(configurationPropertyName);
+
+      if (index === -1) return;
+
+      propertiesNotProcessed.splice(index, 1);
+    });
+
+    propertiesNotProcessed.forEach(property => {
+      newTypedConfiguration[property] = currentConfiguration[property];
+    });
+
+    currentTypedConfiguration = newTypedConfiguration;
+  }
+
   async function init() {
 
     if (configuration.retrieved) {
@@ -295,6 +395,7 @@ module.exports = (configuration) => {
       currentConfigurationId = configuration.localConfiguration.configurationId;
       currentConfiguration = configuration.localConfiguration.configurationData;
       currentKeys = Object.keys(currentConfiguration).map((key) => { return key; });
+      getTypedConfiguration(currentConfiguration);
       initialized = true;
       
       if (retrievedCallback) {
@@ -356,6 +457,11 @@ module.exports = (configuration) => {
     return currentConfigurationId;
   }
 
+  function typedConfiguration() {
+    checkInitialisation();
+    return currentTypedConfiguration;
+  }
+
   function get(key) {
     checkInitialisation();
     return currentConfiguration[key];
@@ -391,6 +497,8 @@ module.exports = (configuration) => {
     await getConfiguration();
   }
 
+  defineConfigurationMapping(configuration);
+
   return {
     init,
     dispose,
@@ -402,6 +510,9 @@ module.exports = (configuration) => {
     },
     get configurationId() {
       return configurationId();
+    },
+    get typedConfiguration() {
+      return typedConfiguration();
     },
     get,
     getBoolean,
