@@ -100,7 +100,7 @@ Once the above has been completed execute the following command within the scope
 docker-compose up
 ```
 
-To view/create/change configuration etc on the `elency-config-server` browse to <a href="https://elency-config.vcap.me">https://elency-config.vcap.me<a/>.  You will need to `trust` the `insecure` certifacte!
+To view/create/change configuration etc on the `elency-config-server` browse to <a href="https://elency-config.vcap.me">https://elency-config.vcap.me<a/> or browse to <a href="https://localhost">https://localhost</a>.  You will need to `trust` the `insecure` certifacte!
 
 Useful logins are `admin` and `joe.bloggs`
 
