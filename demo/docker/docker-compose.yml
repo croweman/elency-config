@@ -10,9 +10,9 @@ services:
       driver: none
 
   demo:
-    build: .
+    #build: .
     container_name: elency-config-client-demo
-    #image: croweman/elency-config-demo:0.0.15-beta
+    image: croweman/elency-config-demo:0.0.15-beta
     volumes:
       - configuration_files:/app/configuration_files
       - certs:/app/certs
