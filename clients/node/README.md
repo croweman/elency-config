@@ -30,7 +30,7 @@ npm install `elency-config` --save
 
 or
 
-1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.6-beta.tar.gz">elency-config-node-client</a>.
+1. Download <a href="../../../../raw/master/releases/clients/node/package/elency-config-node-client-0.0.10-beta.tar.gz">elency-config-node-client</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 

@@ -1,0 +1,13 @@
+{
+  "name": "elency-config-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "elency-config": "0.0.10-beta"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "",
+  "license": "ISC"
+}

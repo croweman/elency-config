@@ -73,8 +73,8 @@ Please refer to <a href="./documentation/clients.md">clients.md</a> for more inf
 
 Basic client usage examples can be found in the following places:
 
-- `c#`: See <a href="./example/csharp/Example">here<a/>.
-- `node`: See <a href="./example/node">here<a/>.
+- `c#`: See <a href="./demo/docker/support/csharp-client">here<a/>.
+- `node`: See <a href="./demo/docker/support/node-client">here<a/>.
 
 ---
 
@@ -90,7 +90,7 @@ A video can be found below demonstrating basic usage of the admin ui.
 
 * The demo has a dependency on `Docker Compose`.
 
-The demo spins up in a docker containerised environment a mongo instance populated with sample data, an `elency-config-server` (with ui) and a `node client` that consumes configuration from the `Centre` app under team `Atlanta Falcons` with real time refreshing every `1000ms`.
+The demo spins up in a docker containerised environment a mongo instance populated with sample data, an `elency-config-server` (with ui) and a `node and csharp client` that consumes configuration from the `Centre` app under team `Atlanta Falcons` with real time refreshing every `1000ms`.
 
 The demo can be setup by firstly downloading <a href="https://raw.githubusercontent.com/croweman/elency-config/master/demo/docker/docker-compose.yml">docker-compose.yml</a> and placing it into an `elency-config` directory.
 
@@ -121,7 +121,11 @@ A `JSON Schema` has been setup for the `Atlanta Falcons - Wide receiver` app to 
 The docker-compose real-time console logging will show you any updates that occur for the `Centre` app under team `Atlanta Falcons`.  You can also execute the following to tail the logs
 
 ```
-docker logs -t -f --tail 100 elency-config-client-demo
+docker logs -t -f --tail 100 elency-config-client-demo-node-client
+
+# or
+
+docker logs -t -f --tail 100 elency-config-client-demo-csharp-client
 ```
 
 If you would like to bring down the containers execute

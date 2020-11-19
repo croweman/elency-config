@@ -331,7 +331,11 @@ module.exports = (configuration) => {
 
     configurationMappings.forEach(mapping => {
       let { configurationPropertyName, propertyName, type, fallback } = mapping;
-      let targetPropertyName = propertyName ?? configurationPropertyName;
+      let targetPropertyName = propertyName;
+
+      if (targetPropertyName === null || targetPropertyName === undefined)
+        targetPropertyName = configurationPropertyName;
+
       let value = undefined;
 
       if (type) {

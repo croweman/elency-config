@@ -1,4 +1,6 @@
 const http = require('http');
+const path = require('path');
+const { writeFileSync } = require('fs');
 
 const serverUrl = 'http://app:3000/private/ping';
 
@@ -50,9 +52,12 @@ waitForServer()
     console.log('Server now available');
     console.log('=====================');
     console.log();
+    const filePath = path.join(__dirname, 'status', 'server-up.txt');
+    writeFileSync(filePath, '');
     process.exit(0);
   })
-  .catch(() => {
+  .catch((err) => {
+    console.log(err);
     console.log('Server did not come up');
     console.log('=====================');
     console.log();

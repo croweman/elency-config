@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm -f ./status/server-up.txt
+
 cp ./support/config.json ./configuration_files/config.json
 cp ./support/keys.json ./configuration_files/keys.json
 cp ./support/elency-config.private.pem ./configuration_files/elency-config.private.pem
@@ -10,4 +12,3 @@ cp ./support/vcap.me.key ./certs/vcap.me.key
 
 node ./insert-data.js
 node ./wait.js
-node ./index.js

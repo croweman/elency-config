@@ -1,4 +1,4 @@
-FROM node:12.18.3-alpine3.12 as base
+FROM node:14.15.1-alpine3.12 as base
 WORKDIR /app
 COPY controllers ./controllers
 COPY domain ./domain

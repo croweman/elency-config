@@ -10,14 +10,35 @@ services:
       driver: none
 
   demo:
-    #build: .
+    build: .
     container_name: elency-config-client-demo
-    image: croweman/elency-config-demo:0.0.14-beta
+    #image: croweman/elency-config-demo:0.0.15-beta
     volumes:
       - configuration_files:/app/configuration_files
       - certs:/app/certs
+      - status:/app/status
     depends_on:
       - mongodb
+
+  node-client:
+    #build: ./support/node-client
+    container_name: elency-config-client-demo-node-client
+    image: croweman/elency-config-node-client-demo:0.0.2-beta
+    volumes:
+      - status:/app/status
+    depends_on:
+      - demo
+      - app
+
+  csharp-client:
+    #build: ./support/csharp-client
+    container_name: elency-config-client-demo-csharp-client
+    image: croweman/elency-config-csharp-client-demo:0.0.1-beta
+    volumes:
+      - status:/build/status
+    depends_on:
+      - demo
+      - app
 
   ldapmockserver:
     container_name: elency-config-demo-ldap-mock-server
@@ -65,7 +86,7 @@ services:
 
   app:
     container_name: elency-config-server-demo
-    image: croweman/elency-config-server:0.0.21-beta
+    image: croweman/elency-config-server:0.0.22-beta
     restart: "on-failure:10"
     volumes:
       - configuration_files:/app/configuration_files
@@ -87,6 +108,7 @@ services:
 volumes:
   configuration_files:
   certs:
+  status:
 
 networks:
   default:

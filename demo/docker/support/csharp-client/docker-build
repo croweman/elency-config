@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#dotnet publish -c Release
+
+#docker build -t croweman/elency-config-csharp-client-demo:0.0.1-beta .
+#docker push croweman/elency-config-csharp-client-demo:0.0.1-beta
+
+

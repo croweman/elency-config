@@ -56,7 +56,7 @@ The script is dependent on a number of environment variables when being executed
 - `HMAC_AUTHORIZATION_KEY` A 32 character (base64 encoded) string used for authorization tokens. This should match the server HMACAuthorizationKey.
 - `CONFIG_ENCRYPTION_KEY` A 32 character (base64 encoded) string used to decrypt `secure` configuration variables.  This is the value of the `key` associated with an application environment.
 
-It is advised that when executing the script, you capture the exist code and fail your process gracefully if the exit code is not successful.
+It is advised that when executing the script, you capture the exit code and fail your process gracefully if the exit code is not successful.
 
 ```
 #!/bin/bash

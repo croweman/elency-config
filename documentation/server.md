@@ -41,12 +41,12 @@ The server should be setup with a `reverse proxy` in front of it over `https` an
 
 ### Linux based system<a name="linux"></a>
 
-1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.21-beta.tar.gz">elency-config-server</a>.
+1. Download <a href="../../raw/master/releases/server/package/elency-config-server-0.0.22-beta.tar.gz">elency-config-server</a>.
 
 2. Extract the above `tar.gz` file into a desired location on your machine.
 
     ```
-    tar xzf ./elency-config-server-0.0.21-beta.tar.gz
+    tar xzf ./elency-config-server-0.0.22-beta.tar.gz
     ```
 
 3. Create and add the relevant config and security files to the `config` and `sec` directories.  Refer to the <a href="#configuration">Configuration</a> section.
@@ -85,7 +85,7 @@ version: '3'
 services:
   app:
     container_name: elency-config-server
-    image: croweman/elency-config-server:0.0.21-beta
+    image: croweman/elency-config-server:0.0.22-beta
     restart: "on-failure:10"
     volumes:
       - ./configuration_files:/app/configuration_files

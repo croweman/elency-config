@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Nock.net;
 using System.Net;
 using System.Collections.Specialized;
+using Newtonsoft.Json;
+
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 
@@ -604,7 +606,8 @@ namespace ElencyConfig.Tests
                             { "IntProperty", "5" },
                             { "DecimalProperty", "1.2" },
                             { "DateTimeProperty", "2020-10-24T16:27:01.359Z" },
-                            { "EnumProperty", "Error" }
+                            { "EnumProperty", "Error" },
+                            { "AnotherProperty", "AnotherValue" }
                         }
                     }
                 };
@@ -616,7 +619,7 @@ namespace ElencyConfig.Tests
                 Assert.AreEqual("production", client.Environment);
                 Assert.AreEqual("9b386d19-fa7a-40ba-b794-f961e56ffe08", client.ConfigurationId);
                 
-                Assert.AreEqual(7, client.GetAllKeys().Count);
+                Assert.AreEqual(8, client.GetAllKeys().Count);
 
                 var configuration = client.Configuration;
                 
@@ -628,6 +631,7 @@ namespace ElencyConfig.Tests
                 Assert.AreEqual(1.2, configuration.DecimalProperty);
                 Assert.AreEqual("2020-10-24T16:27:01.3590000Z", configuration.DateTimeProperty.ToString("O"));
                 Assert.AreEqual(TypedConfiguration.LogLevel.Error, configuration.EnumProperty);
+                Assert.AreEqual("AnotherValue", configuration.SomethingElse);
             }
             catch (Exception ex)
             {
@@ -659,6 +663,9 @@ namespace ElencyConfig.Tests
             public decimal DecimalProperty { get; set; }
             public DateTime DateTimeProperty { get; set; }
             public LogLevel EnumProperty { get; set; }
+            
+            [JsonProperty("AnotherProperty")]
+            public string SomethingElse { get; set; }
         }
     }
 }
