@@ -90,7 +90,7 @@ A video can be found below demonstrating basic usage of the admin ui.
 
 * The demo has a dependency on `Docker Compose`.
 
-The demo spins up in a docker containerised environment a mongo instance populated with sample data, an `elency-config-server` (with ui) and a `node and csharp client` that consumes configuration from the `Centre` app under team `Atlanta Falcons` with real time refreshing every `1000ms`.
+The demo spins up in a docker containerised environment a mongo instance populated with sample data, an `elency-config-server` (with ui) and a `node and csharp client` that consumes configuration from the `Centre` app under team `Atlanta Falcons` with real time refreshing every `1000ms`.  A `bash client` is also used which retrieves the configuration and creates a json file from it.
 
 The demo can be setup by firstly downloading <a href="https://raw.githubusercontent.com/croweman/elency-config/master/demo/docker/docker-compose.yml">docker-compose.yml</a> and placing it into an `elency-config` directory.
 

@@ -40,6 +40,16 @@ services:
       - demo
       - app
 
+  bash-client:
+    #build: ./support/bash-client
+    container_name: elency-config-client-demo-bash-client
+    image: croweman/elency-config-bash-client-demo:0.0.1-beta
+    volumes:
+      - status:/app/status
+    depends_on:
+      - demo
+      - app
+
   ldapmockserver:
     container_name: elency-config-demo-ldap-mock-server
     image: croweman/elency-config-demo-ldap-mock-server:0.0.3-beta
