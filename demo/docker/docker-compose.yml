@@ -43,7 +43,7 @@ services:
   bash-client:
     #build: ./support/bash-client
     container_name: elency-config-client-demo-bash-client
-    image: croweman/elency-config-bash-client-demo:0.0.1-beta
+    image: croweman/elency-config-bash-client-demo:0.0.2-beta
     volumes:
       - status:/app/status
     depends_on:

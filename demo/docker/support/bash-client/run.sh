@@ -19,4 +19,5 @@ fi
 
 echo "Configuration:"
 
-cat app_configuration.json
+configurationData=`cat app_configuration.json`
+echo $configurationData

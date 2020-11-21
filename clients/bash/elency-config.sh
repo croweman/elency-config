@@ -106,7 +106,7 @@ function getConfiguration() {
     configuration="$configuration \"configurationHash\": \"$configurationHash\","
     configuration="$configuration \"appVersion\": \"$appVersion\","
     configuration="$configuration \"environment\": \"$environment\","
-    configuration="$configuration \"entries\":["
+    configuration="$configuration \"entries\":{"
 
     encryptedConfiguration=$(echo ${response} | jq -r .configuration)
 
@@ -141,14 +141,15 @@ function getConfiguration() {
        value=${value//\"/\\\"}
        value=$(echo "$value" | tr -d '\t' | tr -d '\r' | tr -d '\n')
 
-       configuration="$configuration { \"$keyName\": \"$value\" },"
+       configuration="$configuration \"$keyName\": \"$value\","
     done
 
-    configuration="$configuration]}"
+    configuration="$configuration}}"
     configuration=${configuration//\,\]\}/\]\}}
 
     cmd="jq -n '${configuration}' >> app_configuration.json"
     eval $cmd
+
     rm -f elency_config_response
 }
 
