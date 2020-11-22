@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 while [ ! -f ./status/server-up.txt ]; do sleep 1; done
 
 URI=http://app:3000 \
@@ -21,3 +22,16 @@ echo "Configuration:"
 
 configurationData=`cat app_configuration.json`
 echo $configurationData
+
+echo "Environment variables:"
+
+keys=$(jq -r '.entries | keys[]' app_configuration.json)
+
+for key in $keys
+do
+    cmd="jq '.entries.$key' app_configuration.json"
+    value=$(eval $cmd)
+    export $key="$value"
+done
+
+env

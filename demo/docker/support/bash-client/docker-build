@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#docker build -t croweman/elency-config-bash-client-demo:0.0.2-beta .
-#docker push croweman/elency-config-bash-client-demo:0.0.2-beta
+#docker build -t croweman/elency-config-bash-client-demo:0.0.3-beta .
+#docker push croweman/elency-config-bash-client-demo:0.0.3-beta
 
 
