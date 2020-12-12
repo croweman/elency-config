@@ -433,7 +433,7 @@ module.exports = (configuration) => {
                   refreshFailureCallback(err);
               }
           }
-      }, parseInt(elencyConfig.refreshInterval));
+      }, parseInt(elencyConfig.refreshInterval)).unref();
     }
   }
 
