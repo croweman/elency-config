@@ -25,7 +25,7 @@
   "author": "Lee Crowe a.k.a croweman",
   "license": "MIT",
   "dependencies": {
-    "axios": "~0.20.0",
+    "axios": "~0.21.1",
     "debug": "~3.1.0",
     "uuid": "~3.0.1"
   },
