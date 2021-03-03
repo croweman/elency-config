@@ -38,7 +38,7 @@
     "passport": "~0.4.0",
     "passport-local": "~1.0.0",
     "passport-totp": "0.0.2",
-    "pug": "~3.0.0",
+    "pug": "~3.0.1",
     "qrcode": "~1.4.4",
     "semver": "~5.4.1",
     "thirty-two": "~1.0.2",
