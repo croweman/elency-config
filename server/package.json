@@ -22,7 +22,7 @@
   "author": "Lee Crowe",
   "license": "ISC",
   "dependencies": {
-    "ajv": "~6.2.1",
+    "ajv": "~6.12.3",
     "body-parser": "~1.18.2",
     "connect-flash": "~0.1.1",
     "connect-mongo": "~3.2.0",
